@@ -1,0 +1,7 @@
+pdf_meta_extraction.settings_form:
+  path: '/admin/config/system/pdf-meta-extraction'
+  defaults:
+    _title: 'PDF Meta Extraction settings'
+    _form: 'Drupal\pdf_meta_extraction\Form\SettingsForm'
+  requirements:
+    _permission: 'administer site configuration'

@@ -1,0 +1,51 @@
+<?php
+
+
+// function pdf_meta_extraction_node_update(\Drupal\node\NodeInterface $entity){
+//   \Drupal::logger('pdf_meta_extraction')->info(__FUNCTION__.":".__LINE__);
+ // Create an instance of the ProcessPdf class
+         // $pdfProcessor = new \Drupal\pdf_meta_extraction\ProcessPdf();
+
+          // Call the method on the instance
+//          $pdfProcessor->processPdfNodeData($entity->id());
+//}
+
+/**
+ * @file
+ * Primary module hooks for PDF Meta Extraction module.
+ * 
+ */
+
+/**
+ * Implements hook_node_insert().
+ */
+
+function pdf_meta_extraction_node_insert(Drupal\node\NodeInterface $entity) {
+ pdf_meta_extraction_process($entity);
+}
+ function pdf_meta_extraction_process($entity){
+   \Drupal::logger('pdf_meta_extraction')->info(__FUNCTION__.":".__LINE__);
+  if ($entity instanceof Drupal\node\NodeInterface) {
+    // Load the settings from the configuration.
+    $config = \Drupal::config('pdf_meta_extraction.settings');
+    $allowed_types = $config->get('content_types');
+    \Drupal::logger('pdf_meta_extraction')->info(__FUNCTION__.":".__LINE__);
+
+    // Check if the content type of the node is in the allowed types.
+    if (is_array($allowed_types) && in_array($entity->getType(), $allowed_types)) {
+      // Create an instance of the ProcessPdf class
+      \Drupal::logger('pdf_meta_extraction')->info(__FUNCTION__.":".__LINE__);
+
+      $pdfProcessor = new \Drupal\pdf_meta_extraction\ProcessPdf();
+      $pdfProcessor->setInsert();
+      \Drupal::logger('pdf_meta_extraction')->info(__FUNCTION__.":".__LINE__);
+
+      // Call the method on the instance
+      $pdfProcessor->processPdfNodeData($entity->id());
+
+      \Drupal::logger('pdf_meta_extraction')->info(__FUNCTION__.":".__LINE__);
+
+      \Drupal::messenger()->addMessage('Node of allowed content type is being saved.');
+    }
+  }
+}

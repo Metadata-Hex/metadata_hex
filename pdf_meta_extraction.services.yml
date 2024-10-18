@@ -1,0 +1,5 @@
+services:
+  pdf_meta_extraction.process_pdf:
+    class: Drupal\pdf_meta_extraction\ProcessPdf
+  pdf_meta_extraction.pdf_metadata_extractor:
+    class: 'Drupal\pdf_meta_extraction\Service\PDFMetadataExtractor'

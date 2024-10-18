@@ -1,0 +1,4 @@
+administer pdf_meta_extraction configuration:
+  title: 'Administer pdf_meta_extraction configuration'
+  description: 'Optional description.'
+  restrict access: true
