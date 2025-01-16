@@ -55,18 +55,17 @@ class ProcessPdfTest extends UnitTestCase {
   /**
    * Set up the test.
    */
-  protected function setUp(): void {
-    parent::setUp();
-
-    $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
-    $this->pdfMetadataExtractor = $this->createMock(PDFMetadataExtractor::class);
-    $this->logger = $this->createMock(LoggerInterface::class);
-    $this->config = $this->createMock(ImmutableConfig::class);
-
-    $this->processPdf = new ProcessPdf();
-  }
-
   /**
+protected function setUp(): void {
+  parent::setUp();
+
+  $this->entityTypeManager = $this->createMock(EntityTypeManagerInterface::class);
+  $this->pdfMetadataExtractor = $this->createMock(PDFMetadataExtractor::class);
+  $this->logger = $this->createMock(LoggerInterface::class);
+  $this->config = $this->createMock(ImmutableConfig::class);
+
+  $this->processPdf = new ProcessPdf($this->config, $this->pdfMetadataExtractor, $this->logger);
+}
    * Tests the init method.
    *
    * @covers ::init

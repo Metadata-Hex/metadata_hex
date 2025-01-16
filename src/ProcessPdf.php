@@ -122,8 +122,19 @@ private $extract_body;
  */
 private $reprocess;
 
-  public function _construct()
-  {
+ 
+  public function __construct(
+    ImmutableConfig $config,
+    PDFMetadataExtractor $extractor,
+    LoggerInterface $logger,
+    EntityTypeManagerInterface $entityTypeManager,
+    FileSystemInterface $fileSystem
+  ) {
+    $this->config = $config;
+    $this->extractor = $extractor;
+    $this->logger = $logger;
+    $this->entityTypeManager = $entityTypeManager;
+    $this->fileSystem = $fileSystem;
     $this->insert = false;
     $this->data_to_process = [];
     $this->metadata = [];
@@ -138,8 +149,8 @@ private $reprocess;
     $this->field_name_for_create = null;
     $this->init();
   }
- 
-  function init(){
+
+    function init(){
     $this->config = \Drupal::config('pdf_meta_extraction.settings');
     $this->log_message_template = 'Metadata imported from pdf on @date by @user';
     $this->extractor = \Drupal::service('pdf_meta_extraction.pdf_metadata_extractor');
@@ -155,7 +166,6 @@ private $reprocess;
     $this->body_field_name_for_create = $this->config->get('body_field_name_for_create');
 
   }
-
   function removeTitle(){
     unset($this->field_mappings['title']);
   }
