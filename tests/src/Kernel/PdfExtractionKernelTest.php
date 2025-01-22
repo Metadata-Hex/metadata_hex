@@ -38,6 +38,12 @@ class PdfExtractionKernelTest extends KernelTestBase {
 
     // Ensure the file exists.
     $this->assertTrue(file_exists($this->testPdfPath), 'Test PDF file found.');
+
+    // Create test content types or entities
+    $this->drupalCreateContentType(['type' => 'document']);
+
+    // Add sample test data
+    $this->createTestFiles();
   }
 
   /**
