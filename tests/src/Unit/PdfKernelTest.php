@@ -1,17 +1,17 @@
 <?php
 
-namespace Drupal\your_module\Tests;
+namespace Drupal\pdf_meta_extraction\Tests;
 
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\file\Entity\File;
-use Drupal\your_module\Service\PdfExtractorService;
+use Drupal\pdf_meta_extraction\Service\PdfExtractorService;
 
 /**
  * Tests for the PDF extraction module functionality.
  *
  * @group your_module
  */
-class PdfExtractionFunctionalTest extends KernelTestBase {
+class PdfExtractionKernelTest extends KernelTestBase {
 
   /**
    * Modules required for the test.
@@ -59,18 +59,15 @@ class PdfExtractionFunctionalTest extends KernelTestBase {
     // Assertions.
     $this->assertNotEmpty($text, 'Extracted text is not empty.');
     $this->assertStringContainsString('Expected Content', $text, 'Extracted text contains expected content.');
-  }
 
-  function pdf_meta_extraction_process($entity){
-    \Drupal::logger('pdf_meta_extraction')->info(__FUNCTION__.":".__LINE__);
-   if ($entity instanceof Drupal\node\NodeInterface) {
+
      // Load the settings from the configuration.
      $config = \Drupal::config('pdf_meta_extraction.settings');
      $allowed_types = $config->get('content_types');
      \Drupal::logger('pdf_meta_extraction')->info(__FUNCTION__.":".__LINE__);
  
      // Check if the content type of the node is in the allowed types.
-     if (is_array($allowed_types) && in_array($entity->getType(), $allowed_types)) {
+
        // Create an instance of the ProcessPdf class
        \Drupal::logger('pdf_meta_extraction')->info(__FUNCTION__.":".__LINE__);
  
@@ -81,11 +78,8 @@ class PdfExtractionFunctionalTest extends KernelTestBase {
        // Call the method on the instance
        $pdfProcessor->processPdfNodeData($entity->id());
  
-       \Drupal::logger('pdf_meta_extraction')->info(__FUNCTION__.":".__LINE__);
- 
-       \Drupal::messenger()->addMessage('Node of allowed content type is being saved.');
-     }
-   }
+     
+   
  }
 }
 
