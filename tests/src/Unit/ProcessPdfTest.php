@@ -67,7 +67,7 @@ protected function setUp(): void {
 
   $this->processPdf = new ProcessPdf($this->config, $this->pdfMetadataExtractor, $this->logger);
 }
-   * Tests the init method.
+/** Tests the init method.
    *
    * @covers ::init
    */
