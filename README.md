@@ -1,5 +1,3 @@
-Sure! Here’s the README in Markdown format:
-
 # **Metadata Hex**
 
 **Metadata Hex** is a Drupal module that facilitates metadata extraction, processing, and association with Drupal entities, particularly nodes and files. It supports structured metadata ingestion from PDFs and other file formats, mapping extracted values to Drupal fields dynamically.
