@@ -1,0 +1,4 @@
+administer metadata_hex configuration:
+  title: 'Administer Metadata Hex configuration'
+  description: 'Optional description.'
+  restrict access: true

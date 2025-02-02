@@ -1,0 +1,6 @@
+metadata_hex.admin_settings:
+  title: 'Metadata Hex Settings'
+  description: 'Configure metadata extraction and processing settings.'
+  route_name: metadata_hex.settings_form
+  parent: system.admin_config
+  weight: 10

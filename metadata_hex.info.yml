@@ -1,0 +1,22 @@
+name: 'Metadata Hex'
+type: module
+description: 'Provides metadata extraction and processing for files and nodes.'
+core_version_requirement: ^9 || ^10 || ^11
+package: 'Metadata Tools'
+dependencies:
+  - drupal:file
+  - drupal:node
+  - drupal:taxonomy
+  - drupal:config
+  - drupal:system
+  - drupal:plugin
+  - drupal:datetime
+  - drupal:field
+  - drupal:entity
+  - drupal:views
+  - drupal:media
+php: '>=7.4'
+version: '1.0.0'
+author: 'David Belich'
+project: 'metadata_hex'
+configure: 'admin/config/metadata_hex'

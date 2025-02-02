@@ -1,6 +1,0 @@
-name: PDF Meta Extraction
-type: module
-description: Extracts metadata from a pdf and appends to a node entity
-package: Custom
-core: 8.x
-core_version_requirement: ^8 || ^9 || ^10 || ^11

@@ -1,6 +1,0 @@
-pdf_meta_extraction.settings_form:
-  title: PDF Meta Extraction
-  description: Configure PDF Meta Extraction.
-  parent: system.admin_config_content
-  route_name: pdf_meta_extraction.settings_form
-  weight: -10

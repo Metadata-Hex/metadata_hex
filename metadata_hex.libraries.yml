@@ -1,0 +1,6 @@
+metadata_hex:
+  version: 1.x
+  dependencies:
+    - core/drupal
+    - core/jquery
+    - core/drupal.ajax

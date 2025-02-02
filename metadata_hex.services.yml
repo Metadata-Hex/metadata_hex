@@ -1,0 +1,25 @@
+services:
+  metadata_hex.file_handler_manager:
+    class: 'Drupal\metadata_hex\Service\FileHandlerManager'
+    arguments: ['@plugin.manager']
+    public: true
+
+  metadata_hex.metadata_extractor:
+    class: 'Drupal\metadata_hex\Service\MetadataExtractor'
+    arguments: ['@logger.channel.metadata_hex']
+    public: true
+
+  metadata_hex.metadata_parser:
+    class: 'Drupal\metadata_hex\Utility\MetadataParser'
+    arguments: ['@logger.channel.metadata_hex', '@config.factory']
+    public: true
+
+  metadata_hex.settings_manager:
+    class: 'Drupal\metadata_hex\Service\SettingsManager'
+    arguments: ['@config.factory']
+    public: true
+
+  metadata_hex.metadata_batch_processor:
+    class: 'Drupal\metadata_hex\Handler\MetadataBatchProcessor'
+    arguments: ['@logger.channel.metadata_hex', '@metadata_hex.metadata_extractor']
+    public: true

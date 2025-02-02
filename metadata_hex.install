@@ -2,20 +2,20 @@
 
 /**
  * @file
- * Install, update and uninstall functions for the Pdf Meta Extraction module.
+ * Install, update and uninstall functions for the Metadata Hex module.
  */
 
 /**
  * Implements hook_install().
  */
-function pdf_meta_extraction_install() {
+function metadata_hex_install() {
   \Drupal::messenger()->addStatus(__FUNCTION__);
 }
 
 /**
  * Implements hook_uninstall().
  */
-function pdf_meta_extraction_uninstall() {
+function metadata_hex_uninstall() {
   \Drupal::messenger()->addStatus(__FUNCTION__);
 }
 
@@ -25,8 +25,8 @@ function pdf_meta_extraction_uninstall() {
 /**
  * Implements hook_schema().
  */
-function pdf_meta_extraction_schema() {
-  $schema['pdf_meta_extraction_processed'] = [
+function metadata_hex_schema() {
+  $schema['metadata_hex_processed'] = [
     'description' => 'Table to track processed entities.',
     'fields' => [
       'id' => [
@@ -65,14 +65,14 @@ function pdf_meta_extraction_schema() {
 /**
  * Implements hook_requirements().
  */
-function pdf_meta_extraction_requirements($phase) {
+function metadata_hex_requirements($phase) {
   $requirements = [];
 
   if ($phase == 'runtime') {
     $value = mt_rand(0, 100);
-    $requirements['pdf_meta_extraction_status'] = [
-      'title' => t('Pdf Meta Extraction status'),
-      'value' => t('Pdf Meta Extraction value: @value', ['@value' => $value]),
+    $requirements['metadata_hex_status'] = [
+      'title' => t('Metadata Hex status'),
+      'value' => t('Metadata Hex  value: @value', ['@value' => $value]),
       'severity' => $value > 50 ? REQUIREMENT_INFO : REQUIREMENT_WARNING,
     ];
   }
