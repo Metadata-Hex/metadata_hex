@@ -1,0 +1,26 @@
+<?php
+
+use Drupal\metadata_hex\Handler\MetadataBatchProcessor;
+use Drupal\Core\Entity\EntityInterface;
+
+/**
+ * Implements hook_node_insert().
+ *
+ * Processes newly inserted nodes if they match the configured node types.
+ */
+function metadata_hex_node_insert(EntityInterface $node) {
+  // Ensure the entity is a node.
+  if ($node->getEntityTypeId() !== 'node') {
+    return;
+  }
+
+  // Load the configuration settings.
+  $config = \Drupal::config('metadata_hex.settings');
+  $allowed_types = $config->get('extraction_settings.hook_node_types') ?? [];
+
+  // Check if the node's bundle type is in the allowed types.
+  if (in_array($node->bundle(), $allowed_types, true)) {
+    // Process the node using MetadataBatchProcessor.
+    MetadataBatchProcessor::processNode($node->id());
+  }
+}

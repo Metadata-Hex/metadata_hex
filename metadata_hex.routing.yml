@@ -1,0 +1,9 @@
+metadata_hex.settings_form:
+  path: '/admin/config/metadata_hex'
+  defaults:
+    _form: '\Drupal\metadata_hex\Form\SettingsForm'
+    _title: 'Metadata Hex Settings'
+  requirements:
+    _permission: 'administer site configuration'
+  options:
+    _admin_route: true
