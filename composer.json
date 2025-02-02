@@ -1,0 +1,19 @@
+{
+    "name": "davidbelich/drupal.pdf_meta_extraction",
+    "description": "Extracts pdf metadata",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "autoload": {
+        "psr-4": {
+            "Davidbelich\\DrupalPdfMetaExtraction\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "David Belich",
+            "email": "david@codekoalas.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
