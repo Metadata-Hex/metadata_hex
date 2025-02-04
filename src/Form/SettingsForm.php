@@ -55,7 +55,7 @@ class SettingsForm extends ConfigFormBase {
 
     $form['extraction_settings']['field_mappings'] = [
       '#type' => 'fieldset',
-      '#title' => $this->t('Field mappings (PDF to Drupal)'),
+      '#title' => $this->t('Field mappings (File to Drupal)'),
     ];
 
     $field_mappings = $config->get('extraction_settings.field_mappings') ?? [];
@@ -64,10 +64,10 @@ class SettingsForm extends ConfigFormBase {
         '#type' => 'fieldset',
         '#title' => $this->t('Mapping @index', ['@index' => $index + 1]),
       ];
-      $form['extraction_settings']['field_mappings'][$index]['pdf_field'] = [
+      $form['extraction_settings']['field_mappings'][$index]['file_field'] = [
         '#type' => 'textfield',
-        '#title' => $this->t('PDF Field'),
-        '#default_value' => $mapping['pdf_field'] ?? '',
+        '#title' => $this->t('File Field'),
+        '#default_value' => $mapping['file_field'] ?? '',
       ];
       $form['extraction_settings']['field_mappings'][$index]['drupal_field'] = [
         '#type' => 'textfield',
@@ -163,9 +163,9 @@ class SettingsForm extends ConfigFormBase {
     
     $config->set('extraction_settings.field_mappings', []);
     foreach ($form_state->getValue('field_mappings') as $mapping) {
-      if (!empty($mapping['pdf_field']) && !empty($mapping['drupal_field'])) {
+      if (!empty($mapping['file_field']) && !empty($mapping['drupal_field'])) {
         $config->append('extraction_settings.field_mappings', [
-          'pdf_field' => $mapping['pdf_field'],
+          'file_field' => $mapping['file_field'],
           'drupal_field' => $mapping['drupal_field'],
         ]);
       }

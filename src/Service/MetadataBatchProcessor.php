@@ -9,8 +9,8 @@ use Exception;
 /**
  * Class MetadataBatchProcessor
  *
- * Handles high-level PDF processing operations, such as categorizing,
- * scanning, and processing PDF files and nodes.
+ * Handles high-level file processing operations, such as categorizing,
+ * scanning, and processing files and nodes.
  */
 class MetadataBatchProcessor extends MetadataHexCore {
 
@@ -36,18 +36,18 @@ class MetadataBatchProcessor extends MetadataHexCore {
   protected $reprocess = false;
 
   /**
-   * Handles metadata extraction from PDF files.
+   * Handles metadata extraction from files.
    *
    * @var MetadataExtractor
    */
   protected $extractor;
 
   /**
-   * List of PDF file URIs to process.
+   * List of file URIs to process.
    *
    * @var array
    */
-  protected $pdfFiles = [];
+  protected $files = [];
 
   /**
    * Constructs the MetadataBatchProcessor class.
@@ -60,7 +60,7 @@ class MetadataBatchProcessor extends MetadataHexCore {
   public function __construct(LoggerInterface $logger, MetadataExtractor $extractor) {
     parent::__construct($logger);
     $this->extractor = $extractor;
-    $this->pdfFiles = [];
+    $this->files = [];
   }
 
   /**
@@ -109,7 +109,7 @@ class MetadataBatchProcessor extends MetadataHexCore {
     $referenced = [];
     $unreferenced = [];
 
-    foreach ($this->pdfFiles as $file_uri) {
+    foreach ($this->files as $file_uri) {
       $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
       
       if (!empty($file)) {
@@ -148,7 +148,7 @@ class MetadataBatchProcessor extends MetadataHexCore {
     $files = scandir($dir_to_scan);
     foreach ($files as $file) {
       if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') {
-        $this->pdfFiles[] = "$dir_to_scan/$file";
+        $this->files[] = "$dir_to_scan/$file";
       }
     }
   }

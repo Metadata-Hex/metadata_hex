@@ -29,7 +29,7 @@ class MetadataEntity extends MetadataHexCore {
   protected $metadataProcessed = [];
 
   /**
-   * Raw metadata extracted directly from the PDF.
+   * Raw metadata extracted directly from the file.
    *
    * @var array
    */

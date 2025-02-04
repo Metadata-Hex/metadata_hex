@@ -155,7 +155,7 @@ class NodeBinder extends MetadataHexCore {
   /**
    * Initializes a blank node if no reference is found.
    *
-   * @param string $pdf_uri
+   * @param string $file_uri
    *   The file URI.
    * @param string $target_bundle
    *   The target bundle type.
@@ -165,7 +165,7 @@ class NodeBinder extends MetadataHexCore {
    * @return Node
    *   The initialized node.
    */
-  public function initNode(string $pdf_uri, string $target_bundle, ?string $field_name = null): Node {
+  public function initNode(string $file_uri, string $target_bundle, ?string $field_name = null): Node {
     $node = Node::create([
       'type' => $target_bundle,
       'status' => 0,
@@ -173,7 +173,7 @@ class NodeBinder extends MetadataHexCore {
     ]);
 
     if ($field_name) {
-      $file = File::create(['uri' => $pdf_uri]);
+      $file = File::create(['uri' => $file_uri]);
       $file->save();
       $node->set($field_name, ['target_id' => $file->id()]);
     }

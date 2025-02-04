@@ -3,8 +3,8 @@
 namespace Drupal\metadata_hex\Service;
 
 use Psr\Log\LoggerInterface;
-use Smalot\PdfParser\Parser;
 use Exception;
+use FileHandlerManager;
 
 /**
  * Class MetadataExtractor
@@ -13,6 +13,8 @@ use Exception;
  */
 class MetadataExtractor extends MetadataHexCore {
 
+
+  protected $fileHandlerManager;
   /**
    * Constructs the MetadataExtractor class.
    *
@@ -21,6 +23,7 @@ class MetadataExtractor extends MetadataHexCore {
    */
   public function __construct(LoggerInterface $logger) {
     parent::__construct($logger);
+    $this->fileHandlerManager = new FileHandlerManager();
   }
 
   /**
@@ -43,27 +46,19 @@ class MetadataExtractor extends MetadataHexCore {
    *   If the file cannot be read or parsed.
    */
   protected function extractMetadata(string $file_uri): array {
-    if (!file_exists($file_uri) || pathinfo($file_uri, PATHINFO_EXTENSION) !== 'pdf') {
-      $this->logger->error("Invalid PDF file: $file_uri");
-      throw new Exception("Invalid PDF file: $file_uri");
+    if (!file_exists($file_uri)) {
+      $this->logger->error("Invalid file: $file_uri");
+      throw new Exception("Invalid file: $file_uri");
     }
 
     try {
-      $parser = new Parser();
-      $pdf = $parser->parseFile($file_uri);
-      $details = $pdf->getDetails();
-
-      $metadata = [
-        'title' => $details['Title'] ?? '',
-        'author' => $details['Author'] ?? '',
-        'created_date' => $details['CreationDate'] ?? '',
-        'keywords' => isset($details['Keywords']) ? explode(',', $details['Keywords']) : [],
-      ];
+      $handler = $this->fileHandlerManager->getHandlerForExtension( pathinfo($file_uri, PATHINFO_EXTENSION));
+      $metadata = $handler->extractMetadata($file_uri);
 
       return $this->sanitizeArray($metadata);
     } catch (Exception $e) {
-      $this->logger->error("Error parsing PDF metadata: " . $e->getMessage());
-      throw new Exception("Error parsing PDF metadata: " . $e->getMessage());
+      $this->logger->error("Error parsing file metadata: " . $e->getMessage());
+      throw new Exception("Error parsing file metadata: " . $e->getMessage());
     }
   }
 

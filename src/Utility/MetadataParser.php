@@ -24,7 +24,7 @@ class MetadataParser extends MetadataHexCore {
   protected $availableFields;
 
   /**
-   * Initialized PdfExtractor.
+   * Initialized MetadataExtractor.
    *
    * @var MetadataExtractor
    */

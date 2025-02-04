@@ -1,17 +1,17 @@
 {
-    "name": "davidbelich/drupal.pdf_meta_extraction",
-    "description": "Extracts pdf metadata",
+    "name": "drupal/metadata_hex",
+    "description": "Extracts metadata to nodes",
     "type": "drupal-module",
     "license": "GPL-2.0-or-later",
     "autoload": {
         "psr-4": {
-            "Davidbelich\\DrupalPdfMetaExtraction\\": "src/"
+            "Drupal\\MetadataHex\\": "src/"
         }
     },
     "authors": [
         {
             "name": "David Belich",
-            "email": "david@codekoalas.com"
+            "email": "developer@davidbelich.com"
         }
     ],
     "minimum-stability": "dev",
