@@ -19,4 +19,3 @@ class MetadataHexPluginManager extends DefaultPluginManager {
     $this->setCacheBackend($cache_backend, 'metadata_hex_plugins');
   }
 }
-
