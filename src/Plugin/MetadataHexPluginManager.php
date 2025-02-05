@@ -14,7 +14,7 @@ class MetadataHexPluginManager extends DefaultPluginManager {
       'Drupal\metadata_hex\Plugin\MetadataHexInterface',
       'Drupal\metadata_hex\Annotation\MetadataHex'
     );
-    
+
     $this->alterInfo('metadata_hex_info');
     $this->setCacheBackend($cache_backend, 'metadata_hex_plugins');
   }
