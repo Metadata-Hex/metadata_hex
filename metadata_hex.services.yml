@@ -1,8 +1,4 @@
 services:
-  metadata_hex.file_handler_manager:
-    class: 'Drupal\metadata_hex\Service\FileHandlerManager'
-    arguments: ['@plugin.manager']
-    public: true
 
   metadata_hex.metadata_extractor:
     class: 'Drupal\metadata_hex\Service\MetadataExtractor'
@@ -18,7 +14,16 @@ services:
     class: 'Drupal\metadata_hex\Service\SettingsManager'
     arguments: ['@config.factory']
     public: true
-
+  
+  plugin.manager.metadata_hex:
+    class: Drupal\metadata_hex\Plugin\MetadataHexPluginManager
+    parent: default_plugin_manager
+    arguments: ['@service_container', '@cache.default', '@module_handler']
+  
+  metadata_hex.file_handler_manager:
+    class: Drupal\metadata_hex\FileHandlerManager
+    arguments: ['@plugin.manager.metadata_hex']
+  
   metadata_hex.metadata_batch_processor:
     class: 'Drupal\metadata_hex\Handler\MetadataBatchProcessor'
     arguments: ['@logger.channel.metadata_hex', '@metadata_hex.metadata_extractor']
