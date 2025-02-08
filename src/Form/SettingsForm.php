@@ -5,7 +5,7 @@ namespace Drupal\metadata_hex\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\NodeType;
-
+use Drupal\metadata_hex\Validator\FormValidator;
 /**
 * Class SettingsForm
 *
@@ -77,24 +77,6 @@ class SettingsForm extends ConfigFormBase {
       '#description' => $this->t('Enter each field mappings in the format "file_field | drupal_field" on a new line.'),
     ];
     
-    // $field_mappings = $config->get('extraction_settings.field_mappings') ?? [];
-    // foreach ($field_mappings as $index => $mapping) {
-    //   $form['extraction_settings']['field_mappings'][$index] = [
-    //     '#type' => 'fieldset',
-    //     '#title' => $this->t('Mapping @index', ['@index' => $index + 1]),
-    //   ];
-    //   $form['extraction_settings']['field_mappings'][$index]['pdf_field'] = [
-    //     '#type' => 'textfield',
-    //     '#title' => $this->t('PDF Field'),
-    //     '#default_value' => $mapping['pdf_field'] ?? '',
-    //   ];
-    //   $form['extraction_settings']['field_mappings'][$index]['drupal_field'] = [
-    //     '#type' => 'textfield',
-    //     '#title' => $this->t('Drupal Field'),
-    //     '#default_value' => $mapping['drupal_field'] ?? '',
-    //   ];
-    // }
-    
     $form['extraction_settings']['strict_handling'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Strict handling for string comparison'),
@@ -116,13 +98,17 @@ class SettingsForm extends ConfigFormBase {
     $form['extraction_settings']['available_extensions'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Enabled file extensions'),
-      '#default_value' => implode("\n", $config->get('extraction_settings.available_extensions') ?? $extensions),
+      '#default_value' => $config->get('extraction_settings.available_extensions') ?? $extensions,
       '#description' => $this->t('Enter file extensions, one per line.'),
     ];
-    
+    $form['extraction_settings']['actions']['submit'] = [
+      '#type' => 'submit',
+      '#value' => $this->t('Save Configuration'),
+    ];
+
     $form['node_process'] = [
       '#type' => 'details',
-      '#title' => $this->t('Node Processing Settings'),
+      '#title' => $this->t('Node Bulk Processing Settings'),
       '#open' => false,
       '#group' => 'settings',
     ];
@@ -133,7 +119,7 @@ class SettingsForm extends ConfigFormBase {
       '#multiple' => TRUE,
       '#options' => $options,
       '#default_value' => implode("\n", $config->get('node_process.bundle_types') ?? []),
-      '#description' => $this->t('Select multiple node bundle types to indicate which types will be preprocessed for PDF metadata extraction.'),
+      '#description' => $this->t('Select multiple node bundle types to indicate which types will be preprocessed for file metadata extraction.'),
     ];
     
     $form['node_process']['allow_reprocess'] = [
@@ -156,10 +142,12 @@ class SettingsForm extends ConfigFormBase {
     ];
     
     $form['file_ingest']['bundle_type_for_generation'] = [
-      '#type' => 'textfield',
+      '#type' => 'select',
       '#title' => $this->t('Bundle type for content generation'),
       '#options' => $options,
-      '#default_value' => implode("\n", $config->get('file_ingest.bundle_type_for_generation') ?? []),
+      '#multiple' => false,
+      '#default_value' => implode("\n", $config->get('node_process.bundle_types') ?? []),
+      '#description' => $this->t('Select  node bundle types to indicate which types will be created from extracted metadata.'),
     ];
     
     $form['file_ingest']['file_attachment_field'] = [
@@ -178,7 +166,7 @@ class SettingsForm extends ConfigFormBase {
     $form['file_ingest']['process_cron_nodes'] = [
       '#type' => 'submit',
       '#value' => $this->t('Manually trigger file ingest'),
-      '#submit' => ['::processAllPdfs'],
+      '#submit' => ['::processAllPdfs'], // @todo fix this
     ];
     
     
@@ -190,9 +178,10 @@ class SettingsForm extends ConfigFormBase {
   */
   public function validateForm(array &$form, FormStateInterface $form_state)
   {
-    
+    return;
+    // @TODO fix this validation call
     $fieldMappings = $form_state->getValue('field_mappings');
-    $validator = new FormValidator($this->mapping);
+    $validator = new FormValidator($fieldMappings);
     $result = $validator->validateForm();
     
     if ($result !== true) {

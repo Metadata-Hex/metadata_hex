@@ -1,3 +1,4 @@
+<?php
 namespace Drupal\metadata_hex\Plugin;
 
 use Drupal\Component\Plugin\PluginInspectionInterface;

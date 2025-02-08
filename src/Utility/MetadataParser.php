@@ -2,8 +2,11 @@
 
 namespace Drupal\metadata_hex\Utility;
 
+use \Drupal\metadata_hex\Base\MetadataHexCore;
 use Psr\Log\LoggerInterface;
 use Exception;
+use Drupal\node\Entity\NodeType;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 
 /**
  * Class MetadataParser
@@ -14,7 +17,8 @@ use Exception;
  * - Extracting and cleaning data
  * - Ensuring compatibility with Drupal field structures
  */
-class MetadataParser extends MetadataHexCore {
+class MetadataParser extends MetadataHexCore
+{
 
   /**
    * The fields available.
@@ -24,19 +28,19 @@ class MetadataParser extends MetadataHexCore {
   protected $availableFields;
 
   /**
-   * Initialized PdfExtractor.
-   *
-   * @var MetadataExtractor
-   */
-  protected $extractor;
-
-  /**
    * The field mappings.
    *
    * @var array
    */
   protected $fieldMapping;
 
+  /**
+   * Summary of bundleType
+   * 
+   * @var NodeType|string|null 
+   *
+   */
+  protected $bundleType;
   /**
    * Determines if we are strictly handling string comparisons.
    *
@@ -45,27 +49,48 @@ class MetadataParser extends MetadataHexCore {
   protected $strictHandling = false;
 
   /**
+   * The metadata array.
+   *
+   * @var array
+   */
+  protected $metaArray = [];
+
+  /**
+   * The entity field manager service.
+   *
+   * @var \Drupal\Core\Entity\EntityFieldManagerInterface
+   */
+  protected $entityFieldManager;
+
+  /**
    * Constructs the MetadataParser class.
    *
    * @param LoggerInterface $logger
    *   The logger service.
-   * @param object $bundleType
+   * @param EntityFieldManagerInterface $entityFieldManager
+   *   The entity field manager service.
+   * @param string $bundleType
    *   The bundle type object.
    */
-  public function __construct(LoggerInterface $logger, $bundleType) {
+  public function __construct(LoggerInterface $logger, $bundleType = null)
+  {
     parent::__construct($logger);
-    $this->bundleType = $bundleType;
+
+    if ($bundleType !== null) {
+      $this->setBundleType($bundleType);
+    }
   }
 
   /**
    * Initializes the parser.
    */
-  public function init() {
-    $this->availableFields = $this->bundleType
-      ->extractFields()
-      ->extractFieldNameValues()
-      ->toArray();
+  public function init()
+  {
 
+    // @TOTO this though
+    if ($this->bundleType !== null) {
+      $this->availableFields = $this->entityFieldManager->getFieldDefinitions('node', $this->bundleType->id());
+    }
     // Grab the module configuration.
     $config = \Drupal::config('metadata_hex.settings');
 
@@ -73,14 +98,17 @@ class MetadataParser extends MetadataHexCore {
     $extractedFieldMaps = $config->get('field_mappings');
     $this->fieldMapping = $this->cleanFieldMapping($extractedFieldMaps);
 
-    // Initialize the extractor.
-    $this->extractor = new MetadataExtractor();
+
+  }
+  protected function getEntityFieldManager()
+  {
+    return \Drupal::service('entity_field.manager');
   }
 
   /**
    * Removes any field mappings that do not match available fields.
    *
-   * @param array $dirty_fieldmapping
+   * @param array|null $dirty_fieldmapping
    *   The uncleaned field mappings.
    *
    * @return array
@@ -89,8 +117,11 @@ class MetadataParser extends MetadataHexCore {
    * @throws Exception
    *   If input is invalid.
    */
-  protected function cleanFieldMapping(array $dirty_fieldmapping): array {
-    if (!is_array($dirty_fieldmapping)) {
+  protected function cleanFieldMapping(array $dirty_fieldmapping = null): array
+  {
+    if ($dirty_fieldmapping === null && !empty($this->fieldMapping)) {
+      $dirty_fieldmapping = $this->fieldMapping;
+    } else if (!is_array($dirty_fieldmapping)) {
       throw new Exception("Invalid input for field mapping. Expected an array.");
     }
 
@@ -117,28 +148,36 @@ class MetadataParser extends MetadataHexCore {
    * @throws Exception
    *   If input is invalid.
    */
-  protected function cleanMetadata(array $dirty_metadata): array {
-    if (!is_array($dirty_metadata)) {
+  public function cleanMetadata(array $dirty_metadata): array
+  {
+    if ($dirty_metadata === null && !empty($this->metaArray)) {
+      $dirty_metadata = $this->metaArray;
+    } else if (!is_array($dirty_metadata)) {
       throw new Exception("Invalid metadata input. Expected an associative array.");
     }
+    // Flatten the array.
+    $flattenedArray = $this->flattenArray($dirty_metadata);
 
+    // Sanitize the array.
+    $sanitizedArray = $this->sanitizeArray($flattenedArray);
     $clean_metadata = [];
-    foreach ($dirty_metadata as $key => $value) {
+    foreach ($sanitizedArray as $key => $value) {
       if (empty($key) || empty($value)) {
         continue;
       }
 
-      $normalizedKey = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $key));
+      // if we arent strict handling, normalize all keys
       if (!$this->strictHandling) {
-        $key = $normalizedKey;
+        $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $key));
       }
 
       $clean_metadata[$key] = is_array($value) ? array_map('trim', $value) : trim($value);
     }
 
     if (empty($clean_metadata)) {
-      throw new Exception("Cleaned metadata array is empty.");
+      $this->logger->error("Cleaned metadata array is empty.");
     }
+
 
     return $clean_metadata;
   }
@@ -155,7 +194,8 @@ class MetadataParser extends MetadataHexCore {
    * @throws Exception
    *   If input is invalid.
    */
-  protected function explodeKeyValueString(string $fieldMappings): array {
+  protected function explodeKeyValueString(string $fieldMappings): array
+  {
     if (!is_string($fieldMappings) || empty($fieldMappings)) {
       throw new Exception("Invalid field mapping string.");
     }
@@ -189,7 +229,8 @@ class MetadataParser extends MetadataHexCore {
    * @throws Exception
    *   If input is invalid.
    */
-  protected function sanitizeArray(array $unsanitized_array): array {
+  private function sanitizeArray(array $unsanitized_array): array
+  {
     if (!is_array($unsanitized_array)) {
       throw new Exception("Invalid input for sanitization. Expected an array.");
     }
@@ -216,5 +257,81 @@ class MetadataParser extends MetadataHexCore {
     }
 
     return $sanitized;
+  }
+
+  /**
+   * Flattens a multi-dimensional array into a single-dimensional array with dot-separated keys.
+   *
+   * @param array $array
+   *   The multi-dimensional array to flatten.
+   * @param string $prefix
+   *   The prefix for the keys (used for recursion).
+   *
+   * @return array
+   *   The flattened array.
+   */
+  private function flattenArray(array $array): array
+  {
+    $result = [];
+
+    array_walk_recursive($array, function ($value, $key) use (&$result) {
+      $result[$key] = $value;
+    });
+
+    return $result;
+  }
+
+  /**
+   * Loads the correct bundle type from a bundle type string.
+   *
+   * @param string $bundleType
+   *   The bundle type string.
+   *
+   * @return object
+   *   The loaded bundle type object.
+   *
+   * @throws Exception
+   *   If the bundle type cannot be loaded.
+   */
+  protected function loadBundleType(string $bundleType)
+  {
+    $entity_type_manager = \Drupal::entityTypeManager();
+    $bundle_info = $entity_type_manager->getStorage('node_type')->load($bundleType);
+
+    if (!$bundle_info) {
+      throw new Exception("Bundle type not found: $bundleType");
+    }
+
+    return $bundle_info;
+  }
+
+  /**
+   * Sets the bundle type.
+   *
+   * @param string|NodeType $bundleType
+   *   The bundle type string or NodeType object.
+   *
+   * @throws Exception
+   *   If the bundle type cannot be loaded.
+   */
+  public function setBundleType($bundleType)
+  {
+    if (is_string($bundleType)) {
+      $this->bundleType = $this->loadBundleType($bundleType);
+    } elseif ($bundleType instanceof NodeType) {
+      $this->bundleType = $bundleType;
+    } else {
+      throw new Exception("Invalid bundle type. Expected a string or NodeType object.");
+    }
+    $this->availableFields = $this->getEntityFieldManager()->getFieldDefinitions('node', $this->bundleType->id());
+  }
+
+  /**
+   * Summary of getFieldMappings
+   * @return array
+   */
+  public function getFieldMappings()
+  {
+    return $this->fieldMapping;
   }
 }

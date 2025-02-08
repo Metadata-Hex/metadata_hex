@@ -6,13 +6,17 @@ use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;
 use Psr\Log\LoggerInterface;
 use Exception;
+use \Drupal\metadata_hex\Base\MetadataHexCore;
+use \Drupal\metadata_hex\Model\NodeBinder;
+use Drupal\metadata_hex\Utility\MetadataParser;
 
 /**
  * Class MetadataEntity
  *
  * Encapsulates the node, metadata, and file connection.
  */
-class MetadataEntity extends MetadataHexCore {
+class MetadataEntity extends MetadataHexCore
+{
 
   /**
    * Flag to prevent overwriting existing data.
@@ -26,10 +30,16 @@ class MetadataEntity extends MetadataHexCore {
    *
    * @var array
    */
+  protected $metadataMapped = [];
+  /**
+   * Metadata that has been cleaned, processed, and matched to fields.
+   *
+   * @var array
+   */
   protected $metadataProcessed = [];
 
   /**
-   * Raw metadata extracted directly from the PDF.
+   * Raw metadata extracted directly from the file.
    *
    * @var array
    */
@@ -43,6 +53,11 @@ class MetadataEntity extends MetadataHexCore {
   protected $nodeBinder;
 
   /**
+   * Summary of metadataParser
+   * @var MetadataParser
+   */
+  protected $metadataParser = null;
+  /**
    * Flag to prevent overwriting the title.
    *
    * @var bool
@@ -55,7 +70,8 @@ class MetadataEntity extends MetadataHexCore {
    * @param LoggerInterface $logger
    *   The logger service.
    */
-  public function __construct(LoggerInterface $logger) {
+  public function __construct(LoggerInterface $logger)
+  {
     parent::__construct($logger);
   }
 
@@ -68,7 +84,8 @@ class MetadataEntity extends MetadataHexCore {
    * @throws \InvalidArgumentException
    *   If the input is invalid.
    */
-  protected function init($input) {
+  protected function init($input)
+  {
     if ($input instanceof File) {
       $this->loadFromFile($input->getFileUri());
     } elseif ($input instanceof Node) {
@@ -76,8 +93,31 @@ class MetadataEntity extends MetadataHexCore {
     } else {
       throw new \InvalidArgumentException("Invalid input provided.");
     }
-  }
 
+    $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
+
+  }
+  /**
+   * public initialize
+   * @param mixed $input
+   * @return void
+   */
+  public function initialize($input)
+  {
+    $this->init($input);
+  }
+  /**
+   * Summary of getParser
+   * @return MetadataParser
+   */
+  public function getParser(): MetadataParser
+  {
+    if ($this->metadataParser === null) {
+      $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
+
+    }
+    return $this->metadataParser;
+  }
   /**
    * Matches a passed-in string to available bundle taxonomy.
    *
@@ -90,7 +130,8 @@ class MetadataEntity extends MetadataHexCore {
    * @throws Exception
    *   If the input is not a string.
    */
-  protected function findMatchingTaxonomy(string $term_to_find): array {
+  protected function findMatchingTaxonomy(string $term_to_find): array
+  {
     if (!is_string($term_to_find)) {
       throw new Exception("Invalid input. Expected a string.");
     }
@@ -119,7 +160,8 @@ class MetadataEntity extends MetadataHexCore {
    * @throws Exception
    *   If the file is invalid.
    */
-  protected function loadFromFile(string $file_uri) {
+  public function loadFromFile(string $file_uri)
+  {
     $file = File::load(\Drupal::entityQuery('file')
       ->condition('uri', $file_uri)
       ->execute());
@@ -128,11 +170,31 @@ class MetadataEntity extends MetadataHexCore {
       throw new Exception("File not found: $file_uri");
     }
 
-    $this->nodeBinder = new NodeBinder($this->logger);
-    $this->nodeBinder->init($file);
-    $this->metadataRaw = $this->nodeBinder->ingestNodeFileMeta();
+
+    $this->setLocalMetadata($this->getNodeBinder($file)->ingestNodeFileMeta());
+
+    // cleans up and parses the metadata and sets
+    $mtdt = $this->getParser()->cleanMetadata($this->metadataRaw);
+    $this->mapMetadata($mtdt);
+    $this->setLocalMetadata($this->metadataMapped, false);
+    //$this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
+
   }
 
+  public function getNodeBinder($nodefile = null)
+  {
+
+    if ($this->nodeBinder === null) {
+      $this->nodeBinder = new NodeBinder($this->logger);
+    }
+
+    if ($nodefile === null) {
+      return $this->nodeBinder;
+    }
+
+    $this->nodeBinder->init($nodefile);
+    return $this->nodeBinder;
+  }
   /**
    * Loads and initializes a MetadataEntity via a node ID.
    *
@@ -142,34 +204,59 @@ class MetadataEntity extends MetadataHexCore {
    * @throws Exception
    *   If the node is invalid.
    */
-  protected function loadFromNode(string $nid) {
+  public function loadFromNode(string $nid)
+  {
     $node = Node::load($nid);
 
     if (!$node) {
       throw new Exception("Node not found: $nid");
     }
 
-    $this->nodeBinder = new NodeBinder($this->logger);
-    $this->nodeBinder->init($node);
-    $this->metadataRaw = $this->nodeBinder->ingestNodeFileMeta();
+    // Ingests the metadata and sets
+    $tmd = $this->getNodeBinder($node)->ingestNodeFileMeta();
+    $this->setLocalMetadata($tmd);
+
+    // cleans up and parses the metadata and sets
+    $mtdt = $this->getParser()->cleanMetadata($this->metadataRaw);
+    $this->mapMetadata($mtdt);
+    $this->setLocalMetadata($this->metadataMapped, false);
+  }
+
+  /**
+   * Sets the local metadata array. 
+   *
+   * @param array $metadata
+   * @param mixed $raw
+   * @return void
+   */
+  public function setLocalMetadata(array $metadata, $raw = true)
+  {
+    if ($raw) {
+      $this->metadataRaw = array_merge($this->metadataRaw, $metadata);
+    } else {
+      $this->metadataProcessed = array_merge($this->metadataProcessed, $metadata);
+    }
   }
 
   /**
    * Writes the processed metadata to a node.
    */
-  protected function writeMetadata() {
+  public function writeMetadata()
+  {
     if (empty($this->metadataProcessed)) {
       return;
     }
 
-    $node = $this->nodeBinder->getNode();
+    $node = $this->getNodeBinder()->getNode();
     if (!$node) {
       throw new Exception("No valid node found for metadata writing.");
     }
+    // TODO make option to flatten pdf:metadata keys
 
     foreach ($this->metadataProcessed as $field_name => $value) {
+
+      // These should already be filtered out by the parser.
       if (!$node->hasField($field_name)) {
-        $this->logger->error("Field {$field_name} does not exist on node.");
         continue;
       }
 
@@ -233,8 +320,25 @@ class MetadataEntity extends MetadataHexCore {
       }
     }
 
-    $this->nodeBinder->setRevision();
+    $this->getNodeBinder()->setRevision();
     $node->save();
-    $this->nodeBinder->setProcessed();
+    $this->getNodeBinder()->setProcessed();
+  }
+
+  /**
+   * Summary of mapMetadata
+   * @param array $metadata
+   * @return void
+   */
+  public function mapMetadata(array $metadata)
+  {
+
+    $field_mappings = $this->metadataParser->getFieldMappings();
+    foreach ($field_mappings as $drupal_field => $pdf_field) {
+
+      if (isset($metadata[$pdf_field]) && !empty($metadata[$pdf_field])) {
+        $this->metadataMapped[$drupal_field] = $metadata[$pdf_field];
+      }
+    }
   }
 }

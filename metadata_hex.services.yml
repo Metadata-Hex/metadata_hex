@@ -7,7 +7,7 @@ services:
 
   metadata_hex.metadata_parser:
     class: 'Drupal\metadata_hex\Utility\MetadataParser'
-    arguments: ['@logger.channel.default', '@config.factory']
+    arguments: ['@logger.channel.default', '@entity_field.manager', '@config.factory']
     public: true
 
   metadata_hex.settings_manager:
