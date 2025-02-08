@@ -21,7 +21,7 @@ services:
     arguments: ['@service_container', '@cache.default', '@module_handler']
 
   metadata_hex.file_handler_manager:
-    class: Drupal\metadata_hex\FileHandlerManager
+    class: Drupal\metadata_hex\Service\FileHandlerManager
     arguments: ['@plugin.manager.metadata_hex']
 
   metadata_hex.metadata_batch_processor:
