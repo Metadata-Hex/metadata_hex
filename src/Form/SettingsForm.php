@@ -4,6 +4,7 @@ namespace Drupal\metadata_hex\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\node\Entity\NodeType;
 
 /**
  * Class SettingsForm
@@ -39,11 +40,17 @@ class SettingsForm extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('metadata_hex.settings');
+    $form['settings'] = [
+  '#type' => 'vertical_tabs',
+  '#title' => $this->t('Configuration Sections'),
+];
+
 
     $form['extraction_settings'] = [
-      '#type' => 'vertical_tabs',
+      '#type' => 'details',
       '#title' => $this->t('Extraction Settings'),
       '#open' => true,
+      '#group' => 'settings',
     ];
 
     $form['extraction_settings']['hook_node_types'] = [
@@ -106,7 +113,8 @@ class SettingsForm extends ConfigFormBase {
     $form['node_process'] = [
       '#type' => 'details',
       '#title' => $this->t('Node Processing Settings'),
-      '#open' => true,
+      '#open' => false,
+      '#group' => 'settings',
     ];
 
     $content_types = NodeType::loadMultiple();
@@ -139,7 +147,8 @@ class SettingsForm extends ConfigFormBase {
     $form['file_ingest'] = [
       '#type' => 'details',
       '#title' => $this->t('File Ingest Settings'),
-      '#open' => true,
+      '#open' => false,
+      '#group' => 'settings',
     ];
 
     $form['file_ingest']['bundle_type_for_generation'] = [
@@ -198,7 +207,7 @@ class SettingsForm extends ConfigFormBase {
     $config = $this->config('metadata_hex.settings');
 
     $config->set('extraction_settings.hook_node_types', $form_state->getValue('hook_node_types'));
-    
+
     $config->set('extraction_settings.field_mappings', $form_state->getValue('field_mappings'));
     $config->set('extraction_settings.strict_handling', $form_state->getValue('strict_handling'));
     $config->set('extraction_settings.data_protected', $form_state->getValue('data_protected'));
