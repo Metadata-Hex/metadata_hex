@@ -6,6 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\metadata_hex\Validator\FormValidator;
+
 /**
 * Class SettingsForm
 *
@@ -77,6 +78,12 @@ class SettingsForm extends ConfigFormBase {
       '#description' => $this->t('Enter each field mappings in the format "file_field | drupal_field" on a new line.'),
     ];
     
+    $form['extraction_settings']['flatten_keys'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Flattens metadata keys that have : in them'),
+      '#default_value' => $config->get('extraction_settings.flatten_keys')||false,
+    ];    
+
     $form['extraction_settings']['strict_handling'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Strict handling for string comparison'),
@@ -97,6 +104,7 @@ class SettingsForm extends ConfigFormBase {
     
     $form['extraction_settings']['available_extensions'] = [
       '#type' => 'textarea',
+      '#class' => 'hidden',
       '#title' => $this->t('Enabled file extensions'),
       '#default_value' => $config->get('extraction_settings.available_extensions') ?? $extensions,
       '#description' => $this->t('Enter file extensions, one per line.'),
@@ -178,8 +186,7 @@ class SettingsForm extends ConfigFormBase {
   */
   public function validateForm(array &$form, FormStateInterface $form_state)
   {
-    return;
-    // @TODO fix this validation call
+
     $fieldMappings = $form_state->getValue('field_mappings');
     $validator = new FormValidator($fieldMappings);
     $result = $validator->validateForm();
@@ -204,6 +211,7 @@ class SettingsForm extends ConfigFormBase {
     
     $config->set('extraction_settings.field_mappings', $form_state->getValue('field_mappings'));
     $config->set('extraction_settings.strict_handling', $form_state->getValue('strict_handling'));
+    $config->set('extraction_settings.flatten_keys', $form_state->getValue('flatten_keys'));
     $config->set('extraction_settings.data_protected', $form_state->getValue('data_protected'));
     $config->set('extraction_settings.title_protected', $form_state->getValue('title_protected'));
     $config->set('extraction_settings.available_extensions', $form_state->getValue('available_extensions'));

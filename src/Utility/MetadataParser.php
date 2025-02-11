@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use Exception;
 use Drupal\node\Entity\NodeType;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\metadata_hex\Service\SettingsManager;
 
 /**
  * Class MetadataParser
@@ -49,6 +50,11 @@ class MetadataParser extends MetadataHexCore
   protected $strictHandling = false;
 
   /**
+   * Summary of flattenKeys
+   * @var bool
+   */
+  protected $flattenKeys = false;
+  /**
    * The metadata array.
    *
    * @var array
@@ -63,6 +69,11 @@ class MetadataParser extends MetadataHexCore
   protected $entityFieldManager;
 
   /**
+   * Summary of settingsManager
+   * @var 
+   */
+  protected $settingsManager;
+  /**
    * Constructs the MetadataParser class.
    *
    * @param LoggerInterface $logger
@@ -75,7 +86,7 @@ class MetadataParser extends MetadataHexCore
   public function __construct(LoggerInterface $logger, $bundleType = null)
   {
     parent::__construct($logger);
-
+    $this->settingsManager = new SettingsManager();
     if ($bundleType !== null) {
       $this->setBundleType($bundleType);
     }
@@ -92,10 +103,12 @@ class MetadataParser extends MetadataHexCore
       $this->availableFields = $this->entityFieldManager->getFieldDefinitions('node', $this->bundleType->id());
     }
     // Grab the module configuration.
-    $config = \Drupal::config('metadata_hex.settings');
+    
+    $this->settingsManager = new SettingsManager();
 
     // Extract the entered field mappings from config.
-    $extractedFieldMaps = $config->get('field_mappings');
+    //$con/fig = \Drupal::config('metadata_hex.settings');
+    $extractedFieldMaps =  $this->settingsManager->getFieldMappings();//$config->get('field_mappings');
     $this->fieldMapping = $this->cleanFieldMapping($extractedFieldMaps);
 
 
@@ -247,6 +260,10 @@ class MetadataParser extends MetadataHexCore
         $cleanValue = is_array($cleanValue)
           ? array_map(fn($v) => preg_replace('/[^a-zA-Z0-9_ ]/', '', $v), $cleanValue)
           : preg_replace('/[^a-zA-Z0-9_ ]/', '', $cleanValue);
+      }
+
+      if ($this->flattenKeys){
+        $cleanKey = substr(strrchr($cleanKey, ':'), 1);
       }
 
       $sanitized[$cleanKey] = $cleanValue;

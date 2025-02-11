@@ -251,7 +251,6 @@ class MetadataEntity extends MetadataHexCore
     if (!$node) {
       throw new Exception("No valid node found for metadata writing.");
     }
-    // TODO make option to flatten pdf:metadata keys
 
     foreach ($this->metadataProcessed as $field_name => $value) {
 

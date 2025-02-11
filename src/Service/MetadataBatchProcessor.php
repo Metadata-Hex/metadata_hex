@@ -8,6 +8,7 @@ use Exception;
 use Drupal\metadata_hex\Base\MetadataHexCore;
 use Drupal\metadata_hex\Model\MetadataEntity;
 use Drupal\metadata_hex\Service\MetadataExtractor;
+use Drupal\metadata_hex\Service\SettingsManager;
 /**
  * Class MetadataBatchProcessor
  *
@@ -51,7 +52,11 @@ class MetadataBatchProcessor extends MetadataHexCore
    * @var array
    */
   protected $files = [];
-
+  /**
+   * Summary of settingsManager
+   * @var SettingsManager
+   */
+  protected $settingsManager;
   /**
    * Constructs the MetadataBatchProcessor class.
    *
@@ -65,6 +70,7 @@ class MetadataBatchProcessor extends MetadataHexCore
     parent::__construct($logger);
     $this->extractor = $extractor;
     $this->files = [];
+    $this->settingsManager = new SettingsManager();
   }
 
   /**
@@ -165,8 +171,9 @@ class MetadataBatchProcessor extends MetadataHexCore
    * Processes files in a directory.
    */
   protected function processFiles()
-  {
-    $this->ingestFiles('public://');// @TODO make this dynamic
+  { 
+    $ingestDir = $this->settingsManager->getIngestDir()??'';
+    $this->ingestFiles('public://'.$ingestDir);
     $categorized = $this->categorizeFiles();
 
     foreach ($categorized['referenced'] as $file_uri) {
