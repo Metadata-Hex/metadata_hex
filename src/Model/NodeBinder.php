@@ -2,13 +2,14 @@
 
 namespace Drupal\metadata_hex\Model;
 
-use Drupal\metadata_hex\Handler\PdfFileHandler;
-use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;
-use Psr\Log\LoggerInterface;
-use Exception;
 use Drupal\metadata_hex\Base\MetadataHexCore;
+use Drupal\metadata_hex\Handler\PdfFileHandler;
 use Drupal\metadata_hex\Service\FileHandlerManager;
+use Drupal\node\Entity\Node;
+use Exception;
+use Psr\Log\LoggerInterface;
+
 /**
  * Class NodeBinder
  *
@@ -22,6 +23,7 @@ class NodeBinder extends MetadataHexCore
    * @var string|null
    */
   protected $uuid = null;
+
   /**
    * The node ID associated with this NodeBinder object.
    *
@@ -102,6 +104,8 @@ class NodeBinder extends MetadataHexCore
     }
 
     $file_uris = [];
+
+    //parses through all the fields on a node to find and retrieve file uris
     foreach ($node->getFields() as $field_name => $field) {
       if ($field->getFieldDefinition()->getType() === 'file') {
         foreach ($field->getValue() as $file_item) {
@@ -177,10 +181,15 @@ class NodeBinder extends MetadataHexCore
       return $metadata;
     }
 
+    // Iterate over all node fields for files 
     foreach ($node->getFields() as $field_name => $field) {
       if ($field->getFieldDefinition()->getType() === 'file') {
         foreach ($field->getValue() as $file_item) {
+          
+          // loads the file into a drupal model
           $file = File::load($file_item['target_id']);
+
+          // assuming it exists, retrieve information
           if ($file) {
             $file_uri = $file->getFileUri();
             $file_extension = pathinfo($file_uri, PATHINFO_EXTENSION);
@@ -193,12 +202,15 @@ class NodeBinder extends MetadataHexCore
             $handler = new PdfFileHandler();
             // ** Temporary fix ** // 
 
+            // setup the handler and extract the metadata
             $handler->setFileUri($file_uri);
             $exmd = $handler->extractMetadata();
             $data = [
               'uri' => $file->getFileUri(),
               'metadata' => $exmd,
             ];
+
+            // appends the data in a non-destructive way
             if (!isset($metadata[$file->id()])) {
               $metadata[$file->id()] = $data;
             } else {
@@ -226,12 +238,14 @@ class NodeBinder extends MetadataHexCore
    */
   public function initNode(string $file_uri, string $target_bundle, ?string $field_name = null): Node
   {
+    // initiate a new node
     $node = Node::create([
       'type' => $target_bundle,
       'status' => 0,
       'title' => 'Generated Node',
     ]);
 
+    // attach the file to the specified field and save
     if ($field_name) {
       $file = File::create(['uri' => $file_uri]);
       $file->save();
@@ -291,6 +305,7 @@ class NodeBinder extends MetadataHexCore
       return;
     }
 
+    // Lets set the field to the new value, ONLY if the target is empty or overwrite is true
     if ($overwrite || empty($node->get($field_name)->getValue())) {
       $node->set($field_name, $value);
       $node->save();

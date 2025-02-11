@@ -2,13 +2,14 @@
 
 namespace Drupal\metadata_hex\Model;
 
-use Drupal\node\Entity\Node;
 use Drupal\file\Entity\File;
-use Psr\Log\LoggerInterface;
-use Exception;
-use \Drupal\metadata_hex\Base\MetadataHexCore;
-use \Drupal\metadata_hex\Model\NodeBinder;
+use Drupal\metadata_hex\Base\MetadataHexCore;
+use Drupal\metadata_hex\Model\NodeBinder;
 use Drupal\metadata_hex\Utility\MetadataParser;
+use Exception;
+use Drupal\node\Entity\Node;
+use Psr\Log\LoggerInterface;
+
 
 /**
  * Class MetadataEntity
@@ -31,6 +32,7 @@ class MetadataEntity extends MetadataHexCore
    * @var array
    */
   protected $metadataMapped = [];
+
   /**
    * Metadata that has been cleaned, processed, and matched to fields.
    *
@@ -57,6 +59,7 @@ class MetadataEntity extends MetadataHexCore
    * @var MetadataParser
    */
   protected $metadataParser = null;
+
   /**
    * Flag to prevent overwriting the title.
    *
@@ -86,6 +89,7 @@ class MetadataEntity extends MetadataHexCore
    */
   protected function init($input)
   {
+    // ingest the input depending on what it is
     if ($input instanceof File) {
       $this->loadFromFile($input->getFileUri());
     } elseif ($input instanceof Node) {
@@ -94,6 +98,7 @@ class MetadataEntity extends MetadataHexCore
       throw new \InvalidArgumentException("Invalid input provided.");
     }
 
+    // setup the parser
     $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
 
   }
@@ -106,18 +111,21 @@ class MetadataEntity extends MetadataHexCore
   {
     $this->init($input);
   }
+
   /**
-   * Summary of getParser
+   * Returns an instance of MetadataParser. If it hasnt been initialized yet, init it
+   * 
    * @return MetadataParser
    */
   public function getParser(): MetadataParser
   {
     if ($this->metadataParser === null) {
       $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
-
     }
+
     return $this->metadataParser;
   }
+
   /**
    * Matches a passed-in string to available bundle taxonomy.
    *
@@ -132,6 +140,7 @@ class MetadataEntity extends MetadataHexCore
    */
   protected function findMatchingTaxonomy(string $term_to_find): array
   {
+    // only strings are allowed
     if (!is_string($term_to_find)) {
       throw new Exception("Invalid input. Expected a string.");
     }
@@ -139,7 +148,7 @@ class MetadataEntity extends MetadataHexCore
     $term_to_find = strtolower($term_to_find);
     $matching_terms = [];
 
-    $vocabulary = 'taxonomy_vocabulary'; // Replace with actual vocabulary.
+    $vocabulary = 'taxonomy_vocabulary'; // @todo does this need Replace with actual vocabulary?
     $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vocabulary);
 
     foreach ($terms as $term) {
@@ -170,31 +179,37 @@ class MetadataEntity extends MetadataHexCore
       throw new Exception("File not found: $file_uri");
     }
 
-
+    // Ingest and set the raw metadata
     $this->setLocalMetadata($this->getNodeBinder($file)->ingestNodeFileMeta());
 
     // cleans up and parses the metadata and sets
     $mtdt = $this->getParser()->cleanMetadata($this->metadataRaw);
     $this->mapMetadata($mtdt);
     $this->setLocalMetadata($this->metadataMapped, false);
-    //$this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
-
   }
 
+  /**
+   * Returns an instance of NodeBinder. Initializes if unset
+   * 
+   * @return NodeBinder
+   */
   public function getNodeBinder($nodefile = null)
   {
-
+    // init if its not initalized
     if ($this->nodeBinder === null) {
       $this->nodeBinder = new NodeBinder($this->logger);
     }
 
+    // if we aren't passing a nodefile in, just return the nodeBinder
     if ($nodefile === null) {
       return $this->nodeBinder;
     }
 
+    // if we DID pass a nodefile in, init the nodeBinder and pass it back
     $this->nodeBinder->init($nodefile);
     return $this->nodeBinder;
   }
+
   /**
    * Loads and initializes a MetadataEntity via a node ID.
    *
@@ -223,7 +238,7 @@ class MetadataEntity extends MetadataHexCore
   }
 
   /**
-   * Sets the local metadata array. 
+   * Sets the local metadata arrays. 
    *
    * @param array $metadata
    * @param mixed $raw
@@ -239,11 +254,12 @@ class MetadataEntity extends MetadataHexCore
   }
 
   /**
-   * Writes the processed metadata to a node.
+   * Writes the processed metadata to a node
    */
   public function writeMetadata()
   {
-    if (empty($this->metadataProcessed)) {
+    // Some may think to default to processed metadata. Perhaps
+    if (empty($this->metadataMapped)) {
       return;
     }
 
@@ -252,13 +268,15 @@ class MetadataEntity extends MetadataHexCore
       throw new Exception("No valid node found for metadata writing.");
     }
 
-    foreach ($this->metadataProcessed as $field_name => $value) {
+    // iterates over all matching mapped fields
+    foreach ($this->metadataMapped as $field_name => $value) {
 
       // These should already be filtered out by the parser.
       if (!$node->hasField($field_name)) {
         continue;
       }
 
+      // grab the field info
       $field_definition = $node->getFieldDefinition($field_name);
       $field_type = $field_definition->getType();
 
@@ -305,6 +323,7 @@ class MetadataEntity extends MetadataHexCore
           break;
 
         case 'list_string':
+          // 
           $allowed_values = $field_definition->getSetting('allowed_values');
           if (in_array($value, $allowed_values, true)) {
             $node->set($field_name, $value);
@@ -325,7 +344,7 @@ class MetadataEntity extends MetadataHexCore
   }
 
   /**
-   * Summary of mapMetadata
+   * Consolidates the metadata array to only those items that match the confirmed valid field mappings
    * @param array $metadata
    * @return void
    */
@@ -333,10 +352,10 @@ class MetadataEntity extends MetadataHexCore
   {
 
     $field_mappings = $this->metadataParser->getFieldMappings();
-    foreach ($field_mappings as $drupal_field => $pdf_field) {
+    foreach ($field_mappings as $drupal_field => $file_field) {
 
-      if (isset($metadata[$pdf_field]) && !empty($metadata[$pdf_field])) {
-        $this->metadataMapped[$drupal_field] = $metadata[$pdf_field];
+      if (isset($metadata[$file_field]) && !empty($metadata[$file_field])) {
+        $this->metadataMapped[$drupal_field] = $metadata[$file_field];
       }
     }
   }

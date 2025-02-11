@@ -3,7 +3,7 @@
 namespace Drupal\metadata_hex\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-use \Drupal\metadata_hex\Base\MetadataHexCore;
+use Drupal\metadata_hex\Base\MetadataHexCore;
 /**
  * Class SettingsManager
  *
@@ -19,14 +19,20 @@ class SettingsManager extends MetadataHexCore {
   protected $configFactory;
 
   /**
+   * The config object used to fetch specific settings
+   */
+  protected $config;
+
+  /**
    * Constructs the SettingsManager class.
    *
    * @param ConfigFactoryInterface $configFactory
    *   The configuration factory service.
-   * @todo fix
+   * 
    */ 
   public function __construct(?ConfigFactoryInterface $configFactory = null) {
     $this->configFactory = $configFactory ?? new ConfigFactoryInterface(); 
+    $this->config = $this->configFactory->get('metadata_hex.settings');
   }
 
   /**
@@ -36,8 +42,7 @@ class SettingsManager extends MetadataHexCore {
    *   The extraction settings.
    */
   protected function getExtractionSettings(): array {
-    $config = $this->configFactory->get('metadata_hex.settings');
-    return $config->get('extraction') ?? [];
+    return $this->config->get('extraction') ?? [];
   }
 
   /**
@@ -47,8 +52,7 @@ class SettingsManager extends MetadataHexCore {
    *   The field mapping settings.
    */
   public function getFieldMappings(): array {
-    $config = $this->configFactory->get('metadata_hex.settings');
-    return $config->get('field_mappings') ?? [];
+    return $this->config->get('field_mappings') ?? [];
   }
 
   /**
@@ -58,13 +62,25 @@ class SettingsManager extends MetadataHexCore {
    *   The file ingestion settings.
    */
   protected function getFileIngestSettings(): array {
-    $config = $this->configFactory->get('metadata_hex.settings');
-    return $config->get('file_ingest') ?? [];
+    return $this->config->get('file_ingest') ?? [];
   }
 
+  /**
+   * Retrieves the allowed node types setup for parsing
+   * 
+   * @return array
+   *  The node types
+   */
   public function getAllowedNodeTypes(){
     return $this->getExtractionSettings()['hook_node_types'];
   }
+
+ /**
+   * Retrieves the user set directory to ingest
+   * 
+   * @return string
+   *  The directory to ingest
+   */
   public function getIngestDir(){
     return $this->getFileIngestSettings()['ingest_directory'];
   }
@@ -76,7 +92,6 @@ class SettingsManager extends MetadataHexCore {
    *   The node processing settings.
    */
   protected function getNodeProcessingSettings(): array {
-    $config = $this->configFactory->get('metadata_hex.settings');
-    return $config->get('node_processing') ?? [];
+    return $this->config->get('node_processing') ?? [];
   }
 }

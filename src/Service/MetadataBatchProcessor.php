@@ -3,12 +3,13 @@
 namespace Drupal\metadata_hex\Service;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Psr\Log\LoggerInterface;
-use Exception;
 use Drupal\metadata_hex\Base\MetadataHexCore;
 use Drupal\metadata_hex\Model\MetadataEntity;
 use Drupal\metadata_hex\Service\MetadataExtractor;
 use Drupal\metadata_hex\Service\SettingsManager;
+use Exception;
+use Psr\Log\LoggerInterface;
+
 /**
  * Class MetadataBatchProcessor
  *
@@ -69,7 +70,6 @@ class MetadataBatchProcessor extends MetadataHexCore
   {
     parent::__construct($logger);
     $this->extractor = $extractor;
-    $this->files = [];
     $this->settingsManager = new SettingsManager();
   }
 

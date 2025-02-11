@@ -4,8 +4,14 @@ namespace Drupal\metadata_hex\Validator;
 
 class FormValidator
 {
+  /**
+   * @var string
+   */
   private $fieldMappings;
 
+  /**
+   * 
+   */
   public function __construct($fieldMappings)
   {
     $this->fieldMappings = $fieldMappings;

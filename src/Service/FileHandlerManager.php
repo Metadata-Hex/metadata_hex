@@ -2,9 +2,10 @@
 
 namespace Drupal\metadata_hex\Service;
 
+use Drupal\metadata_hex\Plugin\MetadataHexPluginManager;
 use Drupal\Component\Plugin\PluginManagerInterface;
 use Psr\Log\LoggerInterface;
-use Drupal\metadata_hex\Plugin\MetadataHexPluginManager;
+
 /**
  * Class FileHandlerManager
  *

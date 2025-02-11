@@ -2,11 +2,11 @@
 
 namespace Drupal\metadata_hex\Service;
 
-use Psr\Log\LoggerInterface;
-//use Smalot\Pa/rser\Parser;
-use Exception;
 use Drupal\metadata_hex\Base\MetadataHexCore;
 use Drupal\metadata_hex\Utility\MetadataParser as Parser;
+use Exception;
+use Psr\Log\LoggerInterface;
+
 /**
  * Class MetadataExtractor
  *

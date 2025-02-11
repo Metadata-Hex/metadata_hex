@@ -1,6 +1,6 @@
 name: 'Metadata Hex'
 type: module
-description: 'Provides metadata extraction and processing for files and nodes.'
+description: 'Provides metadata heap extraction and processing for files and nodes.'
 core_version_requirement: ^9 || ^10 || ^11
 package: 'Metadata Tools'
 dependencies:
