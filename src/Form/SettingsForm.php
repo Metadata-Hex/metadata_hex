@@ -6,6 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\metadata_hex\Validator\FormValidator;
+
 /**
 * Class SettingsForm
 *
