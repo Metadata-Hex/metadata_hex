@@ -3,7 +3,7 @@
 namespace Drupal\metadata_hex\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
-
+use \Drupal\metadata_hex\Base\MetadataHexCore;
 /**
  * Class SettingsManager
  *

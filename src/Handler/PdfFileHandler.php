@@ -7,6 +7,11 @@ use Exception;
 
 /**
  * Class PdfFileHandler
+ * 
+ * @MetadataHex(
+ *   id = "pdf_file_handler",
+ *   extensions = {"pdf"}
+ * )
  *
  * Handles parsing operations for extracted metadata from PDF files.
  * Responsible for:
@@ -33,19 +38,10 @@ class PdfFileHandler extends FileHandler {
 
     try {
       $parser = new Parser();
+
       $pdf = $parser->parseFile($this->fileUri);
       $details = $pdf->getDetails();
-
-      return [
-        'title' => $details['Title'] ?? '',
-        'author' => $details['Author'] ?? '',
-        'subject' => $details['Subject'] ?? '',
-        'keywords' => $details['Keywords'] ?? '',
-        'creator' => $details['Creator'] ?? '',
-        'producer' => $details['Producer'] ?? '',
-        'created' => $details['CreationDate'] ?? '',
-        'modified' => $details['ModDate'] ?? '',
-      ];
+      return $details;
     } catch (Exception $e) {
       $this->logger->error("Error parsing PDF file: " . $e->getMessage());
       throw new Exception("Error parsing PDF file: " . $e->getMessage());
@@ -55,10 +51,10 @@ class PdfFileHandler extends FileHandler {
   /**
    * Returns an array of supported file extensions.
    *
-   * @return array
+   * @return arrayq
    *   The supported file extensions.
    */
   public function getSupportedExtentions(): array {
-    return ['pdf'];
+    return ['pdf', 'pdfx'];
   }
 }

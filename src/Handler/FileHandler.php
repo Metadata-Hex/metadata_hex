@@ -1,7 +1,7 @@
 <?php
 
 namespace Drupal\metadata_hex\Handler;
-
+require_once __DIR__ . '/../../vendor/autoload.php';
 use Drupal\metadata_hex\Base\MetadataHexCore;
 use Drupal\file\Entity\File;
 
@@ -46,15 +46,24 @@ abstract class FileHandler extends MetadataHexCore {
   /**
    * Constructs the FileHandler class.
    *
-   * @param string $filePath
+   * @param string|null $filePath
    *   The path to the file.
    */
-  public function __construct(string $filePath) {
+  public function __construct(string $filePath = null) {
     parent::__construct(\Drupal::service('logger.factory')->get('metadata_hex'));
-    $this->fileUri = $filePath;
-    $this->fileType = pathinfo($filePath, PATHINFO_EXTENSION);
+    if ($filePath) {
+      $this->setFileUri($filePath);
+    }
   }
-
+  /**
+   * Summary of setFileUri
+   * @param string $fileUri
+   * @return void
+   */
+  public function setFileUri(string $fileUri) {
+    $this->fileUri = $fileUri;
+    $this->fileType = pathinfo($this->fileUri, PATHINFO_EXTENSION);
+  }
   /**
    * Extract metadata from the file.
    * Must be implemented in child classes.
