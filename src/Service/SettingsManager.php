@@ -23,9 +23,10 @@ class SettingsManager extends MetadataHexCore {
    *
    * @param ConfigFactoryInterface $configFactory
    *   The configuration factory service.
-   */
-  public function __construct(ConfigFactoryInterface $configFactory) {
-    $this->configFactory = $configFactory;
+   * @todo fix
+   */ 
+  public function __construct(?ConfigFactoryInterface $configFactory = null) {
+    $this->configFactory = $configFactory ?? new ConfigFactoryInterface(); 
   }
 
   /**
@@ -45,7 +46,7 @@ class SettingsManager extends MetadataHexCore {
    * @return array
    *   The field mapping settings.
    */
-  protected function getFieldMappings(): array {
+  public function getFieldMappings(): array {
     $config = $this->configFactory->get('metadata_hex.settings');
     return $config->get('field_mappings') ?? [];
   }
@@ -59,6 +60,13 @@ class SettingsManager extends MetadataHexCore {
   protected function getFileIngestSettings(): array {
     $config = $this->configFactory->get('metadata_hex.settings');
     return $config->get('file_ingest') ?? [];
+  }
+
+  public function getAllowedNodeTypes(){
+    return $this->getExtractionSettings()['hook_node_types'];
+  }
+  public function getIngestDir(){
+    return $this->getFileIngestSettings()['ingest_directory'];
   }
 
   /**

@@ -54,40 +54,13 @@ class MetadataExtractor extends MetadataHexCore
     }
 
     try {
-      $parser = new Parser();
+      $parser = new Parser($this->logger);
       $file = $parser->parseFile($file_uri);
-      $details = $file->getDetails();
+      return $file->getDetails();
 
-      // TODO what the hell is this about?!
-      $metadata = [
-        'title' => $details['Title'] ?? '',
-        'author' => $details['Author'] ?? '',
-        'created_date' => $details['CreationDate'] ?? '',
-        'keywords' => isset($details['Keywords']) ? explode(',', $details['Keywords']) : [],
-      ];
-
-      return $this->sanitizeArray($metadata);
     } catch (Exception $e) {
       $this->logger->error("Error parsing  metadata: " . $e->getMessage());
       throw new Exception("Error parsing  metadata: " . $e->getMessage());
     }
-  }
-
-  /**
-   * Sanitizes an array's keys and values.
-   *
-   * @param array $metadata
-   *   The metadata array.
-   *
-   * @return array
-   *   The sanitized metadata.
-   * 
-   */
-  // TODO is this a duplicate method from parser?
-  private function sanitizeArray(array $metadata): array
-  {
-    return array_map(function ($value) {
-      return is_array($value) ? array_map('trim', $value) : trim(htmlspecialchars($value, ENT_QUOTES, 'UTF-8'));
-    }, $metadata);
   }
 }
