@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e3b911d2eeabd6b2ce964cf3153b81b",
+    "content-hash": "d526ee75d3981d92d1d6c431bc8a23b3",
     "packages": [
         {
             "name": "smalot/pdfparser",
