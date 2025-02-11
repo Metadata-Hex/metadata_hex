@@ -26,7 +26,7 @@ class SettingsManager extends MetadataHexCore {
    * @todo fix
    */ 
   public function __construct(?ConfigFactoryInterface $configFactory = null) {
-    $this->configFactory = $configFactory ?? new ConfigFactoryInterface(); 
+    $this->configFactory = $configFactory ?? \Drupal::service('config.factory'); 
   }
 
   /**
@@ -37,18 +37,18 @@ class SettingsManager extends MetadataHexCore {
    */
   protected function getExtractionSettings(): array {
     $config = $this->configFactory->get('metadata_hex.settings');
-    return $config->get('extraction') ?? [];
+    return $config->get('extraction_settings') ?? [];
   }
 
   /**
    * Retrieves field mapping settings.
    *
-   * @return array
+   * @return string
    *   The field mapping settings.
    */
-  public function getFieldMappings(): array {
-    $config = $this->configFactory->get('metadata_hex.settings');
-    return $config->get('field_mappings') ?? [];
+  public function getFieldMappings(): string {
+    return $this->getExtractionSettings()['field_mappings']??'';
+
   }
 
   /**

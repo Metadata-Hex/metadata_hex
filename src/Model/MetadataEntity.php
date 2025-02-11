@@ -333,11 +333,13 @@ class MetadataEntity extends MetadataHexCore
   {
 
     $field_mappings = $this->metadataParser->getFieldMappings();
+    if (is_object($field_mappings) || is_array($field_mappings)){
     foreach ($field_mappings as $drupal_field => $pdf_field) {
 
       if (isset($metadata[$pdf_field]) && !empty($metadata[$pdf_field])) {
         $this->metadataMapped[$drupal_field] = $metadata[$pdf_field];
       }
     }
+  }
   }
 }

@@ -26,14 +26,14 @@ class MetadataParser extends MetadataHexCore
    *
    * @var array
    */
-  protected $availableFields;
+  protected $availableFields = [];
 
   /**
    * The field mappings.
    *
    * @var array
    */
-  protected $fieldMapping;
+  protected $fieldMapping = null;
 
   /**
    * Summary of bundleType
@@ -72,7 +72,7 @@ class MetadataParser extends MetadataHexCore
    * Summary of settingsManager
    * @var 
    */
-  protected $settingsManager;
+  protected $settingsManager = null;
   /**
    * Constructs the MetadataParser class.
    *
@@ -87,6 +87,7 @@ class MetadataParser extends MetadataHexCore
   {
     parent::__construct($logger);
     $this->settingsManager = new SettingsManager();
+    $this->entityFieldManager = self::getEntityFieldManager();
     if ($bundleType !== null) {
       $this->setBundleType($bundleType);
     }
@@ -98,21 +99,52 @@ class MetadataParser extends MetadataHexCore
   public function init()
   {
 
-    // @TOTO this though
     if ($this->bundleType !== null) {
-      $this->availableFields = $this->entityFieldManager->getFieldDefinitions('node', $this->bundleType->id());
-    }
-    // Grab the module configuration.
-    
-    $this->settingsManager = new SettingsManager();
-
-    // Extract the entered field mappings from config.
-    //$con/fig = \Drupal::config('metadata_hex.settings');
-    $extractedFieldMaps =  $this->settingsManager->getFieldMappings();//$config->get('field_mappings');
-    $this->fieldMapping = $this->cleanFieldMapping($extractedFieldMaps);
-
-
+self::initAvailableFields();    }
   }
+
+protected function getAvailableFields(){
+  if ($this->availableFields == null || empty($this->availableFields)){
+    self::initAvailableFields();
+  }
+  return $this->availableFields;
+}  
+
+protected function initAvailableFields(){
+      $this->availableFields = $this->entityFieldManager->getFieldDefinitions('node', $this->bundleType->id());
+
+}
+  /**
+   * Initiates the settings manager
+   */
+  protected function initSettingsManager(){
+    if ($this->settingsManager == null){
+      $this->settingsManager = new SettingsManager();
+      self::initFieldMaps();
+    }
+  }
+
+  /**
+   * Returns the settings manager, includes an init check
+   */
+  protected function getSettingsManager(){
+    self::initSettingsManager();
+    return $this->settingsManager;
+  }
+
+  /**
+   * initiates and populates field mapping
+   */
+  protected function initFieldMaps(){
+    
+    $extractedFieldMaps =  self::explodeKeyValueString($this->getSettingsManager()->getFieldMappings());
+    
+    $this->fieldMapping = $this->cleanFieldMapping($extractedFieldMaps);
+  }
+
+  /**
+   * Returns the entityFieldManager service
+   */
   protected function getEntityFieldManager()
   {
     return \Drupal::service('entity_field.manager');
@@ -132,9 +164,12 @@ class MetadataParser extends MetadataHexCore
    */
   protected function cleanFieldMapping(array $dirty_fieldmapping = null): array
   {
-    if ($dirty_fieldmapping === null && !empty($this->fieldMapping)) {
-      $dirty_fieldmapping = $this->fieldMapping;
-    } else if (!is_array($dirty_fieldmapping)) {
+    if ($dirty_fieldmapping === null) {
+      $dirty_fieldmapping = $this->getFieldMappings();
+    } 
+    echo print_r($this->availableFields, true);
+echo print_r($dirty_fieldmapping, true);
+    if (!is_array($dirty_fieldmapping) || empty($dirty_fieldmapping)) {
       throw new Exception("Invalid input for field mapping. Expected an array.");
     }
 
@@ -314,7 +349,7 @@ class MetadataParser extends MetadataHexCore
   {
     $entity_type_manager = \Drupal::entityTypeManager();
     $bundle_info = $entity_type_manager->getStorage('node_type')->load($bundleType);
-
+    
     if (!$bundle_info) {
       throw new Exception("Bundle type not found: $bundleType");
     }
@@ -340,7 +375,7 @@ class MetadataParser extends MetadataHexCore
     } else {
       throw new Exception("Invalid bundle type. Expected a string or NodeType object.");
     }
-    $this->availableFields = $this->getEntityFieldManager()->getFieldDefinitions('node', $this->bundleType->id());
+self::initAvailableFields();
   }
 
   /**
@@ -349,6 +384,10 @@ class MetadataParser extends MetadataHexCore
    */
   public function getFieldMappings()
   {
+    if ($this->fieldMapping == null){
+      self::initFieldMaps();
+    }
+      echo print_r($dirty_fieldmapping, true);
     return $this->fieldMapping;
   }
 }
