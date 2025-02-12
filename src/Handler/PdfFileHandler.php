@@ -2,8 +2,8 @@
 
 namespace Drupal\metadata_hex\Handler;
 
-use Smalot\PdfParser\Parser;
 use Exception;
+use Smalot\PdfParser\Parser;
 
 /**
  * Class PdfFileHandler
@@ -38,7 +38,6 @@ class PdfFileHandler extends FileHandler {
 
     try {
       $parser = new Parser();
-
       $pdf = $parser->parseFile($this->fileUri);
       $details = $pdf->getDetails();
       return $details;

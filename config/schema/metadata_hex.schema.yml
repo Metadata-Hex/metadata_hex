@@ -19,6 +19,9 @@ metadata_hex.settings:
         strict_handling:
           type: boolean
           label: 'Strict handling for string comparison'
+        flatten_keys:
+          type: boolean
+          label: 'Flattens metadata keys'
         data_protected:
           type: boolean
           label: 'Protect existing data from being overwritten'

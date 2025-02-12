@@ -2,8 +2,8 @@
 
 namespace Drupal\metadata_hex\Handler;
 
-use PhpOffice\PhpWord\IOFactory;
 use Exception;
+use PhpOffice\PhpWord\IOFactory;
 
 /**
  * Class DocxFileHandler
@@ -29,17 +29,19 @@ class DocxFileHandler extends FileHandler {
     try {
       $phpWord = IOFactory::load($this->fileUri);
       $docInfo = $phpWord->getDocInfo();
-
-      return [
-        'title' => $docInfo->getTitle(),
-        'creator' => $docInfo->getCreator(),
-        'company' => $docInfo->getCompany(),
-        'description' => $docInfo->getDescription(),
-        'keywords' => $docInfo->getKeywords(),
-        'last_modified_by' => $docInfo->getLastModifiedBy(),
-        'created' => $docInfo->getCreated(),
-        'modified' => $docInfo->getModified(),
-      ];
+      
+      return $docInfo;
+      // @todo test this
+      // return [
+      //   'title' => $docInfo->getTitle(),
+      //   'creator' => $docInfo->getCreator(),
+      //   'company' => $docInfo->getCompany(),
+      //   'description' => $docInfo->getDescription(),
+      //   'keywords' => $docInfo->getKeywords(),
+      //   'last_modified_by' => $docInfo->getLastModifiedBy(),
+      //   'created' => $docInfo->getCreated(),
+      //   'modified' => $docInfo->getModified(),
+      // ];
     } catch (Exception $e) {
       throw new Exception("Error parsing DOCX file: " . $e->getMessage());
     }

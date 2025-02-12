@@ -4,8 +4,8 @@ namespace Drupal\metadata_hex\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\node\Entity\NodeType;
 use Drupal\metadata_hex\Validator\FormValidator;
+use Drupal\node\Entity\NodeType;
 
 /**
 * Class SettingsForm

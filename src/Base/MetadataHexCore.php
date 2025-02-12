@@ -2,9 +2,9 @@
 
 namespace Drupal\metadata_hex\Base;
 
-use Psr\Log\LoggerInterface;
-use Exception;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Exception;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class MetadataHexCore
@@ -49,10 +49,6 @@ abstract class MetadataHexCore {
     } catch (Exception $e) {
       $message = $context ? "{$context}: {$e->getMessage()}" : $e->getMessage();
       $this->logger->error($message);
-
-      // Optionally rethrow the exception if needed.
-      // throw $e;
-
       return $default;
     }
   }
