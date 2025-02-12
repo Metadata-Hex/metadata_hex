@@ -104,7 +104,7 @@ class SettingsForm extends ConfigFormBase {
     
     $form['extraction_settings']['available_extensions'] = [
       '#type' => 'textarea',
-      '#class' => 'hidden',
+      '#access' => false,
       '#title' => $this->t('Enabled file extensions'),
       '#default_value' => $config->get('extraction_settings.available_extensions') ?? $extensions,
       '#description' => $this->t('Enter file extensions, one per line.'),
@@ -214,7 +214,7 @@ class SettingsForm extends ConfigFormBase {
     $config->set('extraction_settings.flatten_keys', $form_state->getValue('flatten_keys'));
     $config->set('extraction_settings.data_protected', $form_state->getValue('data_protected'));
     $config->set('extraction_settings.title_protected', $form_state->getValue('title_protected'));
-    $config->set('extraction_settings.available_extensions', $form_state->getValue('available_extensions'));
+    //$config->set('extraction_settings.available_extensions', $form_state->getValue('available_extensions'));
     
     $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
     $config->set('node_process.allow_reprocess', $form_state->getValue('allow_reprocess'));
