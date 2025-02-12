@@ -31,7 +31,7 @@ class SettingsManager extends MetadataHexCore {
    * 
    */ 
   public function __construct(?ConfigFactoryInterface $configFactory = null) {
-    $this->configFactory = $configFactory ?? new ConfigFactoryInterface(); 
+    $this->configFactory = $configFactory ?? \Drupal::service('config.factory'); 
     $this->config = $this->configFactory->get('metadata_hex.settings');
   }
 
@@ -48,11 +48,11 @@ class SettingsManager extends MetadataHexCore {
   /**
    * Retrieves field mapping settings.
    *
-   * @return array
+   * @return string
    *   The field mapping settings.
    */
-  public function getFieldMappings(): array {
-    return $this->config->get('field_mappings') ?? [];
+  public function getFieldMappings(): string {
+   return $this->config->get('extraction_settings.field_mappings') ?? '';
   }
 
   /**
@@ -66,13 +66,23 @@ class SettingsManager extends MetadataHexCore {
   }
 
   /**
+   * Retrieves if we are strict handling
+   * 
+   * @return bool
+   *  The node types
+   */
+  public function getStrictHandling(){
+    return $this->config->get('extraction_settings.strict_handling') ?? false;
+  }
+
+  /**
    * Retrieves the allowed node types setup for parsing
    * 
    * @return array
    *  The node types
    */
   public function getAllowedNodeTypes(){
-    return $this->getExtractionSettings()['hook_node_types'];
+    return $this->config->get('extraction_settings.hook_node_types') ?? '';
   }
 
  /**

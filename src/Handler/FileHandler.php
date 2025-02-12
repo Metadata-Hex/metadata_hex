@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../../vendor/autoload.php';
-
 namespace Drupal\metadata_hex\Handler;
+
+require_once __DIR__ . '/../../vendor/autoload.php';
 
 use Drupal\file\Entity\File;
 use Drupal\metadata_hex\Base\MetadataHexCore;

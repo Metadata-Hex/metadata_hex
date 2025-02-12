@@ -180,11 +180,16 @@ class MetadataEntity extends MetadataHexCore
     }
 
     // Ingest and set the raw metadata
-    $this->setLocalMetadata($this->getNodeBinder($file)->ingestNodeFileMeta());
+    $tmd = $this->getNodeBinder($file)->ingestNodeFileMeta();
+    $this->setLocalMetadata($tmd);
 
     // cleans up and parses the metadata and sets
     $mtdt = $this->getParser()->cleanMetadata($this->metadataRaw);
     $this->mapMetadata($mtdt);
+
+    // Ingests the metadata and sets
+    $tmd = $this->getNodeBinder($node)->ingestNodeFileMeta();
+    $this->setLocalMetadata($tmd);
     $this->setLocalMetadata($this->metadataMapped, false);
   }
 
@@ -259,7 +264,7 @@ class MetadataEntity extends MetadataHexCore
   public function writeMetadata()
   {
     // Some may think to default to processed metadata. Perhaps
-    if (empty($this->metadataMapped)) {
+    if (empty($this->metadataProcessed)) {
       return;
     }
 
@@ -350,8 +355,8 @@ class MetadataEntity extends MetadataHexCore
    */
   public function mapMetadata(array $metadata)
   {
-
     $field_mappings = $this->metadataParser->getFieldMappings();
+
     foreach ($field_mappings as $drupal_field => $file_field) {
 
       if (isset($metadata[$file_field]) && !empty($metadata[$file_field])) {

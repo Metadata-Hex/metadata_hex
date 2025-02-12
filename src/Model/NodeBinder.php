@@ -131,13 +131,13 @@ class NodeBinder extends MetadataHexCore
       return false;
     }
 
-    $query = \Drupal::database()->select('node_processing_status', 'nps')
-      ->fields('nps', ['processed'])
-      ->condition('nid', $this->nid)
+    $query = (bool) \Drupal::database()->select('metadata_hex_processed', 'mhp')
+      ->fields('mhp', ['processed'])
+      ->condition('entity_id', $this->nid)
       ->execute()
       ->fetchField();
 
-    return (bool) $query;
+    return $query;
   }
 
   /**
@@ -324,11 +324,10 @@ class NodeBinder extends MetadataHexCore
       return;
     }
 
-    \Drupal::database()->insert('node_processing_status')
-      ->fields(['nid' => $this->nid, 'processed' => 1])
+    \Drupal::database()->insert('metadata_hex_processed')
+      ->fields(['entity_id' => $this->nid, 'entity_type' => $this->getBundleType()->id(), 'processed' => 1])
       ->execute();
   }
-
   /**
    * Sets a revision message when updating a node.
    * 

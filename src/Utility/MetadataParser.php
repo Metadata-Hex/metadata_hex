@@ -134,15 +134,15 @@ class MetadataParser extends MetadataHexCore
    */
   protected function cleanFieldMapping(array $dirty_fieldmapping = null): array
   {
-    if ($dirty_fieldmapping === null && !empty($this->fieldMapping)) {
-      $dirty_fieldmapping = $this->fieldMapping;
+    if ($dirty_fieldmapping === null && !empty($this->getFieldMappings())) {
+      $dirty_fieldmapping = $this->getFieldMappings();
     } else if (!is_array($dirty_fieldmapping)) {
       throw new Exception("Invalid input for field mapping. Expected an array.");
     }
 
     // clean the fields
     $cleaned = array_filter($dirty_fieldmapping, function ($key) {
-      return in_array($key, $this->availableFields, true);
+        return array_key_exists($key, $this->availableFields);
     }, ARRAY_FILTER_USE_KEY);
 
     if (empty($cleaned)) {
@@ -219,11 +219,11 @@ class MetadataParser extends MetadataHexCore
 
     $lines = explode("\n", $fieldMappings);
     $result = [];
-
+    $sh = (bool) $this->settingsManager->getStrictHandling();
     foreach ($lines as $line) {
       if (strpos($line, '|') !== false) {
         list($key, $value) = explode('|', $line);
-        $result[trim($value)] = trim($key);
+        $result[trim($value)] = $sh ? trim($key) : strtolower(trim($key));
       }
     }
 
@@ -355,9 +355,10 @@ class MetadataParser extends MetadataHexCore
   public function getFieldMappings()
   {
     // If fieldmapping is null, grab it
-    if ($this->fieldMapping == null){
+    if ($this->fieldMapping == null || empty($this->fieldMapping)){
       $extractedFieldMaps =  $this->settingsManager->getFieldMappings();
-      $this->fieldMapping = $this->cleanFieldMapping($extractedFieldMaps);
+      $fieldMapArray = $this->explodeKeyValueString($extractedFieldMaps);
+      $this->fieldMapping = $this->cleanFieldMapping($fieldMapArray);
     }
     return $this->fieldMapping;
   }
