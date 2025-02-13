@@ -4,7 +4,6 @@ namespace Drupal\metadata_hex\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\metadata_hex\Validator\FormValidator;
 use Drupal\node\Entity\NodeType;
 
 /**
@@ -13,7 +12,7 @@ use Drupal\node\Entity\NodeType;
 * Provides a settings form for the Metadata Hex module.
 */
 class SettingsForm extends ConfigFormBase {
-  
+
   /**
   * {@inheritdoc}
   */
@@ -225,5 +224,52 @@ class SettingsForm extends ConfigFormBase {
     
     $config->save();
     parent::submitForm($form, $form_state);
+  }
+}
+
+class FormValidator
+{
+  /**
+   * @var string
+   */
+  private $fieldMappings;
+
+  /**
+   * 
+   */
+  public function __construct($fieldMappings)
+  {
+    $this->fieldMappings = $fieldMappings;
+  }
+
+  /**
+   * Validates the format of field mappings.
+   * 
+   * Each mapping must either be empty or in the format 'key|value'.
+   * Returns true if valid, or an error message if invalid.
+   */
+  public function validateForm()
+  {
+    // Split input into lines
+    $lines = explode("\n", $this->fieldMappings);
+    $lineNumber = 0;
+
+    foreach ($lines as $line) {
+      $lineNumber++;
+      $line = trim($line);
+      if (!empty($line)) {
+        // Check if line contains exactly one '|'
+        if (substr_count($line, '|') != 1) {
+          return "Error on line $lineNumber: Each entry must be in the format 'key|value'.";
+        }
+        // Further split the line to check for non-empty key and value
+        list($key, $value) = explode('|', $line, 2);
+        if (trim($key) === '' || trim($value) === '') {
+          return "Error on line $lineNumber: Neither key nor value can be empty.";
+        }
+      }
+    }
+
+    return true;
   }
 }
