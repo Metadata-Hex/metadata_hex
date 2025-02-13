@@ -4,7 +4,6 @@ namespace Drupal\metadata_hex\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\metadata_hex\Validator\FormValidator;
 use Drupal\node\Entity\NodeType;
 
 /**
@@ -13,7 +12,7 @@ use Drupal\node\Entity\NodeType;
 * Provides a settings form for the Metadata Hex module.
 */
 class SettingsForm extends ConfigFormBase {
-  
+
   /**
   * {@inheritdoc}
   */
@@ -40,6 +39,10 @@ class SettingsForm extends ConfigFormBase {
   *   The form structure.
   */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    $form = parent::buildForm($form, $form_state);
+
+    // Unset the default submit button.
+    unset($form['actions']['submit']);
     $config = $this->config('metadata_hex.settings');
     $form['settings'] = [
       '#type' => 'vertical_tabs',
@@ -57,7 +60,7 @@ class SettingsForm extends ConfigFormBase {
 
     $form['extraction_settings'] = [
       '#type' => 'details',
-      '#title' => $this->t('Extraction Settings'),
+      '#title' => $this->t('Extraction'),
       '#open' => true,
       '#group' => 'settings',
     ];
@@ -67,56 +70,64 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t('Bundle types to hook'),
       '#multiple' => TRUE,
       '#options' => $options,
-      '#default_value' => implode("\n", $config->get('extraction_settings.hook_node_types') ?? []),
-      '#description' => $this->t('Select multiple node bundle types to indicate which types will be preprocessed on update or create.'),
+      '#default_value' => $config->get('extraction_settings.hook_node_types') ?? [],
+      '#description' => $this->t('Select the node bundle types to preprocess on update or create.'),
     ];
-    
+
     $form['extraction_settings']['field_mappings'] = [
       '#type' => 'textarea',
       '#title' => $this->t('Field mappings (File to Drupal)'),
-      '#default_value' => $config->get('field_mappings'),
-      '#description' => $this->t('Enter each field mappings in the format "file_field | drupal_field" on a new line.'),
+      '#default_value' => $config->get('extraction_settings.field_mappings'),
+      '#description' => $this->t('Enter each field mapping in the format "file_field | drupal_field" on a new line.'),
     ];
-    
+
     $form['extraction_settings']['flatten_keys'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Flattens metadata keys that have : in them'),
-      '#default_value' => $config->get('extraction_settings.flatten_keys')||false,
-    ];    
+      '#title' => $this->t('Flatten metadata keys containing colons'),
+      '#default_value' => $config->get('extraction_settings.flatten_keys') ?? FALSE,
+      '#description' => $this->t('Enable this option to flatten keys containing colons: key(pdfx:title) becomes key(title).'),
+    ];
 
     $form['extraction_settings']['strict_handling'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Strict handling for string comparison'),
-      '#default_value' => $config->get('extraction_settings.strict_handling')||false,
+      '#title' => $this->t('Enable strict handling'),
+      '#default_value' => $config->get('extraction_settings.strict_handling') ?? FALSE,
+      '#description' => $this->t('When enabled, handling will bypass case/syntax transforms'),
     ];
-    
+
     $form['extraction_settings']['data_protected'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Protect existing data from being overwritten'),
-      '#default_value' => $config->get('extraction_settings.data_protected')||true,
+      '#default_value' => $config->get('extraction_settings.data_protected') ?? TRUE,
+      '#description' => $this->t('Prevent the system from overwriting existing data during processing.'),
     ];
-    
+
     $form['extraction_settings']['title_protected'] = [
       '#type' => 'checkbox',
       '#title' => $this->t('Protect title from being overwritten'),
-      '#default_value' => $config->get('extraction_settings.title_protected')||true,
+      '#default_value' => $config->get('extraction_settings.title_protected') ?? TRUE,
+      '#description' => $this->t('Ensure that the node title remains unchanged during processing.'),
     ];
-    
+
     $form['extraction_settings']['available_extensions'] = [
       '#type' => 'textarea',
-      '#access' => false,
+      '#access' => FALSE,
       '#title' => $this->t('Enabled file extensions'),
       '#default_value' => $config->get('extraction_settings.available_extensions') ?? $extensions,
-      '#description' => $this->t('Enter file extensions, one per line.'),
+      '#description' => $this->t('Enter allowed file extensions, one per line.'),
     ];
+
     $form['extraction_settings']['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Save Configuration'),
+      '#value' => $this->t('Save configuration'),
+      '#attributes' => [
+        'class' => ['button', 'button--primary'],
+      ],
     ];
 
     $form['node_process'] = [
       '#type' => 'details',
-      '#title' => $this->t('Node Bulk Processing Settings'),
+      '#title' => $this->t('Node Bulk Processing'),
       '#open' => false,
       '#group' => 'settings',
     ];
@@ -127,12 +138,12 @@ class SettingsForm extends ConfigFormBase {
       '#multiple' => TRUE,
       '#options' => $options,
       '#default_value' => implode("\n", $config->get('node_process.bundle_types') ?? []),
-      '#description' => $this->t('Select multiple node bundle types to indicate which types will be preprocessed for file metadata extraction.'),
+      '#description' => $this->t('Select multiple bundle types to indicate which types will be preprocessed for file metadata extraction.'),
     ];
     
     $form['node_process']['allow_reprocess'] = [
       '#type' => 'checkbox',
-      '#title' => $this->t('Allow reprocessing of already processed nodes'),
+      '#title' => $this->t('Allow reprocessing of content'),
       '#default_value' => $config->get('node_process.allow_reprocess'),
     ];
     
@@ -144,7 +155,7 @@ class SettingsForm extends ConfigFormBase {
     
     $form['file_ingest'] = [
       '#type' => 'details',
-      '#title' => $this->t('File Ingest Settings'),
+      '#title' => $this->t('File Ingest'),
       '#open' => false,
       '#group' => 'settings',
     ];
@@ -155,12 +166,12 @@ class SettingsForm extends ConfigFormBase {
       '#options' => $options,
       '#multiple' => false,
       '#default_value' => implode("\n", $config->get('node_process.bundle_types') ?? []),
-      '#description' => $this->t('Select  node bundle types to indicate which types will be created from extracted metadata.'),
+      '#description' => $this->t('The node bundle type that will be created on ingest.'),
     ];
     
     $form['file_ingest']['file_attachment_field'] = [
       '#type' => 'textfield',
-      '#title' => $this->t('Field for attaching files'),
+      '#title' => $this->t('Field to attaching files to'),
       '#default_value' => $config->get('file_ingest.file_attachment_field'),
     ];
     
@@ -168,17 +179,17 @@ class SettingsForm extends ConfigFormBase {
       '#type' => 'textfield',
       '#title' => $this->t('Directory for file ingestion'),
       '#default_value' => $config->get('file_ingest.ingest_directory'),
-      '#description' => $this->t('Enter the directory path where files should be ingested.'),
+      '#description' => $this->t('Enter the directory path where files should be ingested from.'),
     ];
     
     $form['file_ingest']['process_cron_nodes'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Manually trigger file ingest'),
+      '#value' => $this->t('Ingest files'),
       '#submit' => ['::processAllPdfs'], // @todo fix this
     ];
     
     
-    return parent::buildForm($form, $form_state);
+    return $form; //parent::buildForm($form, $form_state);
   }
   
   /**
@@ -225,5 +236,52 @@ class SettingsForm extends ConfigFormBase {
     
     $config->save();
     parent::submitForm($form, $form_state);
+  }
+}
+
+class FormValidator
+{
+  /**
+   * @var string
+   */
+  private $fieldMappings;
+
+  /**
+   * 
+   */
+  public function __construct($fieldMappings)
+  {
+    $this->fieldMappings = $fieldMappings;
+  }
+
+  /**
+   * Validates the format of field mappings.
+   * 
+   * Each mapping must either be empty or in the format 'key|value'.
+   * Returns true if valid, or an error message if invalid.
+   */
+  public function validateForm()
+  {
+    // Split input into lines
+    $lines = explode("\n", $this->fieldMappings);
+    $lineNumber = 0;
+
+    foreach ($lines as $line) {
+      $lineNumber++;
+      $line = trim($line);
+      if (!empty($line)) {
+        // Check if line contains exactly one '|'
+        if (substr_count($line, '|') != 1) {
+          return "Error on line $lineNumber: Each entry must be in the format 'key|value'.";
+        }
+        // Further split the line to check for non-empty key and value
+        list($key, $value) = explode('|', $line, 2);
+        if (trim($key) === '' || trim($value) === '') {
+          return "Error on line $lineNumber: Neither key nor value can be empty.";
+        }
+      }
+    }
+
+    return true;
   }
 }
