@@ -18,7 +18,7 @@ class FileHandlerManager {
    *
    * @var MetadataHexPluginManager
    */
-  protected $pluginManager;
+  protected $pluginManager = null;
 
   /**
    * Constructs the FileHandlerManager class.
@@ -39,8 +39,9 @@ class FileHandlerManager {
    * @return mixed|null
    *   The handler plugin or null if not found.
    */
-  public function getHandlerForExtension(string $extension) {
-    foreach ($this->pluginManager->getDefinitions() as $plugin_id => $definition) {
+ public function getHandlerForExtension(string $extension) {
+
+  foreach ($this->pluginManager->getDefinitions() as $plugin_id => $definition) {
       if (isset($definition['extensions']) && in_array($extension, $definition['extensions'], true)) {
         return $this->pluginManager->createInstance($plugin_id);
       }

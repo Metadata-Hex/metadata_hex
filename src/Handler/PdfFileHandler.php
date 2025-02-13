@@ -50,10 +50,11 @@ class PdfFileHandler extends FileHandler {
   /**
    * Returns an array of supported file extensions.
    *
-   * @return arrayq
+   * @return array
    *   The supported file extensions.
    */
   public function getSupportedExtentions(): array {
     return ['pdf', 'pdfx'];
   }
+
 }
