@@ -3,8 +3,11 @@ namespace Drupal\metadata_hex\Handler;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
+use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\file\Entity\File;
 use Drupal\metadata_hex\Base\MetadataHexCore;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class FileHandler
@@ -14,7 +17,7 @@ use Drupal\metadata_hex\Base\MetadataHexCore;
  * - Extracting and cleaning data
  * - Ensuring compatibility with Drupal field structures
  */
-abstract class FileHandler extends MetadataHexCore {
+abstract class FileHandler extends PluginBase implements FileHandlerInterface, ContainerFactoryPluginInterface {
 
   /**
    * Array of IDs from nodes that reference the file.
@@ -43,20 +46,32 @@ abstract class FileHandler extends MetadataHexCore {
    * @var string
    */
   protected $fileUri;
-
-  /**
-   * Constructs the FileHandler class.
-   *
-   * @param string|null $filePath
-   *   The path to the file.
-   */
-  public function __construct(string $filePath = null) {
-    parent::__construct(\Drupal::service('logger.factory')->get('metadata_hex'));
-    if ($filePath) {
-      $this->setFileUri($filePath);
-    }
-  }
   
+  /**
+   * The file system service
+   * 
+   * @var \Drupal\Core\File\FileSystemInterface $fileSystem
+   * 
+   */
+  protected $fileSystem;
+
+   /**
+   * Constructs a FileHandler object.
+   *
+   * @param array $configuration
+   *   The plugin configuration array.
+   * @param string $plugin_id
+   *   The plugin ID.
+   * @param mixed $plugin_definition
+   *   The plugin definition.
+   * @param \Drupal\Core\File\FileSystemInterface $file_system
+   *   The file system service.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, $file_system) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition);
+    $this->fileSystem = $file_system;
+  }
+
   /**
    * Summary of setFileUri
    * @param string $fileUri
@@ -93,6 +108,20 @@ abstract class FileHandler extends MetadataHexCore {
    */
   protected function getFileType(): string {
     return $this->fileType;
+  }
+
+  /**
+   * Returns the plugin ID.
+   */
+  public function getPluginId() {
+    return $this->pluginId;
+  }
+
+  /**
+   * Returns the plugin definition.
+   */
+  public function getPluginDefinition() {
+    return $this->pluginDefinition;
   }
 
   /**
@@ -143,5 +172,30 @@ abstract class FileHandler extends MetadataHexCore {
    */
   protected function isValidFile(): bool {
     return file_exists($this->fileUri) && is_readable($this->fileUri);
+  }
+
+   /**
+   * Factory method for dependency injection.
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      null
+    );
+  }
+
+  /**
+   * Processes the file.
+   *
+   * @param string $file_path
+   *   The path to the file.
+   *
+   * @return mixed
+   *   The result of processing.
+   */  
+  public function process($file_path): mixed {
+    return $file_path;
   }
 }

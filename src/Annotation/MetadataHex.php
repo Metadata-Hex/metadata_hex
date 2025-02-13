@@ -17,6 +17,13 @@ class MetadataHex extends Plugin {
   public $id;
 
   /**
+   * The human-readable name.
+   *
+   * @var \Drupal\Core\Annotation\Translation
+   */
+  public $label;
+  
+  /**
    * The file extensions this plugin handles.
    *
    * @var array

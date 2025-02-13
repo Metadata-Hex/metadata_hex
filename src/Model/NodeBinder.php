@@ -193,18 +193,12 @@ class NodeBinder extends MetadataHexCore
           if ($file) {
             $file_uri = $file->getFileUri();
             $file_extension = pathinfo($file_uri, PATHINFO_EXTENSION);
-
-            // @todo Investivate why this fails with opluginManager
-            //$handler = $this->fileHandlerManager->getHandlerForExtension($file_extension);
-            //var_dump($this->fileHandlerManager->getAvailableExtentions());
-
-            // ** Temporary fix ** // 
-            $handler = new PdfFileHandler();
-            // ** Temporary fix ** // 
+            $handler = $this->fileHandlerManager->getHandlerForExtension($file_extension);
 
             // setup the handler and extract the metadata
             $handler->setFileUri($file_uri);
             $exmd = $handler->extractMetadata();
+
             $data = [
               'uri' => $file->getFileUri(),
               'metadata' => $exmd,
@@ -324,8 +318,13 @@ class NodeBinder extends MetadataHexCore
       return;
     }
 
-    \Drupal::database()->insert('metadata_hex_processed')
-      ->fields(['entity_id' => $this->nid, 'entity_type' => $this->getBundleType()->id(), 'processed' => 1])
+    \Drupal::database()->upsert('metadata_hex_processed')
+      ->key('entity_id') 
+      ->fields([
+        'entity_id' => $this->nid,
+        'entity_type' => $this->getBundleType(),
+        'processed' => 1,
+      ])
       ->execute();
   }
   /**
