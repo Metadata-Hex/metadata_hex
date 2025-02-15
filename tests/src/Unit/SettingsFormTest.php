@@ -1,6 +1,5 @@
 <?php
 
-// Include the stub to override real NodeType behavior
 require_once __DIR__ . '/Mocks/NodeTypeStub.php';
 
 use Drupal\node\Entity\NodeTypeStub as NodeType;
@@ -14,8 +13,7 @@ use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
-use Drupal\Core\Entity\EntityStorageInterface; 
-//use Drupal\node\Entity\NodeType;
+use Drupal\Core\Entity\EntityStorageInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\DependencyInjection\ContainerBuilder;
@@ -54,11 +52,6 @@ class SettingsFormTest extends TestCase
     // Store updated values in a reference array
     $updatedConfig = $defaultSettings;
 
-        // ✅ Mock NodeType
-    // $this->nodeTypeMock = $this->createMock(\Drupal\Core\Entity\EntityInterface::class);
-    // $this->nodeTypeMock->method('id')->willReturn('article');
-    // $this->nodeTypeMock->method('label')->willReturn('Article');
-
     // Mock Config to store and return updated values
     $this->configMock = $this->createMock(Config::class);
     $this->configMock->method('get')->willReturnCallback(function ($key) use (&$updatedConfig) {
@@ -91,75 +84,34 @@ class SettingsFormTest extends TestCase
     $this->messengerMock = $this->createMock(MessengerInterface::class);
 
     // ✅ Properly mock NodeType instances
-$this->articleMock = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityInterface::class);
-$this->articleMock->method('id')->willReturn('article');
-$this->articleMock->method('label')->willReturn('Article');
+    $this->articleMock = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityInterface::class);
+    $this->articleMock->method('id')->willReturn('article');
+    $this->articleMock->method('label')->willReturn('Article');
 
-$this->pageMock = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityInterface::class);
-$this->pageMock->method('id')->willReturn('page');
-$this->pageMock->method('label')->willReturn('Page');
+    $this->pageMock = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityInterface::class);
+    $this->pageMock->method('id')->willReturn('page');
+    $this->pageMock->method('label')->willReturn('Page');
 
-// ✅ Ensure loadMultiple() returns proper mocks
-$this->entityStorageMock = $this->createMock(EntityStorageInterface::class);
-$this->entityStorageMock->method('loadMultiple')->willReturn([
-    'article' => $this->articleMock,
-    'page' => $this->pageMock,
-]);
+    // ✅ Ensure loadMultiple() returns proper mocks
+    $this->entityStorageMock = $this->createMock(EntityStorageInterface::class);
+    $this->entityStorageMock->method('loadMultiple')->willReturn([
+      'article' => $this->articleMock,
+      'page' => $this->pageMock,
+    ]);
 
-// ✅ Ensure load() works properly too
-$this->entityStorageMock->method('load')->willReturnCallback(function ($bundleType) {
-    return $bundleType === 'article' ? $this->articleMock : ($bundleType === 'page' ? $this->pageMock : null);
-});
+    // ✅ Ensure load() works properly too
+    $this->entityStorageMock->method('load')->willReturnCallback(function ($bundleType) {
+      return $bundleType === 'article' ? $this->articleMock : ($bundleType === 'page' ? $this->pageMock : null);
+    });
 
-// ✅ Mock EntityTypeManagerInterface to return correct storage
-$this->entityTypeManagerMock = $this->createMock(EntityTypeManagerInterface::class);
-$this->entityTypeManagerMock->method('getStorage')->willReturnCallback(function ($entityType) {
-    if ($entityType === 'node_type') {
+    // ✅ Mock EntityTypeManagerInterface to return correct storage
+    $this->entityTypeManagerMock = $this->createMock(EntityTypeManagerInterface::class);
+    $this->entityTypeManagerMock->method('getStorage')->willReturnCallback(function ($entityType) {
+      if ($entityType === 'node_type') {
         return $this->entityStorageMock; // ✅ Return correct storage
-    }
-    throw new \InvalidArgumentException("Unexpected entity type: {$entityType}");
-});
-    // $articleMock = new class {
-    //   public function id()
-    //   {
-    //     return 'article';
-    //   }
-    //   public function label()
-    //   {
-    //     return 'Article';
-    //   }
-    // };
-
-    // $pageMock = new class {
-    //   public function id()
-    //   {
-    //     return 'page';
-    //   }
-    //   public function label()
-    //   {
-    //     return 'Page';
-    //   }
-    // };
-
-    // // Mock EntityStorage to Always Return a List of Node Types
-    // $this->entityStorageMock = $this->createMock(EntityStorageInterface::class);
-    // $this->entityStorageMock->method('loadMultiple')->willReturn([
-    //   'article' => $articleMock,
-    //   'page' => $pageMock,
-    // ]);
-
-    // // Ensure `getStorage()` Always Returns a Valid Storage Handler
-    // $this->entityTypeManagerMock = $this->createMock(EntityTypeManagerInterface::class);
-    // $this->entityTypeManagerMock->method('getStorage')
-    //   ->willReturnCallback(function ($entityType) {
-    //     if ($entityType === 'node_type') {
-    //       return $this->entityStorageMock; // Always return the mock for node types
-    //     }
-    //     if (empty($entityType)) {
-    //       return $this->entityStorageMock; // Default to 'node_type'
-    //     }
-    //     throw new \InvalidArgumentException("Unexpected entity type requested: '{$entityType}'");
-    //   });
+      }
+      throw new \InvalidArgumentException("Unexpected entity type: {$entityType}");
+    });
 
     // Mock EntityTypeRepositoryInterface
     $this->entityTypeRepositoryMock = $this->createMock(EntityTypeRepositoryInterface::class);
@@ -178,6 +130,8 @@ $this->entityTypeManagerMock->method('getStorage')->willReturnCallback(function 
     // Pass the correct mocks into MockSettingsForm
     $this->form = new MockSettingsForm($this->configFactoryMock, $this->typedConfigManagerMock, $this->messengerMock);
   }
+
+  /** @test */
   public function testBuildFormContainsExpectedFields()
   {
     $form = [];
@@ -191,6 +145,7 @@ $this->entityTypeManagerMock->method('getStorage')->willReturnCallback(function 
     $this->assertArrayHasKey('settings', $builtForm);
   }
 
+  /** @test */
   public function testSubmitFormUpdatesConfig()
   {
 

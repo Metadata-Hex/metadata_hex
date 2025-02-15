@@ -108,12 +108,13 @@ class MetadataParserTest extends TestCase {
         $this->assertIsArray($result);
         $this->assertEquals($expected, $result);
     }
+
     /** @test */
-public function test_it_throws_a_type_error_when_null_is_passed_without_backup() {
+    public function test_it_throws_a_type_error_when_null_is_passed_without_backup() {
     $this->expectException(\TypeError::class);
     
     $this->parser->cleanMetadata(null);
-}
+    }
 
     /** @test */
     public function it_logs_a_message_when_an_empty_array_is_passed() {
@@ -177,7 +178,7 @@ public function test_it_throws_a_type_error_when_null_is_passed_without_backup()
         $result = $this->parser->cleanMetadata($input);
         $this->assertEquals($expected, $result);
     }
-  /** @test */
+    /** @test */
     public function test_it_retains_unflattened_keys_when_flatten_keys_is_disabled() {
         $input = ['key1' => 'value', 'pdfx:key2' => 'value'];
         $expected = ['key1' => 'value', 'pdfx:key2' => 'value'];
@@ -188,7 +189,7 @@ public function test_it_throws_a_type_error_when_null_is_passed_without_backup()
         $this->assertEquals($expected, $result);
     }
 
-  /** @test */
+    /** @test */
     public function test_it_flattens_keys_when_flatten_keys_is_enabled() {
         $input = ['key1' => 'value', 'pdfx:key2' => 'value'];
         $expected = ['key1' => 'value', 'key2' => 'value'];
@@ -199,43 +200,42 @@ public function test_it_throws_a_type_error_when_null_is_passed_without_backup()
         $this->assertEquals($expected, $result);
     }
 
-/** @test */
-public function test_it_throws_an_exception_when_null_is_passed() {
-    $this->expectException(\TypeError::class);
-    $this->parser->cleanFieldMapping(null);
-}
+    /** @test */
+    public function test_it_throws_an_exception_when_null_is_passed() {
+        $this->expectException(\TypeError::class);
+        $this->parser->cleanFieldMapping(null);
+    }
 
-/** @test */
-public function test_it_returns_expected_fields_when_available_fields_are_set_and_input_matches() { 
-    $this->parser->setAvailableFields(['title', 'author', 'date']);
-    $input = ['title' => 'field_title', 'author' => 'field_author', 'date' => 'field_date'];
-    $expected = ['title' => 'field_title', 'author' => 'field_author', 'date' => 'field_date'];
+    /** @test */
+    public function test_it_returns_expected_fields_when_available_fields_are_set_and_input_matches() { 
+        $this->parser->setAvailableFields(['title', 'author', 'date']);
+        $input = ['title' => 'field_title', 'author' => 'field_author', 'date' => 'field_date'];
+        $expected = ['title' => 'field_title', 'author' => 'field_author', 'date' => 'field_date'];
 
-    $result = $this->parser->cleanFieldMapping($input);
-    $this->assertEquals($expected, $result);
-}
+        $result = $this->parser->cleanFieldMapping($input);
+        $this->assertEquals($expected, $result);
+    }
 
-/** @test */
-public function test_it_filters_out_fields_not_in_available_fields() { /*** */
-    $this->parser->setAvailableFields(['title', 'author']);
+    /** @test */
+    public function test_it_filters_out_fields_not_in_available_fields() { /*** */
+        $this->parser->setAvailableFields(['title', 'author']);
 
-    $input = ['title' => 'field_title', 'author' => 'field_author', 'extra_field' => 'field_extra'];
-    $expected = ['title' => 'field_title', 'author' => 'field_author'];
+        $input = ['title' => 'field_title', 'author' => 'field_author', 'extra_field' => 'field_extra'];
+        $expected = ['title' => 'field_title', 'author' => 'field_author'];
 
-    $result = $this->parser->cleanFieldMapping($input);
-    $this->assertEquals($expected, $result);
-}
+        $result = $this->parser->cleanFieldMapping($input);
+        $this->assertEquals($expected, $result);
+    }     
 
-/** @test */
-public function test_it_returns_an_empty_array_when_no_fields_match_available_fields() {
-    $this->parser->setAvailableFields(['title', 'author']);
+    /** @test */
+    public function test_it_returns_an_empty_array_when_no_fields_match_available_fields() {
+        $this->parser->setAvailableFields(['title', 'author']);
 
-    $input = ['extra_field' => 'field_extra', 'another_field' => 'field_another'];
-    $expected = [];
+        $input = ['extra_field' => 'field_extra', 'another_field' => 'field_another'];
+        $expected = [];
 
-    $result = $this->parser->cleanFieldMapping($input);
-    $this->assertEquals($expected, $result);
-}
-   
+        $result = $this->parser->cleanFieldMapping($input);
+        $this->assertEquals($expected, $result);
+    }
 }
   
