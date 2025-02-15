@@ -17,5 +17,18 @@
     "minimum-stability": "dev",
     "require": {
         "smalot/pdfparser": "dev-master"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Drupal\\Tests\\metadata_hex\\Unit\\": "tests/src/Unit/"
+        }
+    },
+    "extra": {
+        "patches": {},
+        "drupal-scaffold": {
+            "locations": {
+                "web-root": "web"
+            }
+        }
     }
 }

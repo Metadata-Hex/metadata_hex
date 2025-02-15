@@ -55,8 +55,8 @@ class SettingsForm extends ConfigFormBase {
       $options[$content_type->id()] = $content_type->label();
     }
   
-    $fileHandlerManager = \Drupal::service('metadata_hex.file_handler_manager');
-    $extensions = $fileHandlerManager->getAvailableExtentions();
+    //$fileHandlerManager = \Drupal::service('metadata_hex.file_handler_manager');
+    //$extensions = $fileHandlerManager->getAvailableExtentions();
 
     $form['extraction_settings'] = [
       '#type' => 'details',
@@ -189,7 +189,7 @@ class SettingsForm extends ConfigFormBase {
     ];
     
     
-    return $form; //parent::buildForm($form, $form_state);
+    return $form; 
   }
   
   /**
@@ -215,27 +215,25 @@ class SettingsForm extends ConfigFormBase {
   * @param FormStateInterface $form_state
   *   The form state.
   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
+public function submitForm(array &$form, FormStateInterface $formState) {
     $config = $this->config('metadata_hex.settings');
-    
-    $config->set('extraction_settings.hook_node_types', $form_state->getValue('hook_node_types'));
-    
-    $config->set('extraction_settings.field_mappings', $form_state->getValue('field_mappings'));
-    $config->set('extraction_settings.strict_handling', $form_state->getValue('strict_handling'));
-    $config->set('extraction_settings.flatten_keys', $form_state->getValue('flatten_keys'));
-    $config->set('extraction_settings.data_protected', $form_state->getValue('data_protected'));
-    $config->set('extraction_settings.title_protected', $form_state->getValue('title_protected'));
-    $config->set('extraction_settings.available_extensions', ($form_state->getValue('available_extensions')??''));
-    
-    $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
-    $config->set('node_process.allow_reprocess', $form_state->getValue('allow_reprocess'));
-    
-    $config->set('file_ingest.bundle_type_for_generation', $form_state->getValue('bundle_type_for_generation'));
-    $config->set('file_ingest.file_attachment_field', $form_state->getValue('file_attachment_field'));
-    $config->set('file_ingest.ingest_directory', $form_state->getValue('ingest_directory'));
-    
+
+    $config->set('extraction_settings.hook_node_types', $formState->getValue('extraction_settings.hook_node_types', []));
+    $config->set('extraction_settings.field_mappings', $formState->getValue('extraction_settings.field_mappings', ''));
+    $config->set('extraction_settings.strict_handling', $formState->getValue('extraction_settings.strict_handling', FALSE));
+    $config->set('extraction_settings.flatten_keys', $formState->getValue('extraction_settings.flatten_keys', FALSE));
+    $config->set('extraction_settings.data_protected', $formState->getValue('extraction_settings.data_protected', FALSE));
+    $config->set('extraction_settings.title_protected', $formState->getValue('extraction_settings.title_protected', FALSE));
+    $config->set('extraction_settings.available_extensions', $formState->getValue('extraction_settings.available_extensions', ''));
+
+    $config->set('node_process.bundle_types', $formState->getValue('node_process.bundle_types', []));
+    $config->set('node_process.allow_reprocess', $formState->getValue('node_process.allow_reprocess', FALSE));
+
+    $config->set('file_ingest.bundle_type_for_generation', $formState->getValue('file_ingest.bundle_type_for_generation', ''));
+    $config->set('file_ingest.file_attachment_field', $formState->getValue('file_ingest.file_attachment_field', ''));
+    $config->set('file_ingest.ingest_directory', $formState->getValue('file_ingest.ingest_directory', ''));
+
     $config->save();
-    parent::submitForm($form, $form_state);
   }
 }
 
