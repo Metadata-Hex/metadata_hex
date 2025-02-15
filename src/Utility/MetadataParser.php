@@ -104,14 +104,39 @@ class MetadataParser extends MetadataHexCore
     if ($this->bundleType !== null) {
       $this->availableFields = $this->entityFieldManager->getFieldDefinitions('node', $this->bundleType->id());
     }
-    
+
     // init the settings manager
     $this->settingsManager = new SettingsManager();
+
+    // TODO set flatten_keys in here
 
     // setup field mappings
     $this->fieldMapping = $this->getFieldMappings();
   }
 
+  public function getAvailableFields()
+  {
+    return $this->availableFields;
+  }
+  /**
+   * 
+   */
+  public function setStrictHandling(bool $bool)
+  {
+    $this->strictHandling = $bool;
+  }
+
+  public function setFlattenKeys(bool $bool)
+  {
+    $this->flattenKeys = $bool;
+  }
+
+  public function setAvailableFields(array $data)
+  {
+    $this->availableFields = array_fill_keys($data, true);//array_flip(array_map('strval', $data));
+
+    //echo 'setAvailableFields:' . print_r($this->availableFields, true);
+  }
   /**
    * Returns an instance of the entity_field manager
    */
@@ -132,21 +157,21 @@ class MetadataParser extends MetadataHexCore
    * @throws Exception
    *   If input is invalid.
    */
-  protected function cleanFieldMapping(array $dirty_fieldmapping = null): array
+  public function cleanFieldMapping(array $dirty_fieldmapping = null): array
   {
     if ($dirty_fieldmapping === null && !empty($this->getFieldMappings())) {
       $dirty_fieldmapping = $this->getFieldMappings();
     } else if (!is_array($dirty_fieldmapping)) {
       throw new Exception("Invalid input for field mapping. Expected an array.");
     }
-
+    echo $this->availableFields;
     // clean the fields
     $cleaned = array_filter($dirty_fieldmapping, function ($key) {
-        return array_key_exists($key, $this->availableFields);
+      return array_key_exists($key, $this->availableFields);
     }, ARRAY_FILTER_USE_KEY);
 
     if (empty($cleaned)) {
-      throw new Exception("All field mappings were removed. No valid mappings found.");
+      $this->logger->error("All field mappings were removed. No valid mappings found.");
     }
 
     return $cleaned;
@@ -186,7 +211,7 @@ class MetadataParser extends MetadataHexCore
 
       // if we arent strict handling, normalize all keys
       if (!$this->strictHandling) {
-        $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $key));
+        $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '$0', $key));
       }
 
       $cleanedMetadata[$key] = is_array($value) ? array_map('trim', $value) : trim($value);
@@ -211,7 +236,7 @@ class MetadataParser extends MetadataHexCore
    * @throws Exception
    *   If input is invalid.
    */
-  protected function explodeKeyValueString(string $fieldMappings): array
+  public function explodeKeyValueString(string $fieldMappings): array
   {
     if (!is_string($fieldMappings) || empty($fieldMappings)) {
       throw new Exception("Invalid field mapping string.");
@@ -259,6 +284,11 @@ class MetadataParser extends MetadataHexCore
         ? array_map(fn($v) => htmlspecialchars(trim($v), ENT_QUOTES, 'UTF-8'), $value)
         : htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
 
+      // Remove ALL non-ASCII characters (including é and emoji)
+      $cleanKey = preg_replace('/[^\x20-\x7E]/u', '', $cleanKey);
+      $cleanValue = is_array($cleanValue)
+        ? array_map(fn($v) => preg_replace('/[^\x20-\x7E]/u', '', $v), $cleanValue)
+        : preg_replace('/[^\x20-\x7E]/u', '', $cleanValue);
       if ($this->strictHandling) {
         $cleanKey = preg_replace('/[^a-zA-Z0-9_]/', '', $cleanKey);
         $cleanValue = is_array($cleanValue)
@@ -266,7 +296,7 @@ class MetadataParser extends MetadataHexCore
           : preg_replace('/[^a-zA-Z0-9_ ]/', '', $cleanValue);
       }
 
-      if ($this->flattenKeys){
+      if ($this->flattenKeys && strpos($cleanKey, ':') !== false) {
         $cleanKey = substr(strrchr($cleanKey, ':'), 1);
       }
 
@@ -274,7 +304,7 @@ class MetadataParser extends MetadataHexCore
     }
 
     if (empty($sanitized)) {
-      throw new Exception("Sanitized array is empty.");
+      $this->logger->error("Sanitized array is empty.");
     }
 
     return $sanitized;
@@ -355,8 +385,8 @@ class MetadataParser extends MetadataHexCore
   public function getFieldMappings()
   {
     // If fieldmapping is null, grab it
-    if ($this->fieldMapping == null || empty($this->fieldMapping)){
-      $extractedFieldMaps =  $this->settingsManager->getFieldMappings();
+    if ($this->fieldMapping == null || empty($this->fieldMapping)) {
+      $extractedFieldMaps = $this->settingsManager->getFieldMappings();
       $fieldMapArray = $this->explodeKeyValueString($extractedFieldMaps);
       $this->fieldMapping = $this->cleanFieldMapping($fieldMapArray);
     }
