@@ -1,0 +1,1 @@
+{"version":1,"defects":{"SettingsFormTest::testBuildFormContainsExpectedFields":8,"SettingsFormTest::testSubmitFormUpdatesConfig":8},"times":{"SettingsFormTest::testBuildFormContainsExpectedFields":0.004,"SettingsFormTest::testSubmitFormUpdatesConfig":0.001}}

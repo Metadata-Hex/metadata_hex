@@ -32,9 +32,12 @@
         }
     },
     "require-dev": {
-        "phpunit/phpunit": "^12.1@dev"
+        "phpunit/phpunit": "^12.1@dev",
+        "drupal/core-dev": "^8.0@beta",
+        "drupal/core": "^9 || ^10 || ^11",
+        "drupal/core-recommended": "^9 || ^10 || ^11"
     },
-    "scripts": {
-        "phpunit": "./vendor/bin/phpunit --bootstrap web/core/tests/bootstrap.php --configuration web/core/phpunit.xml.dist web/modules/custom"
-    }
+"scripts": {
+    "phpunit": "PHPUNIT_DISABLE_DEPRECATIONS=1 ./vendor/bin/phpunit --configuration phpunit.xml.dist"
+}
 }
