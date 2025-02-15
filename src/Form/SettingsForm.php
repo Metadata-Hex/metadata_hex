@@ -189,7 +189,7 @@ class SettingsForm extends ConfigFormBase {
     ];
     
     
-    return $form; //parent::buildForm($form, $form_state);
+    return $form; 
   }
   
   /**
@@ -218,9 +218,6 @@ class SettingsForm extends ConfigFormBase {
 public function submitForm(array &$form, FormStateInterface $formState) {
     $config = $this->config('metadata_hex.settings');
 
-    //error_log("🔍 FORM STATE VALUES: " . print_r($formState->getValues(), true)); // ✅ Debugging
-
-    // ✅ Ensure values are properly retrieved before setting
     $config->set('extraction_settings.hook_node_types', $formState->getValue('extraction_settings.hook_node_types', []));
     $config->set('extraction_settings.field_mappings', $formState->getValue('extraction_settings.field_mappings', ''));
     $config->set('extraction_settings.strict_handling', $formState->getValue('extraction_settings.strict_handling', FALSE));
@@ -236,11 +233,7 @@ public function submitForm(array &$form, FormStateInterface $formState) {
     $config->set('file_ingest.file_attachment_field', $formState->getValue('file_ingest.file_attachment_field', ''));
     $config->set('file_ingest.ingest_directory', $formState->getValue('file_ingest.ingest_directory', ''));
 
-    //error_log("💾 CONFIG BEFORE SAVE: " . print_r($config, true)); // ✅ Debugging
-
     $config->save();
-
-    //parent::submitForm($form, $form_state);
   }
 }
 
