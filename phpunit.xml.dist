@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="vendor/autoload.php">
+    <testsuites>
+        <testsuite name="MetadataHex Tests">
+            <directory>tests/src/Unit</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <ini name="error_reporting" value="E_ALL &amp; ~E_DEPRECATED &amp; ~E_USER_DEPRECATED"/>
+        <env name="SIMPLETEST_BASE_URL" value="http://localhost"/>
+        <env name="SIMPLETEST_DB" value="sqlite://localhost/:memory:"/>
+        <env name="SYMFONY_DEPRECATIONS_HELPER" value="weak"/>
+    </php>
+</phpunit>

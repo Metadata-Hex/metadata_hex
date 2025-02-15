@@ -84,19 +84,19 @@ class MetadataParserTest extends TestCase {
     }
 
     /** @test */
-    public function it_throws_an_error_when_given_a_non_string() {
+    public function test_it_throws_an_error_when_given_a_non_string() {
         $this->expectException(\TypeError::class);
         $this->parser->explodeKeyValueString(['invalid array input']);
     }
 
     /** @test */
-    public function it_throws_an_error_when_given_an_empty_string() {
+    public function test_it_throws_an_error_when_given_an_empty_string() {
         $this->expectException(\Exception::class);
         $this->parser->explodeKeyValueString('');
     }
 
     /** @test */
-    public function it_parses_a_valid_piped_string_into_an_array() {
+    public function test_it_parses_a_valid_piped_string_into_an_array() {
         $input = "title|field_title\nauthor|field_author";
         $expected = [
             'field_title' => 'title',
@@ -108,12 +108,13 @@ class MetadataParserTest extends TestCase {
         $this->assertIsArray($result);
         $this->assertEquals($expected, $result);
     }
+
     /** @test */
-public function it_throws_a_type_error_when_null_is_passed_without_backup() {
+    public function test_it_throws_a_type_error_when_null_is_passed_without_backup() {
     $this->expectException(\TypeError::class);
     
     $this->parser->cleanMetadata(null);
-}
+    }
 
     /** @test */
     public function it_logs_a_message_when_an_empty_array_is_passed() {
@@ -123,7 +124,7 @@ public function it_throws_a_type_error_when_null_is_passed_without_backup() {
     }
 
     /** @test */
-    public function it_returns_cleaned_metadata_when_structured_array_is_passed() {
+    public function test_it_returns_cleaned_metadata_when_structured_array_is_passed() {
         $input = ['key1' => 'value', 'key2' => 'value'];
         $expected = ['key1' => 'value', 'key2' => 'value'];
 
@@ -132,7 +133,7 @@ public function it_throws_a_type_error_when_null_is_passed_without_backup() {
     }
 
     /** @test */
-    public function it_cleans_utf8_encoded_strings() {
+    public function test_it_cleans_utf8_encoded_strings() {
         $input = ['key1' => 'value', 'key2' => "valueé😀"];
         $expected = ['key1' => 'value', 'key2' => 'value'];
 
@@ -141,7 +142,7 @@ public function it_throws_a_type_error_when_null_is_passed_without_backup() {
     }
 
     /** @test */
-    public function it_flattens_nested_structures_into_a_cleaned_array() {
+    public function test_it_flattens_nested_structures_into_a_cleaned_array() {
         $input = [['key1' => 'value', 'key2' => 'value'], ['key3' => 'value']];
         $expected = ['key1' => 'value', 'key2' => 'value', 'key3' => 'value'];
 
@@ -150,7 +151,7 @@ public function it_throws_a_type_error_when_null_is_passed_without_backup() {
     }
 
     /** @test */
-    public function it_removes_empty_keys_and_values() {
+    public function test_it_removes_empty_keys_and_values() {
         $input = ['key1' => '', 'key2' => 'value', '' => 'value'];
         $expected = ['key2' => 'value'];
 
@@ -159,7 +160,7 @@ public function it_throws_a_type_error_when_null_is_passed_without_backup() {
     }
 
     /** @test */
-    public function it_normalizes_key_case_by_default() {
+    public function test_it_normalizes_key_case_by_default() {
         $input = ['Key1' => 'value', 'kEy2' => 'value'];
         $expected = ['key1' => 'value', 'key2' => 'value'];
 
@@ -168,7 +169,7 @@ public function it_throws_a_type_error_when_null_is_passed_without_backup() {
     }
 
     /** @test */
-    public function it_retains_original_key_case_when_strict_handling_is_enabled() {
+    public function test_it_retains_original_key_case_when_strict_handling_is_enabled() {
         $input = ['Key1' => 'value', 'keY2' => 'value'];
         $expected = ['Key1' => 'value', 'keY2' => 'value'];
 
@@ -177,8 +178,8 @@ public function it_throws_a_type_error_when_null_is_passed_without_backup() {
         $result = $this->parser->cleanMetadata($input);
         $this->assertEquals($expected, $result);
     }
-  /** @test */
-    public function it_retains_unflattened_keys_when_flatten_keys_is_disabled() {
+    /** @test */
+    public function test_it_retains_unflattened_keys_when_flatten_keys_is_disabled() {
         $input = ['key1' => 'value', 'pdfx:key2' => 'value'];
         $expected = ['key1' => 'value', 'pdfx:key2' => 'value'];
 
@@ -188,8 +189,8 @@ public function it_throws_a_type_error_when_null_is_passed_without_backup() {
         $this->assertEquals($expected, $result);
     }
 
-  /** @test */
-    public function it_flattens_keys_when_flatten_keys_is_enabled() {
+    /** @test */
+    public function test_it_flattens_keys_when_flatten_keys_is_enabled() {
         $input = ['key1' => 'value', 'pdfx:key2' => 'value'];
         $expected = ['key1' => 'value', 'key2' => 'value'];
 
@@ -199,43 +200,42 @@ public function it_throws_a_type_error_when_null_is_passed_without_backup() {
         $this->assertEquals($expected, $result);
     }
 
-/** @test */
-public function it_throws_an_exception_when_null_is_passed() {
-    $this->expectException(\TypeError::class);
-    $this->parser->cleanFieldMapping(null);
-}
+    /** @test */
+    public function test_it_throws_an_exception_when_null_is_passed() {
+        $this->expectException(\TypeError::class);
+        $this->parser->cleanFieldMapping(null);
+    }
 
-/** @test */
-public function it_returns_expected_fields_when_available_fields_are_set_and_input_matches() { 
-    $this->parser->setAvailableFields(['title', 'author', 'date']);
-    $input = ['title' => 'field_title', 'author' => 'field_author', 'date' => 'field_date'];
-    $expected = ['title' => 'field_title', 'author' => 'field_author', 'date' => 'field_date'];
+    /** @test */
+    public function test_it_returns_expected_fields_when_available_fields_are_set_and_input_matches() { 
+        $this->parser->setAvailableFields(['title', 'author', 'date']);
+        $input = ['title' => 'field_title', 'author' => 'field_author', 'date' => 'field_date'];
+        $expected = ['title' => 'field_title', 'author' => 'field_author', 'date' => 'field_date'];
 
-    $result = $this->parser->cleanFieldMapping($input);
-    $this->assertEquals($expected, $result);
-}
+        $result = $this->parser->cleanFieldMapping($input);
+        $this->assertEquals($expected, $result);
+    }
 
-/** @test */
-public function it_filters_out_fields_not_in_available_fields() { /*** */
-    $this->parser->setAvailableFields(['title', 'author']);
+    /** @test */
+    public function test_it_filters_out_fields_not_in_available_fields() { /*** */
+        $this->parser->setAvailableFields(['title', 'author']);
 
-    $input = ['title' => 'field_title', 'author' => 'field_author', 'extra_field' => 'field_extra'];
-    $expected = ['title' => 'field_title', 'author' => 'field_author'];
+        $input = ['title' => 'field_title', 'author' => 'field_author', 'extra_field' => 'field_extra'];
+        $expected = ['title' => 'field_title', 'author' => 'field_author'];
 
-    $result = $this->parser->cleanFieldMapping($input);
-    $this->assertEquals($expected, $result);
-}
+        $result = $this->parser->cleanFieldMapping($input);
+        $this->assertEquals($expected, $result);
+    }     
 
-/** @test */
-public function it_returns_an_empty_array_when_no_fields_match_available_fields() {
-    $this->parser->setAvailableFields(['title', 'author']);
+    /** @test */
+    public function test_it_returns_an_empty_array_when_no_fields_match_available_fields() {
+        $this->parser->setAvailableFields(['title', 'author']);
 
-    $input = ['extra_field' => 'field_extra', 'another_field' => 'field_another'];
-    $expected = [];
+        $input = ['extra_field' => 'field_extra', 'another_field' => 'field_another'];
+        $expected = [];
 
-    $result = $this->parser->cleanFieldMapping($input);
-    $this->assertEquals($expected, $result);
-}
-   
+        $result = $this->parser->cleanFieldMapping($input);
+        $this->assertEquals($expected, $result);
+    }
 }
   
