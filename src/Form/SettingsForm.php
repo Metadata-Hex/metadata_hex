@@ -4,7 +4,6 @@ namespace Drupal\metadata_hex\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\node\Entity\NodeType;
 
 /**
 * Class SettingsForm
@@ -49,7 +48,8 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t('Configuration Sections'),
     ];
     
-    $content_types = NodeType::loadMultiple();
+    $node_storage = \Drupal::entityTypeManager()->getStorage('node_type');
+    $content_types = $node_storage ? $node_storage->loadMultiple() : null;
     $options = [];
     foreach ($content_types as $content_type) {
       $options[$content_type->id()] = $content_type->label();
