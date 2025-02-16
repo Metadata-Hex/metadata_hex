@@ -2,15 +2,75 @@
 
 namespace Drupal\metadata_hex\Form;
 
-use Drupal\Core\Form\ConfigFormBase;
+use Drupal\metadata_hex\Service\MetadataBatchProcessor;
+use Drupal\metadata_hex\Service\MetadataExtractor;
+use Drupal\Core\Messenger\MessengerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\ConfigFormBase;
 
-/**
-* Class SettingsForm
-*
-* Provides a settings form for the Metadata Hex module.
-*/
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
+
 class SettingsForm extends ConfigFormBase {
+
+  protected $batchProcessor;
+  protected $metadataExtractor;
+  protected $messenger;
+//protected $typedConfigManager;// must be Drupal\Core\Config\TypedConfigManagerInterface
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),  // ✅ Inject config.factory
+      $container->get('config.typed'),  // ✅ Inject typed config manager
+      $container->get('metadata_hex.metadata_batch_processor'),
+      $container->get('metadata_hex.metadata_extractor'),
+      $container->get('messenger')
+    );
+  }
+
+  /**
+   * Constructs the settings form.
+   */
+  public function __construct(
+    ConfigFactoryInterface $configFactory,
+    TypedConfigManagerInterface $typedConfigManager, // ✅ Required by parent
+    MetadataBatchProcessor $batchProcessor,
+    MetadataExtractor $metadataExtractor,
+    MessengerInterface $messenger
+  ) {
+    parent::__construct($configFactory, $typedConfigManager);
+    $this->batchProcessor = $batchProcessor;
+    $this->metadataExtractor = $metadataExtractor;
+    $this->messenger = $messenger;
+  }
+
+ 
+
+  /**
+   * Submit handler for processing all selected node types.
+   */
+  public function processAllNodes(array &$form, FormStateInterface $form_state) {
+    $config = $this->configFactory->getEditable('metadata_hex.settings'); // ✅ This makes it writable.
+    $config->set('node_process.bundle_types', $form_state->getValue('node_process.bundle_types'));
+    $config->set('node_process.allow_reprocess', $form_state->getValue('node_process.allow_reprocess'));
+    $config->save();
+    
+    $selectedNodeTypes = $form_state->getValue('node_process.bundle_types');
+    $willReprocess = $form_state->getValue('node_process.allow_reprocess') ?? FALSE;
+
+    if (!empty($selectedNodeTypes)) {
+      foreach ($selectedNodeTypes as $bundleType) {
+        $this->batchProcessor->init($bundleType, TRUE, $willReprocess)->processNodes();
+      }
+      $this->messenger->addStatus($this->t('Metadata processing started for selected node types.'));
+    } else {
+      $this->messenger->addWarning($this->t('No node types selected for processing.'));
+    }
+  }
+
 
   /**
   * {@inheritdoc}
@@ -41,7 +101,7 @@ class SettingsForm extends ConfigFormBase {
     $form = parent::buildForm($form, $form_state);
 
     // Unset the default submit button.
-    unset($form['actions']['submit']);
+    //unset($form['actions']['submit']);
     $config = $this->config('metadata_hex.settings');
     $form['settings'] = [
       '#type' => 'vertical_tabs',
@@ -117,13 +177,13 @@ class SettingsForm extends ConfigFormBase {
       '#description' => $this->t('Enter allowed file extensions, one per line.'),
     ];
 
-    $form['extraction_settings']['actions']['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Save configuration'),
-      '#attributes' => [
-        'class' => ['button', 'button--primary'],
-      ],
-    ];
+    // $form['extraction_settings']['actions']['submit'] = [
+    //   '#type' => 'submit',
+    //   '#value' => $this->t('Save configuration'),
+    //   '#attributes' => [
+    //     'class' => ['button', 'button--primary'],
+    //   ],
+    // ];
 
     $form['node_process'] = [
       '#type' => 'details',
@@ -137,7 +197,7 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t('Bundle types to process'),
       '#multiple' => TRUE,
       '#options' => $options,
-      '#default_value' => implode("\n", $config->get('node_process.bundle_types') ?? []),
+      '#default_value' => $config->get('node_process.bundle_types') ?? [],
       '#description' => $this->t('Select multiple bundle types to indicate which types will be preprocessed for file metadata extraction.'),
     ];
     
@@ -216,6 +276,9 @@ class SettingsForm extends ConfigFormBase {
   *   The form state.
   */
 public function submitForm(array &$form, FormStateInterface $formState) {
+      \Drupal::logger('metadata_hex')->notice('🔍 submitForm() triggered.');
+    error_log("🔍 submitForm() triggered.");
+    parent::submitForm($form, $formState); // This ensures default form handling works.
     $config = $this->config('metadata_hex.settings');
 
     $config->set('extraction_settings.hook_node_types', $formState->getValue('extraction_settings.hook_node_types', []));
@@ -234,7 +297,27 @@ public function submitForm(array &$form, FormStateInterface $formState) {
     $config->set('file_ingest.ingest_directory', $formState->getValue('file_ingest.ingest_directory', ''));
 
     $config->save();
+        \Drupal::logger('metadata_hex')->notice('💾 Config saved successfully.');
+    error_log("💾 Config saved successfully.");
+
   }
+  /**
+   * Submit handler for processing all selected node types.
+   */
+  // public function processAllNodes(array &$form, FormStateInterface $form_state) {
+  //   $selectedNodeTypes = $form_state->getValue('node_process.bundle_types');
+  //   $willReprocess = $form_state->getValue('node_process.allow_reprocess')??FALSE;
+  //   if (!empty($selectedNodeTypes)) {
+  //     foreach ($selectedNodeTypes as $bundleType) {
+  //       $me = new MetadataExtractor();
+  //       $np = new MetadataBatchProcessor($this->logger, $me)->init($bundleType, TRUE, $willReprocess)->processNodes();
+  //     }
+  //     $this->messenger->addStatus($this->t('Metadata processing started for selected node types.'));
+  //   }
+  //   else {
+  //     $this->messenger->addWarning($this->t('No node types selected for processing.'));
+  //   }
+  // }
 }
 
 class FormValidator

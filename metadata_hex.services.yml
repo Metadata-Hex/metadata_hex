@@ -25,6 +25,6 @@ services:
     arguments: ['@plugin.manager.metadata_hex']
 
   metadata_hex.metadata_batch_processor:
-    class: 'Drupal\metadata_hex\Handler\MetadataBatchProcessor'
+    class: 'Drupal\metadata_hex\Service\MetadataBatchProcessor'
     arguments: ['@logger.channel.default', '@metadata_hex.metadata_extractor']
     public: true
