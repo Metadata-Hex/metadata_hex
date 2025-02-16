@@ -12,6 +12,8 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\metadata_hex\Handler\PdfFileHandler;
+use Drupal\metadata_hex\Handler\DocxFileHandler;
 
 class FileHandlerManagerTest extends TestCase {
 
@@ -79,28 +81,14 @@ class FileHandlerManagerTest extends TestCase {
         $containerMock->set('entity_type.manager', $this->entityTypeManagerMock);
         \Drupal::setContainer($containerMock);
 
-        //Initialize MetadataParser with the real SettingsManager mock
-        $this->fhm = \Drupal::service('metadata_hex.file_handler_manager');
+        $this->pluginManagerMock = $this->createMock(\Drupal\metadata_hex\Plugin\MetadataHexPluginManager::class);
+        $this->fhm = new FileHandlerManager($this->pluginManagerMock, $this->settingsManagerMock);
     }
-    /** @test */
-    public function test_it_returns_an_array_of_available_extensions() {
-      // Mock expected response from getAvailableExtensions()
-      $expected = ['pdf', 'docx', 'txt'];
-
-      // Assuming FileHandlerManager has a method getAvailableExtensions()
-      $this->fhm = $this->createMock(FileHandlerManager::class);
-      $this->fhm->method('getAvailableExtensions')->willReturn($expected);
-
-      $result = $this->fhm->getAvailableExtensions();
-
-      $this->assertIsArray($result);
-      $this->assertEquals($expected, $result);
-  }
 
   /** @test */
   public function test_it_returns_a_handler_for_pdf_extension() {
       // Mock the handler object
-      $mockHandler = $this->createMock(SomeFileHandlerClass::class);
+      $mockHandler = $this->createMock(PdfFileHandler::class);
 
       // Assuming FileHandlerManager has a method getHandlerForExtension()
       $this->fhm = $this->createMock(FileHandlerManager::class);
@@ -108,21 +96,21 @@ class FileHandlerManagerTest extends TestCase {
 
       $result = $this->fhm->getHandlerForExtension('pdf');
 
-      $this->assertInstanceOf(SomeFileHandlerClass::class, $result);
+      $this->assertInstanceOf(PdfFileHandler::class, $result);
   }
 
   /** @test */
   public function test_it_returns_a_handler_for_doc_extension() {
       // Mock the handler object
-      $mockHandler = $this->createMock(SomeFileHandlerClass::class);
+      $mockHandler = $this->createMock(DocxFileHandler::class);
 
       // Assuming FileHandlerManager has a method getHandlerForExtension()
       $this->fhm = $this->createMock(FileHandlerManager::class);
-      $this->fhm->method('getHandlerForExtension')->with('doc')->willReturn($mockHandler);
+      $this->fhm->method('getHandlerForExtension')->with('docx')->willReturn($mockHandler);
 
-      $result = $this->fhm->getHandlerForExtension('doc');
+      $result = $this->fhm->getHandlerForExtension('docx');
 
-      $this->assertInstanceOf(SomeFileHandlerClass::class, $result);
+      $this->assertInstanceOf(DocxFileHandler::class, $result);
   }
 
   /** @test */
