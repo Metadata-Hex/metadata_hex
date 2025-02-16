@@ -109,11 +109,17 @@ class SettingsForm extends ConfigFormBase {
     ];
     
     $node_storage = \Drupal::entityTypeManager()->getStorage('node_type');
-    $content_types = $node_storage ? $node_storage->loadMultiple() : null;
-    $options = [];
-    foreach ($content_types as $content_type) {
-      $options[$content_type->id()] = $content_type->label();
-    }
+$content_types = $node_storage ? $node_storage->loadMultiple() : [];
+
+// Ensure it's an array
+if (!is_array($content_types)) {
+  $content_types = [];
+}
+
+$options = [];
+foreach ($content_types as $content_type) {
+  $options[$content_type->id()] = $content_type->label();
+}
   
     //$fileHandlerManager = \Drupal::service('metadata_hex.file_handler_manager');
     //$extensions = $fileHandlerManager->getAvailableExtentions();
@@ -281,7 +287,7 @@ public function submitForm(array &$form, FormStateInterface $formState) {
     parent::submitForm($form, $formState); // This ensures default form handling works.
     $config = $this->config('metadata_hex.settings');
 
-    $config->set('extraction_settings.hook_node_types', $formState->getValue('extraction_settings.hook_node_types', []));
+    //$config->set('extraction_settings.hook_node_types', $formState->getValue('extraction_settings.hook_node_types', []));
     $config->set('extraction_settings.field_mappings', $formState->getValue('extraction_settings.field_mappings', ''));
     $config->set('extraction_settings.strict_handling', $formState->getValue('extraction_settings.strict_handling', FALSE));
     $config->set('extraction_settings.flatten_keys', $formState->getValue('extraction_settings.flatten_keys', FALSE));
@@ -289,7 +295,7 @@ public function submitForm(array &$form, FormStateInterface $formState) {
     $config->set('extraction_settings.title_protected', $formState->getValue('extraction_settings.title_protected', FALSE));
     $config->set('extraction_settings.available_extensions', $formState->getValue('extraction_settings.available_extensions', ''));
 
-    $config->set('node_process.bundle_types', $formState->getValue('node_process.bundle_types', []));
+    //$config->set('node_process.bundle_types', $formState->getValue('node_process.bundle_types', []));
     $config->set('node_process.allow_reprocess', $formState->getValue('node_process.allow_reprocess', FALSE));
 
     $config->set('file_ingest.bundle_type_for_generation', $formState->getValue('file_ingest.bundle_type_for_generation', ''));
