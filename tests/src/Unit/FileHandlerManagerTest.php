@@ -134,7 +134,9 @@ class FileHandlerManagerTest extends TestCase {
       $result = $this->fhm->getHandlerForExtension('invalidext');
 
       $this->assertNull($result);
-  } /*
+  } 
+}
+  /*
 setup filehandlerManager
 get available extentions, recieve an array
 get handler for extention('pdf'), handler::typeOF = 
