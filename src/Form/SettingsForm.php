@@ -60,7 +60,9 @@ class SettingsForm extends ConfigFormBase {
 
     if (!empty($selectedNodeTypes)) {
       foreach ($selectedNodeTypes as $bundleType) {
-        $this->batchProcessor->init($bundleType, TRUE, $willReprocess)->processNodes();
+        $this->batchProcessor->init($bundleType, TRUE, $willReprocess);
+        
+        $this->batchProcessor->processNodes();
       }
       $this->messenger->addStatus($this->t('Metadata processing started for selected node types.'));
     } else {
