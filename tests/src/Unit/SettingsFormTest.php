@@ -10,6 +10,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\FormState;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -83,7 +84,7 @@ class SettingsFormTest extends TestCase
     // Mock MessengerInterface
     $this->messengerMock = $this->createMock(MessengerInterface::class);
 
-    // ✅ Properly mock NodeType instances
+    // Properly mock NodeType instances
     $this->articleMock = $this->createMock(\Drupal\Core\Config\Entity\ConfigEntityInterface::class);
     $this->articleMock->method('id')->willReturn('article');
     $this->articleMock->method('label')->willReturn('Article');
@@ -92,7 +93,7 @@ class SettingsFormTest extends TestCase
     $this->pageMock->method('id')->willReturn('page');
     $this->pageMock->method('label')->willReturn('Page');
 
-    // ✅ Mock NodeType Storage
+    // Mock NodeType Storage
     $this->entityStorageMock = $this->createMock(EntityStorageInterface::class);
     $this->entityStorageMock->method('loadMultiple')->willReturn([
       'article' => $this->articleMock,
@@ -103,7 +104,7 @@ class SettingsFormTest extends TestCase
       return $bundleType === 'article' ? $this->articleMock : ($bundleType === 'page' ? $this->pageMock : null);
     });
 
-    // ✅ Mock EntityTypeManagerInterface
+    // Mock EntityTypeManagerInterface
     $this->entityTypeManagerMock = $this->createMock(EntityTypeManagerInterface::class);
     $this->entityTypeManagerMock->method('getStorage')->willReturnCallback(function ($entityType) {
       if ($entityType === 'node_type') {
@@ -115,7 +116,7 @@ class SettingsFormTest extends TestCase
     // Mock EntityTypeRepositoryInterface
     $this->entityTypeRepositoryMock = $this->createMock(EntityTypeRepositoryInterface::class);
 
-    // ✅ Mock MetadataBatchProcessor & MetadataExtractor
+    // Mock MetadataBatchProcessor & MetadataExtractor
     $this->batchProcessorMock = $this->createMock(MetadataBatchProcessor::class);
     $this->metadataExtractorMock = $this->createMock(MetadataExtractor::class);
 
@@ -145,7 +146,7 @@ class SettingsFormTest extends TestCase
   public function testBuildFormContainsExpectedFields()
   {
     $form = [];
-    $formState = new FormState();
+    $formState = new FormStateInterface();
     $builtForm = $this->form->buildForm($form, $formState);
 
     // Ensure form contains expected fields
@@ -159,7 +160,7 @@ class SettingsFormTest extends TestCase
   public function testSubmitFormUpdatesConfig()
   {
     $form = [];
-    $formState = new FormState();
+    $formState = new FormStateInterface();
     $formState->setValues([
       'hook_node_types' => ['article', 'page'],
       'field_mappings' => "Title|title\nSubject|field_subject",

@@ -2,29 +2,28 @@
 
 namespace Drupal\metadata_hex\Form;
 
-use Drupal\metadata_hex\Service\MetadataBatchProcessor;
-use Drupal\metadata_hex\Service\MetadataExtractor;
-use Drupal\Core\Messenger\MessengerInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Form\ConfigFormBase;
-
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Form\ConfigFormBase;
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\metadata_hex\Service\MetadataBatchProcessor;
+use Drupal\metadata_hex\Service\MetadataExtractor;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class SettingsForm extends ConfigFormBase {
 
   protected $batchProcessor;
   protected $metadataExtractor;
   protected $messenger;
-//protected $typedConfigManager;// must be Drupal\Core\Config\TypedConfigManagerInterface
+
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('config.factory'),  // ✅ Inject config.factory
-      $container->get('config.typed'),  // ✅ Inject typed config manager
+      $container->get('config.factory'),  // Inject config.factory
+      $container->get('config.typed'),  // Inject typed config manager
       $container->get('metadata_hex.metadata_batch_processor'),
       $container->get('metadata_hex.metadata_extractor'),
       $container->get('messenger')
@@ -36,7 +35,7 @@ class SettingsForm extends ConfigFormBase {
    */
   public function __construct(
     ConfigFactoryInterface $configFactory,
-    TypedConfigManagerInterface $typedConfigManager, // ✅ Required by parent
+    TypedConfigManagerInterface $typedConfigManager, // Required by parent
     MetadataBatchProcessor $batchProcessor,
     MetadataExtractor $metadataExtractor,
     MessengerInterface $messenger
@@ -47,13 +46,11 @@ class SettingsForm extends ConfigFormBase {
     $this->messenger = $messenger;
   }
 
- 
-
   /**
    * Submit handler for processing all selected node types.
    */
   public function processAllNodes(array &$form, FormStateInterface $form_state) {
-    $config = $this->configFactory->getEditable('metadata_hex.settings'); // ✅ This makes it writable.
+    $config = $this->configFactory->getEditable('metadata_hex.settings'); // This makes it writable.
     $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
     $config->set('node_process.allow_reprocess', $form_state->getValue('allow_reprocess'));
     $config->save();
@@ -100,8 +97,6 @@ class SettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
 
-    // Unset the default submit button.
-    //unset($form['actions']['submit']);
     $config = $this->config('metadata_hex.settings');
     $form['settings'] = [
       '#type' => 'vertical_tabs',
@@ -109,20 +104,17 @@ class SettingsForm extends ConfigFormBase {
     ];
     
     $node_storage = \Drupal::entityTypeManager()->getStorage('node_type');
-$content_types = $node_storage ? $node_storage->loadMultiple() : [];
+    $content_types = $node_storage ? $node_storage->loadMultiple() : [];
 
-// Ensure it's an array
-if (!is_array($content_types)) {
-  $content_types = [];
-}
+    // Ensure it's an array
+    if (!is_array($content_types)) {
+      $content_types = [];
+    }
 
-$options = [];
-foreach ($content_types as $content_type) {
-  $options[$content_type->id()] = $content_type->label();
-}
-  
-    //$fileHandlerManager = \Drupal::service('metadata_hex.file_handler_manager');
-    //$extensions = $fileHandlerManager->getAvailableExtentions();
+    $options = [];
+    foreach ($content_types as $content_type) {
+      $options[$content_type->id()] = $content_type->label();
+    }
 
     $form['extraction_settings'] = [
       '#type' => 'details',
