@@ -54,12 +54,12 @@ class SettingsForm extends ConfigFormBase {
    */
   public function processAllNodes(array &$form, FormStateInterface $form_state) {
     $config = $this->configFactory->getEditable('metadata_hex.settings'); // ✅ This makes it writable.
-    $config->set('node_process.bundle_types', $form_state->getValue('node_process.bundle_types'));
-    $config->set('node_process.allow_reprocess', $form_state->getValue('node_process.allow_reprocess'));
+    $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
+    $config->set('node_process.allow_reprocess', $form_state->getValue('allow_reprocess'));
     $config->save();
     
-    $selectedNodeTypes = $form_state->getValue('node_process.bundle_types');
-    $willReprocess = $form_state->getValue('node_process.allow_reprocess') ?? FALSE;
+    $selectedNodeTypes = $form_state->getValue('bundle_types');
+    $willReprocess = $form_state->getValue('allow_reprocess') ?? FALSE;
 
     if (!empty($selectedNodeTypes)) {
       foreach ($selectedNodeTypes as $bundleType) {
@@ -175,13 +175,13 @@ foreach ($content_types as $content_type) {
       '#description' => $this->t('Ensure that the node title remains unchanged during processing.'),
     ];
 
-    $form['extraction_settings']['available_extensions'] = [
-      '#type' => 'textarea',
-      '#access' => FALSE,
-      '#title' => $this->t('Enabled file extensions'),
-      '#default_value' => $config->get('extraction_settings.available_extensions') ?? $extensions,
-      '#description' => $this->t('Enter allowed file extensions, one per line.'),
-    ];
+    // $form['extraction_settings']['available_extensions'] = [
+    //   '#type' => 'textarea',
+    //   '#access' => FALSE,
+    //   '#title' => $this->t('Enabled file extensions'),
+    //   '#default_value' => $config->get('extraction_settings.available_extensions') ?? $extensions,
+    //   '#description' => $this->t('Enter allowed file extensions, one per line.'),
+    // ];
 
     // $form['extraction_settings']['actions']['submit'] = [
     //   '#type' => 'submit',
@@ -282,48 +282,27 @@ foreach ($content_types as $content_type) {
   *   The form state.
   */
 public function submitForm(array &$form, FormStateInterface $formState) {
-      \Drupal::logger('metadata_hex')->notice('🔍 submitForm() triggered.');
-    error_log("🔍 submitForm() triggered.");
-    parent::submitForm($form, $formState); // This ensures default form handling works.
     $config = $this->config('metadata_hex.settings');
 
-    //$config->set('extraction_settings.hook_node_types', $formState->getValue('extraction_settings.hook_node_types', []));
-    $config->set('extraction_settings.field_mappings', $formState->getValue('extraction_settings.field_mappings', ''));
-    $config->set('extraction_settings.strict_handling', $formState->getValue('extraction_settings.strict_handling', FALSE));
-    $config->set('extraction_settings.flatten_keys', $formState->getValue('extraction_settings.flatten_keys', FALSE));
-    $config->set('extraction_settings.data_protected', $formState->getValue('extraction_settings.data_protected', FALSE));
-    $config->set('extraction_settings.title_protected', $formState->getValue('extraction_settings.title_protected', FALSE));
-    $config->set('extraction_settings.available_extensions', $formState->getValue('extraction_settings.available_extensions', ''));
+    $config->set('extraction_settings.hook_node_types', $formState->getValue('hook_node_types', []));
+    $config->set('extraction_settings.field_mappings', $formState->getValue('field_mappings', ''));
+    $config->set('extraction_settings.strict_handling', $formState->getValue('strict_handling', FALSE));
+    $config->set('extraction_settings.flatten_keys', $formState->getValue('flatten_keys', FALSE));
+    $config->set('extraction_settings.data_protected', $formState->getValue('data_protected', FALSE));
+    $config->set('extraction_settings.title_protected', $formState->getValue('title_protected', FALSE));
+    $config->set('extraction_settings.available_extensions', $formState->getValue('available_extensions', ''));
 
-    //$config->set('node_process.bundle_types', $formState->getValue('node_process.bundle_types', []));
-    $config->set('node_process.allow_reprocess', $formState->getValue('node_process.allow_reprocess', FALSE));
+    $config->set('node_process.bundle_types', $formState->getValue('bundle_types', []));
+    $config->set('node_process.allow_reprocess', $formState->getValue('allow_reprocess', FALSE));
 
-    $config->set('file_ingest.bundle_type_for_generation', $formState->getValue('file_ingest.bundle_type_for_generation', ''));
-    $config->set('file_ingest.file_attachment_field', $formState->getValue('file_ingest.file_attachment_field', ''));
-    $config->set('file_ingest.ingest_directory', $formState->getValue('file_ingest.ingest_directory', ''));
+    $config->set('file_ingest.bundle_type_for_generation', $formState->getValue('bundle_type_for_generation', ''));
+    $config->set('file_ingest.file_attachment_field', $formState->getValue('file_attachment_field', ''));
+    $config->set('file_ingest.ingest_directory', $formState->getValue('ingest_directory', ''));
 
     $config->save();
-        \Drupal::logger('metadata_hex')->notice('💾 Config saved successfully.');
-    error_log("💾 Config saved successfully.");
-
+    parent::submitForm($form, $formState); // This ensures default form handling works.
   }
-  /**
-   * Submit handler for processing all selected node types.
-   */
-  // public function processAllNodes(array &$form, FormStateInterface $form_state) {
-  //   $selectedNodeTypes = $form_state->getValue('node_process.bundle_types');
-  //   $willReprocess = $form_state->getValue('node_process.allow_reprocess')??FALSE;
-  //   if (!empty($selectedNodeTypes)) {
-  //     foreach ($selectedNodeTypes as $bundleType) {
-  //       $me = new MetadataExtractor();
-  //       $np = new MetadataBatchProcessor($this->logger, $me)->init($bundleType, TRUE, $willReprocess)->processNodes();
-  //     }
-  //     $this->messenger->addStatus($this->t('Metadata processing started for selected node types.'));
-  //   }
-  //   else {
-  //     $this->messenger->addWarning($this->t('No node types selected for processing.'));
-  //   }
-  // }
+  
 }
 
 class FormValidator
