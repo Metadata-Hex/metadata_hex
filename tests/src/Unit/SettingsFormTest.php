@@ -10,7 +10,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\FormState;
-use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\StringTranslation\TranslationInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -146,7 +145,7 @@ class SettingsFormTest extends TestCase
   public function testBuildFormContainsExpectedFields()
   {
     $form = [];
-    $formState = new FormStateInterface();
+    $formState = new FormState();
     $builtForm = $this->form->buildForm($form, $formState);
 
     // Ensure form contains expected fields
@@ -160,7 +159,7 @@ class SettingsFormTest extends TestCase
   public function testSubmitFormUpdatesConfig()
   {
     $form = [];
-    $formState = new FormStateInterface();
+    $formState = new FormState();
     $formState->setValues([
       'hook_node_types' => ['article', 'page'],
       'field_mappings' => "Title|title\nSubject|field_subject",
