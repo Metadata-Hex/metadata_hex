@@ -1,5 +1,33 @@
 services:
 
+
+  # File Handler Interface (Abstract Interface - No instantiation)
+  metadata_hex.file_handler_interface:
+    class: Drupal\metadata_hex\Handler\FileHandlerInterface
+
+  # Base File Handler Service
+  metadata_hex.file_handler:
+    class: Drupal\metadata_hex\Handler\FileHandler
+    arguments: ['@logger.channel.default']
+    public: true
+
+  # PDF File Handler
+  metadata_hex.file_handler.pdf:
+    class: Drupal\metadata_hex\Handler\PdfFileHandler
+    arguments: ['@logger.channel.default']
+    public: true
+    tags:
+      - { name: metadata_hex.file_handler }
+
+  # DOCX File Handler
+  metadata_hex.file_handler.docx:
+    class: Drupal\metadata_hex\Handler\DocXFileHandler
+    arguments: ['@logger.channel.default']
+    public: true
+    tags:
+      - { name: metadata_hex.file_handler }
+
+    
   metadata_hex.metadata_extractor:
     class: 'Drupal\metadata_hex\Service\MetadataExtractor'
     arguments: ['@logger.channel.default']

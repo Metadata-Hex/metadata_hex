@@ -4,7 +4,6 @@ namespace Drupal\metadata_hex\Model;
 
 use Drupal\file\Entity\File;
 use Drupal\metadata_hex\Base\MetadataHexCore;
-use Drupal\metadata_hex\Handler\PdfFileHandler;
 use Drupal\metadata_hex\Service\FileHandlerManager;
 use Drupal\node\Entity\Node;
 use Exception;

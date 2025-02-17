@@ -201,7 +201,7 @@ class MetadataParserTest extends TestCase {
     }
 
     /** @test */
-    public function test_it_throws_an_exception_when_null_is_passed() {
+    public function test_it_returns_empty_when_null_is_passed() {
         $this->expectException(\TypeError::class);
         $this->parser->cleanFieldMapping(null);
     }

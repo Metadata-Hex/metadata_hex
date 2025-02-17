@@ -212,10 +212,11 @@ class MetadataBatchProcessor extends MetadataHexCore
   /**
    * Processes all nodes of a specific bundle type.
    */
-  protected function processNodes()
+  public function processNodes()
   {
     $nids = \Drupal::entityQuery('node')
       ->condition('type', $this->bundleType)
+      ->accessCheck(FALSE)
       ->execute();
 
     foreach ($nids as $nid) {

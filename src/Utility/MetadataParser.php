@@ -164,7 +164,6 @@ class MetadataParser extends MetadataHexCore
     } else if (!is_array($dirty_fieldmapping)) {
       throw new Exception("Invalid input for field mapping. Expected an array.");
     }
-    echo $this->availableFields;
     // clean the fields
     $cleaned = array_filter($dirty_fieldmapping, function ($key) {
       return array_key_exists($key, $this->availableFields);

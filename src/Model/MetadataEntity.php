@@ -6,8 +6,8 @@ use Drupal\file\Entity\File;
 use Drupal\metadata_hex\Base\MetadataHexCore;
 use Drupal\metadata_hex\Model\NodeBinder;
 use Drupal\metadata_hex\Utility\MetadataParser;
-use Exception;
 use Drupal\node\Entity\Node;
+use Exception;
 use Psr\Log\LoggerInterface;
 
 

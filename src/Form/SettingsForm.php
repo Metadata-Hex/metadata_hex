@@ -7,6 +7,7 @@ use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\metadata_hex\Batch\MetadataBatch;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -49,24 +50,82 @@ class SettingsForm extends ConfigFormBase {
   /**
    * Submit handler for processing all selected node types.
    */
+
+  /**
+   * Submit handler for processing all selected node types.
+   */
   public function processAllNodes(array &$form, FormStateInterface $form_state) {
-    $config = $this->configFactory->getEditable('metadata_hex.settings'); // This makes it writable.
+    $config = $this->configFactory->getEditable('metadata_hex.settings');
     $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
     $config->set('node_process.allow_reprocess', $form_state->getValue('allow_reprocess'));
     $config->save();
-    
+  
     $selectedNodeTypes = $form_state->getValue('bundle_types');
     $willReprocess = $form_state->getValue('allow_reprocess') ?? FALSE;
 
     if (!empty($selectedNodeTypes)) {
-      foreach ($selectedNodeTypes as $bundleType) {
-        $this->batchProcessor->init($bundleType, TRUE, $willReprocess)->processNodes();
-      }
-      $this->messenger->addStatus($this->t('Metadata processing started for selected node types.'));
+        // Define batch operations
+        $operations = [];
+        foreach ($selectedNodeTypes as $bundleType) {
+            $operations[] = [
+                ['Drupal\metadata_hex\Batch\MetadataBatch', 'processNodes'],
+                [$bundleType, $willReprocess],
+            ];
+        }
+
+        // Define batch
+        $batch = [
+            'title' => $this->t('Processing Metadata'),
+            'operations' => $operations,
+            'init_message' => $this->t('Starting metadata processing...'),
+            'progress_message' => $this->t('Processing...'),
+            'error_message' => $this->t('Metadata processing encountered an error.'),
+            'finished' => ['Drupal\metadata_hex\Batch\MetadataBatch', 'batchFinished'],
+        ];
+
+        batch_set($batch);
     } else {
-      $this->messenger->addWarning($this->t('No node types selected for processing.'));
+        $this->messenger->addWarning($this->t('No node types selected for processing.'));
     }
   }
+  // public function processAllNodes(array &$form, FormStateInterface $form_state) {
+  //   $config = $this->configFactory->getEditable('metadata_hex.settings'); // This makes it writable.
+  //   $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
+  //   $config->set('node_process.allow_reprocess', $form_state->getValue('allow_reprocess'));
+  //   $config->save();
+    
+  //   $selectedNodeTypes = $form_state->getValue('bundle_types');
+  //   $willReprocess = $form_state->getValue('allow_reprocess') ?? FALSE;
+
+  //   if (!empty($selectedNodeTypes)) {
+  //     foreach ($selectedNodeTypes as $bundleType) {
+  //       $this->batchProcessor->init($bundleType, TRUE, $willReprocess);
+  //       $this->batchProcessor->processNodes();
+  //     }
+  //     $this->messenger->addStatus($this->t('Metadata processing started for selected node types.'));
+  //   } else {
+  //     $this->messenger->addWarning($this->t('No node types selected for processing.'));
+  //   }
+  // }
+  // public function processAllNodes(array &$form, FormStateInterface $form_state) {
+  //   $config = $this->configFactory->getEditable('metadata_hex.settings'); // This makes it writable.
+  //   $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
+  //   $config->set('node_process.allow_reprocess', $form_state->getValue('allow_reprocess'));
+  //   $config->save();
+    
+  //   $selectedNodeTypes = $form_state->getValue('bundle_types');
+  //   $willReprocess = $form_state->getValue('allow_reprocess') ?? FALSE;
+
+  //   if (!empty($selectedNodeTypes)) {
+  //     foreach ($selectedNodeTypes as $bundleType) {
+  //       $this->batchProcessor->init($bundleType, TRUE, $willReprocess);
+  //       $this->batchProcessor->processNodes();
+  //     }
+  //     $this->messenger->addStatus($this->t('Metadata processing started for selected node types.'));
+  //   } else {
+  //     $this->messenger->addWarning($this->t('No node types selected for processing.'));
+  //   }
+  // }
 
 
   /**
