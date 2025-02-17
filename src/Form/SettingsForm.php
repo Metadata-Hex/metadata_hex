@@ -2,15 +2,72 @@
 
 namespace Drupal\metadata_hex\Form;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\metadata_hex\Service\MetadataBatchProcessor;
+use Drupal\metadata_hex\Service\MetadataExtractor;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-/**
-* Class SettingsForm
-*
-* Provides a settings form for the Metadata Hex module.
-*/
 class SettingsForm extends ConfigFormBase {
+
+  protected $batchProcessor;
+  protected $metadataExtractor;
+  protected $messenger;
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('config.factory'),  // Inject config.factory
+      $container->get('config.typed'),  // Inject typed config manager
+      $container->get('metadata_hex.metadata_batch_processor'),
+      $container->get('metadata_hex.metadata_extractor'),
+      $container->get('messenger')
+    );
+  }
+
+  /**
+   * Constructs the settings form.
+   */
+  public function __construct(
+    ConfigFactoryInterface $configFactory,
+    TypedConfigManagerInterface $typedConfigManager, // Required by parent
+    MetadataBatchProcessor $batchProcessor,
+    MetadataExtractor $metadataExtractor,
+    MessengerInterface $messenger
+  ) {
+    parent::__construct($configFactory, $typedConfigManager);
+    $this->batchProcessor = $batchProcessor;
+    $this->metadataExtractor = $metadataExtractor;
+    $this->messenger = $messenger;
+  }
+
+  /**
+   * Submit handler for processing all selected node types.
+   */
+  public function processAllNodes(array &$form, FormStateInterface $form_state) {
+    $config = $this->configFactory->getEditable('metadata_hex.settings'); // This makes it writable.
+    $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
+    $config->set('node_process.allow_reprocess', $form_state->getValue('allow_reprocess'));
+    $config->save();
+    
+    $selectedNodeTypes = $form_state->getValue('bundle_types');
+    $willReprocess = $form_state->getValue('allow_reprocess') ?? FALSE;
+
+    if (!empty($selectedNodeTypes)) {
+      foreach ($selectedNodeTypes as $bundleType) {
+        $this->batchProcessor->init($bundleType, TRUE, $willReprocess)->processNodes();
+      }
+      $this->messenger->addStatus($this->t('Metadata processing started for selected node types.'));
+    } else {
+      $this->messenger->addWarning($this->t('No node types selected for processing.'));
+    }
+  }
+
 
   /**
   * {@inheritdoc}
@@ -40,8 +97,6 @@ class SettingsForm extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
 
-    // Unset the default submit button.
-    unset($form['actions']['submit']);
     $config = $this->config('metadata_hex.settings');
     $form['settings'] = [
       '#type' => 'vertical_tabs',
@@ -49,14 +104,17 @@ class SettingsForm extends ConfigFormBase {
     ];
     
     $node_storage = \Drupal::entityTypeManager()->getStorage('node_type');
-    $content_types = $node_storage ? $node_storage->loadMultiple() : null;
+    $content_types = $node_storage ? $node_storage->loadMultiple() : [];
+
+    // Ensure it's an array
+    if (!is_array($content_types)) {
+      $content_types = [];
+    }
+
     $options = [];
     foreach ($content_types as $content_type) {
       $options[$content_type->id()] = $content_type->label();
     }
-  
-    //$fileHandlerManager = \Drupal::service('metadata_hex.file_handler_manager');
-    //$extensions = $fileHandlerManager->getAvailableExtentions();
 
     $form['extraction_settings'] = [
       '#type' => 'details',
@@ -109,21 +167,21 @@ class SettingsForm extends ConfigFormBase {
       '#description' => $this->t('Ensure that the node title remains unchanged during processing.'),
     ];
 
-    $form['extraction_settings']['available_extensions'] = [
-      '#type' => 'textarea',
-      '#access' => FALSE,
-      '#title' => $this->t('Enabled file extensions'),
-      '#default_value' => $config->get('extraction_settings.available_extensions') ?? $extensions,
-      '#description' => $this->t('Enter allowed file extensions, one per line.'),
-    ];
+    // $form['extraction_settings']['available_extensions'] = [
+    //   '#type' => 'textarea',
+    //   '#access' => FALSE,
+    //   '#title' => $this->t('Enabled file extensions'),
+    //   '#default_value' => $config->get('extraction_settings.available_extensions') ?? $extensions,
+    //   '#description' => $this->t('Enter allowed file extensions, one per line.'),
+    // ];
 
-    $form['extraction_settings']['actions']['submit'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Save configuration'),
-      '#attributes' => [
-        'class' => ['button', 'button--primary'],
-      ],
-    ];
+    // $form['extraction_settings']['actions']['submit'] = [
+    //   '#type' => 'submit',
+    //   '#value' => $this->t('Save configuration'),
+    //   '#attributes' => [
+    //     'class' => ['button', 'button--primary'],
+    //   ],
+    // ];
 
     $form['node_process'] = [
       '#type' => 'details',
@@ -137,7 +195,7 @@ class SettingsForm extends ConfigFormBase {
       '#title' => $this->t('Bundle types to process'),
       '#multiple' => TRUE,
       '#options' => $options,
-      '#default_value' => implode("\n", $config->get('node_process.bundle_types') ?? []),
+      '#default_value' => $config->get('node_process.bundle_types') ?? [],
       '#description' => $this->t('Select multiple bundle types to indicate which types will be preprocessed for file metadata extraction.'),
     ];
     
@@ -218,23 +276,25 @@ class SettingsForm extends ConfigFormBase {
 public function submitForm(array &$form, FormStateInterface $formState) {
     $config = $this->config('metadata_hex.settings');
 
-    $config->set('extraction_settings.hook_node_types', $formState->getValue('extraction_settings.hook_node_types', []));
-    $config->set('extraction_settings.field_mappings', $formState->getValue('extraction_settings.field_mappings', ''));
-    $config->set('extraction_settings.strict_handling', $formState->getValue('extraction_settings.strict_handling', FALSE));
-    $config->set('extraction_settings.flatten_keys', $formState->getValue('extraction_settings.flatten_keys', FALSE));
-    $config->set('extraction_settings.data_protected', $formState->getValue('extraction_settings.data_protected', FALSE));
-    $config->set('extraction_settings.title_protected', $formState->getValue('extraction_settings.title_protected', FALSE));
-    $config->set('extraction_settings.available_extensions', $formState->getValue('extraction_settings.available_extensions', ''));
+    $config->set('extraction_settings.hook_node_types', $formState->getValue('hook_node_types', []));
+    $config->set('extraction_settings.field_mappings', $formState->getValue('field_mappings', ''));
+    $config->set('extraction_settings.strict_handling', $formState->getValue('strict_handling', FALSE));
+    $config->set('extraction_settings.flatten_keys', $formState->getValue('flatten_keys', FALSE));
+    $config->set('extraction_settings.data_protected', $formState->getValue('data_protected', FALSE));
+    $config->set('extraction_settings.title_protected', $formState->getValue('title_protected', FALSE));
+    $config->set('extraction_settings.available_extensions', $formState->getValue('available_extensions', ''));
 
-    $config->set('node_process.bundle_types', $formState->getValue('node_process.bundle_types', []));
-    $config->set('node_process.allow_reprocess', $formState->getValue('node_process.allow_reprocess', FALSE));
+    $config->set('node_process.bundle_types', $formState->getValue('bundle_types', []));
+    $config->set('node_process.allow_reprocess', $formState->getValue('allow_reprocess', FALSE));
 
-    $config->set('file_ingest.bundle_type_for_generation', $formState->getValue('file_ingest.bundle_type_for_generation', ''));
-    $config->set('file_ingest.file_attachment_field', $formState->getValue('file_ingest.file_attachment_field', ''));
-    $config->set('file_ingest.ingest_directory', $formState->getValue('file_ingest.ingest_directory', ''));
+    $config->set('file_ingest.bundle_type_for_generation', $formState->getValue('bundle_type_for_generation', ''));
+    $config->set('file_ingest.file_attachment_field', $formState->getValue('file_attachment_field', ''));
+    $config->set('file_ingest.ingest_directory', $formState->getValue('ingest_directory', ''));
 
     $config->save();
+    parent::submitForm($form, $formState); // This ensures default form handling works.
   }
+  
 }
 
 class FormValidator
