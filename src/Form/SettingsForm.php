@@ -75,7 +75,7 @@ class SettingsForm extends ConfigFormBase {
 
         // Define batch
         $batch = [
-            'title' => $this->t('Processing Metadata'),
+            'title' => $this->t('Processing Nodes for Metadata'),
             'operations' => $operations,
             'init_message' => $this->t('Starting metadata processing...'),
             'progress_message' => $this->t('Processing...'),
@@ -88,45 +88,32 @@ class SettingsForm extends ConfigFormBase {
         $this->messenger->addWarning($this->t('No node types selected for processing.'));
     }
   }
-  // public function processAllNodes(array &$form, FormStateInterface $form_state) {
-  //   $config = $this->configFactory->getEditable('metadata_hex.settings'); // This makes it writable.
-  //   $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
-  //   $config->set('node_process.allow_reprocess', $form_state->getValue('allow_reprocess'));
-  //   $config->save();
-    
-  //   $selectedNodeTypes = $form_state->getValue('bundle_types');
-  //   $willReprocess = $form_state->getValue('allow_reprocess') ?? FALSE;
+  /**
+   * Submit handler for processing all selected node types.
+   */
+  public function processAllFiles(array &$form, FormStateInterface $form_state) {
+    $config = $this->configFactory->getEditable('metadata_hex.settings');
+    $config->set('file_ingest.bundle_type_for_generation', $form_state->getValue('bundle_type_for_generation'));
+    $config->set('file_ingest.file_attachment_field', $form_state->getValue('file_attachment_field'));
+    $config->set('file_ingest.ingest_directory', $form_state->getValue('ingest_directory'));
+    $config->save();
 
-  //   if (!empty($selectedNodeTypes)) {
-  //     foreach ($selectedNodeTypes as $bundleType) {
-  //       $this->batchProcessor->init($bundleType, TRUE, $willReprocess);
-  //       $this->batchProcessor->processNodes();
-  //     }
-  //     $this->messenger->addStatus($this->t('Metadata processing started for selected node types.'));
-  //   } else {
-  //     $this->messenger->addWarning($this->t('No node types selected for processing.'));
-  //   }
-  // }
-  // public function processAllNodes(array &$form, FormStateInterface $form_state) {
-  //   $config = $this->configFactory->getEditable('metadata_hex.settings'); // This makes it writable.
-  //   $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
-  //   $config->set('node_process.allow_reprocess', $form_state->getValue('allow_reprocess'));
-  //   $config->save();
-    
-  //   $selectedNodeTypes = $form_state->getValue('bundle_types');
-  //   $willReprocess = $form_state->getValue('allow_reprocess') ?? FALSE;
+    $operations[] = [
+      ['Drupal\metadata_hex\Batch\MetadataBatch', 'processFiles'],
+    ];
 
-  //   if (!empty($selectedNodeTypes)) {
-  //     foreach ($selectedNodeTypes as $bundleType) {
-  //       $this->batchProcessor->init($bundleType, TRUE, $willReprocess);
-  //       $this->batchProcessor->processNodes();
-  //     }
-  //     $this->messenger->addStatus($this->t('Metadata processing started for selected node types.'));
-  //   } else {
-  //     $this->messenger->addWarning($this->t('No node types selected for processing.'));
-  //   }
-  // }
+    // Define batch
+    $batch = [
+      'title' => $this->t('Ingesting Files for metadata processing'),
+      'operations' => $operations,
+      'init_message' => $this->t('Starting file ingestion...'),
+      'progress_message' => $this->t('Processing...'),
+      'error_message' => $this->t('File ingest or Metadata processing encountered an error.'),
+      'finished' => ['Drupal\metadata_hex\Batch\MetadataBatch', 'batchFinished'],
+    ];
 
+    batch_set($batch);
+  } 
 
   /**
   * {@inheritdoc}
@@ -302,7 +289,7 @@ class SettingsForm extends ConfigFormBase {
     $form['file_ingest']['process_cron_nodes'] = [
       '#type' => 'submit',
       '#value' => $this->t('Ingest files'),
-      '#submit' => ['::processAllPdfs'], // @todo fix this
+      '#submit' => ['::processAllFiles'], 
     ];
     
     
