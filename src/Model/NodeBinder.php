@@ -184,7 +184,7 @@ class NodeBinder extends MetadataHexCore
     foreach ($node->getFields() as $field_name => $field) {
       if ($field->getFieldDefinition()->getType() === 'file') {
         foreach ($field->getValue() as $file_item) {
-          
+
           // loads the file into a drupal model
           $file = File::load($file_item['target_id']);
 
@@ -195,20 +195,25 @@ class NodeBinder extends MetadataHexCore
             $handler = $this->fileHandlerManager->getHandlerForExtension($file_extension);
 
             // setup the handler and extract the metadata
-            $handler->setFileUri($file_uri);
-            $exmd = $handler->extractMetadata();
+            if ($handler !== null) {
+              $handler->setFileUri($file_uri);
+              $exmd = $handler->extractMetadata();
 
-            $data = [
-              'uri' => $file->getFileUri(),
-              'metadata' => $exmd,
-            ];
+              $data = [
+                'uri' => $file->getFileUri(),
+                'metadata' => $exmd,
+              ];
 
-            // appends the data in a non-destructive way
-            if (!isset($metadata[$file->id()])) {
-              $metadata[$file->id()] = $data;
+              // appends the data in a non-destructive way
+              if (!isset($metadata[$file->id()])) {
+                $metadata[$file->id()] = $data;
+              } else {
+                $metadata[$file->id()] = array_merge($metadata[$file->id()], $data);
+              }
             } else {
-              $metadata[$file->id()] = array_merge($metadata[$file->id()], $data);
+              $this->logger->error("No extraction handler found for $file_uri");
             }
+
           }
         }
       }
@@ -318,12 +323,12 @@ class NodeBinder extends MetadataHexCore
     }
 
     \Drupal::database()->upsert('metadata_hex_processed')
-      ->key('entity_id') 
+      ->key('entity_id')
       ->fields([
-        'entity_id' => $this->nid,
-        'entity_type' => $this->getBundleType(),
-        'processed' => 1,
-      ])
+          'entity_id' => $this->nid,
+          'entity_type' => $this->getBundleType(),
+          'processed' => 1,
+        ])
       ->execute();
   }
   /**
