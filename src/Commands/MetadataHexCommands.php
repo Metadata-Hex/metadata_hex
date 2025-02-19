@@ -6,6 +6,7 @@ use Drush\Commands\DrushCommands;
 
 /**
  * A Drush command file.
+ * @group metadata_hex
  */
 class MetadataHexCommands extends DrushCommands {
 
