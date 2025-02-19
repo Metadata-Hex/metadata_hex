@@ -17,10 +17,10 @@ class MetadataHexCommands extends DrushCommands {
    */
   protected function initServices() {
     if (!isset($this->extractor)) {
-      $this->extractor = \Drupal::service('metadata_hex.extractor');
+      $this->extractor = \Drupal::service('metadata_hex.metadata_extractor');
     }
     if (!isset($this->batchProcessor)) {
-      $this->batchProcessor = \Drupal::service('metadata_hex.batch_processor');
+      $this->batchProcessor = \Drupal::service('metadata_hex.metadata_batch_processor');
     }
   }
 
