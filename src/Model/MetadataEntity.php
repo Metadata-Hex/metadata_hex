@@ -190,8 +190,8 @@ class MetadataEntity extends MetadataHexCore
     $this->mapMetadata($mtdt);
 
     // Ingests the metadata and sets
-    $tmd = $this->getNodeBinder($node)->ingestNodeFileMeta();
-    $this->setLocalMetadata($tmd);
+    // $tmd = $this->getNodeBinder($n)->ingestNodeFileMeta();
+    // $this->setLocalMetadata($tmd);
     $this->setLocalMetadata($this->metadataMapped, false);
   }
 
