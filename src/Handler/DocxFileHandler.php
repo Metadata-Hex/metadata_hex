@@ -8,6 +8,10 @@ use PhpOffice\PhpWord\IOFactory;
 /**
  * Class DocxFileHandler
  *
+ * @MetadataHex(
+ *   id = "docx_file_handler",
+ *   extensions = {"docx"}
+ * )
  * Handles ingestion and extraction of metadata from DOCX files.
  */
 class DocxFileHandler extends FileHandler {
@@ -29,19 +33,8 @@ class DocxFileHandler extends FileHandler {
     try {
       $phpWord = IOFactory::load($this->fileUri);
       $docInfo = $phpWord->getDocInfo();
-      
+      echo print_r($docInfo, true);
       return $docInfo;
-      // @todo test this
-      // return [
-      //   'title' => $docInfo->getTitle(),
-      //   'creator' => $docInfo->getCreator(),
-      //   'company' => $docInfo->getCompany(),
-      //   'description' => $docInfo->getDescription(),
-      //   'keywords' => $docInfo->getKeywords(),
-      //   'last_modified_by' => $docInfo->getLastModifiedBy(),
-      //   'created' => $docInfo->getCreated(),
-      //   'modified' => $docInfo->getModified(),
-      // ];
     } catch (Exception $e) {
       throw new Exception("Error parsing DOCX file: " . $e->getMessage());
     }
@@ -54,6 +47,6 @@ class DocxFileHandler extends FileHandler {
    *   The supported file extensions.
    */
   public function getSupportedExtentions(): array {
-    return ['docx'];
+    return ['doc', 'docx'];
   }
 }

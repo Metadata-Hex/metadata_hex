@@ -21,7 +21,8 @@
         "symfony/http-foundation": "^6.5 || ^7.1",
         "smalot/pdfparser": "dev-master",
         "guzzlehttp/guzzle": "^7.5",
-        "guzzlehttp/promises": "^1.5 || ^2.0.1"
+        "guzzlehttp/promises": "^1.5 || ^2.0.1",
+        "phpoffice/phpword": "dev-master"
     },
     "autoload-dev": {
         "psr-4": {
