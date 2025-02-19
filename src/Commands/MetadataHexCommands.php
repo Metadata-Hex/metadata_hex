@@ -3,11 +3,29 @@
 namespace Drupal\metadata_hex\Commands;
 
 use Drush\Commands\DrushCommands;
+use Drupal\metadata_hex\Service\MetadataExtractor;
+use Drupal\metadata_hex\Service\MetadataBatchProcessor;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * A Drush command file.
  */
 class MetadataHexCommands extends DrushCommands {
+
+  protected $extractor;
+  protected $batchProcessor;
+
+  public function __construct(MetadataExtractor $extractor, MetadataBatchProcessor $batchProcessor) {
+    $this->extractor = $extractor;
+    $this->batchProcessor = $batchProcessor;
+  }
+
+  public static function create(ContainerInterface $container) {
+    return new static(
+      $container->get('metadata_hex.extractor'),
+      $container->get('metadata_hex.batch_processor')
+    );
+  }
 
   /**
    * Runs a functionality test.
@@ -16,23 +34,20 @@ class MetadataHexCommands extends DrushCommands {
    * @aliases mdhext
    */
   public function testFunctionality() {
-    // Load a node.
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
 
     if ($node) {
       $this->output()->writeln('Node loaded: ' . $node->label());
-    }
-    else {
+    } else {
       $this->output()->writeln('Node not found.');
+      return;
     }
 
-    $mdex = new Drupal\metadata_hex\Service\MetadataExtractor(\Drupal::service('logger.channel.default'));
-    $mdbp = new Drupal\metadata_hex\Service\MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
-    $result = $mdbp->processNode($node->id()); 
-    if ($result === null){
-      $this->output()->writeIn('Success');
+    $result = $this->batchProcessor->processNode($node->id()); 
+    if ($result === null) {
+      $this->output()->writeln('Success');
     } else {
-      $this->output()->writeIn('Error, please check logs');
+      $this->output()->writeln('Error, please check logs');
     }
   }
 
