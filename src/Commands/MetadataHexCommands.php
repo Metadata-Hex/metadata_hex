@@ -5,7 +5,6 @@ namespace Drupal\metadata_hex\Commands;
 use Drush\Commands\DrushCommands;
 use Drupal\metadata_hex\Service\MetadataExtractor;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * A Drush command file.
@@ -15,16 +14,16 @@ class MetadataHexCommands extends DrushCommands {
   protected $extractor;
   protected $batchProcessor;
 
-  public function __construct(MetadataExtractor $extractor, MetadataBatchProcessor $batchProcessor) {
-    $this->extractor = $extractor;
-    $this->batchProcessor = $batchProcessor;
-  }
-
-  public static function create(ContainerInterface $container) {
-    return new static(
-      $container->get('metadata_hex.extractor'),
-      $container->get('metadata_hex.batch_processor')
-    );
+  /**
+   * Initializes services.
+   */
+  protected function initServices() {
+    if (!isset($this->extractor)) {
+      $this->extractor = \Drupal::service('metadata_hex.extractor');
+    }
+    if (!isset($this->batchProcessor)) {
+      $this->batchProcessor = \Drupal::service('metadata_hex.batch_processor');
+    }
   }
 
   /**
@@ -34,6 +33,8 @@ class MetadataHexCommands extends DrushCommands {
    * @aliases mdhext
    */
   public function testFunctionality() {
+    $this->initServices(); // Ensure services are initialized
+
     $node = \Drupal::entityTypeManager()->getStorage('node')->load(1);
 
     if ($node) {
@@ -50,5 +51,4 @@ class MetadataHexCommands extends DrushCommands {
       $this->output()->writeln('Error, please check logs');
     }
   }
-
 }
