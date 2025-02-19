@@ -29,7 +29,7 @@ class DocxFileHandler extends FileHandler {
     try {
       $phpWord = IOFactory::load($this->fileUri);
       $docInfo = $phpWord->getDocInfo();
-      
+
       return $docInfo;
       // @todo test this
       // return [
@@ -54,6 +54,6 @@ class DocxFileHandler extends FileHandler {
    *   The supported file extensions.
    */
   public function getSupportedExtentions(): array {
-    return ['docx'];
+    return ['doc', 'docx'];
   }
 }

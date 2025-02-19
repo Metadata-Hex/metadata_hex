@@ -114,7 +114,7 @@ class MetadataEntity extends MetadataHexCore
 
   /**
    * Returns an instance of MetadataParser. If it hasnt been initialized yet, init it
-   * 
+   *
    * @return MetadataParser
    */
   public function getParser(): MetadataParser
@@ -181,6 +181,8 @@ class MetadataEntity extends MetadataHexCore
 
     // Ingest and set the raw metadata
     $tmd = $this->getNodeBinder($file)->ingestNodeFileMeta();
+    echo print_r($tmd, true);
+
     $this->setLocalMetadata($tmd);
 
     // cleans up and parses the metadata and sets
@@ -195,7 +197,7 @@ class MetadataEntity extends MetadataHexCore
 
   /**
    * Returns an instance of NodeBinder. Initializes if unset
-   * 
+   *
    * @return NodeBinder
    */
   public function getNodeBinder($nodefile = null)
@@ -243,7 +245,7 @@ class MetadataEntity extends MetadataHexCore
   }
 
   /**
-   * Sets the local metadata arrays. 
+   * Sets the local metadata arrays.
    *
    * @param array $metadata
    * @param mixed $raw
@@ -328,7 +330,7 @@ class MetadataEntity extends MetadataHexCore
           break;
 
         case 'list_string':
-          // 
+          //
           $allowed_values = $field_definition->getSetting('allowed_values');
           if (in_array($value, $allowed_values, true)) {
             $node->set($field_name, $value);
