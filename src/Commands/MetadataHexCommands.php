@@ -3,8 +3,6 @@
 namespace Drupal\metadata_hex\Commands;
 
 use Drush\Commands\DrushCommands;
-use Drupal\metadata_hex\Service\MetadataExtractor;
-use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 
 /**
  * A Drush command file.
