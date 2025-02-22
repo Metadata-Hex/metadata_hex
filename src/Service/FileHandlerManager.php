@@ -40,10 +40,9 @@ class FileHandlerManager {
    *   The handler plugin or null if not found.
    */
  public function getHandlerForExtension(string $extension) {
-echo $extension;
-echo "---";
+
 foreach ($this->pluginManager->getDefinitions() as $plugin_id => $definition) {
-  echo print_r($definition['extensions'], true);
+
   if (isset($definition['extensions']) && in_array($extension, $definition['extensions'], true)) {
         return $this->pluginManager->createInstance($plugin_id);
       }
@@ -66,7 +65,7 @@ foreach ($this->pluginManager->getDefinitions() as $plugin_id => $definition) {
         $extensions = array_merge($extensions, $definition['extensions']);
       }
     }
-
+    
     return array_unique($extensions);
   }
 }

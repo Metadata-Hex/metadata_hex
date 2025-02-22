@@ -181,23 +181,17 @@ class MetadataEntity extends MetadataHexCore
 
     // Ingest and set the raw metadata
     $tmd = $this->getNodeBinder($file)->ingestNodeFileMeta();
-    echo print_r($tmd, true);
-
     $this->setLocalMetadata($tmd);
 
     // cleans up and parses the metadata and sets
     $mtdt = $this->getParser()->cleanMetadata($this->metadataRaw);
     $this->mapMetadata($mtdt);
-
-    // Ingests the metadata and sets
-    // $tmd = $this->getNodeBinder($n)->ingestNodeFileMeta();
-    // $this->setLocalMetadata($tmd);
     $this->setLocalMetadata($this->metadataMapped, false);
   }
 
   /**
    * Returns an instance of NodeBinder. Initializes if unset
-   *
+   * 
    * @return NodeBinder
    */
   public function getNodeBinder($nodefile = null)
@@ -245,7 +239,7 @@ class MetadataEntity extends MetadataHexCore
   }
 
   /**
-   * Sets the local metadata arrays.
+   * Sets the local metadata arrays. 
    *
    * @param array $metadata
    * @param mixed $raw
@@ -330,7 +324,6 @@ class MetadataEntity extends MetadataHexCore
           break;
 
         case 'list_string':
-          //
           $allowed_values = $field_definition->getSetting('allowed_values');
           if (in_array($value, $allowed_values, true)) {
             $node->set($field_name, $value);
@@ -346,7 +339,12 @@ class MetadataEntity extends MetadataHexCore
     }
 
     $this->getNodeBinder()->setRevision();
-    $node->save();
+    try {
+      $node->save();
+  } catch (\Throwable $e) {
+      echo "Exception: " . $e->getMessage() . "\n";
+      echo "Stack Trace:\n" . $e->getTraceAsString();
+  }
     $this->getNodeBinder()->setProcessed();
   }
 

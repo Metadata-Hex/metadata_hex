@@ -1,0 +1,154 @@
+<?php
+namespace Drupal\Tests\metadata_hex\Kernel;
+
+use Drupal\KernelTests\KernelTestBase;
+use Drupal\node\Entity\NodeType;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\Tests\metadata_hex\Kernel\Traits\TestFileHelperTrait;
+use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\metadata_hex\Service\MetadataBatchProcessor;
+use Drupal\metadata_hex\Service\MetadataExtractor;
+
+/** 
+  * @internal 
+ */
+abstract class BaseKernelTest extends KernelTestBase {
+
+  use TestFileHelperTrait;
+  /**
+   * The modules required for this test.
+   *
+   * @var array
+   */
+  protected static $modules = [
+    'metadata_hex',
+    'node',
+    'field',
+    'file',
+    'user',
+    'taxonomy',
+    'text',
+    'filter',
+    'system',    
+    'content_moderation', 
+    'workflows', 
+  ];
+
+  /**
+   * The MetadataBatchProcessor service.
+   *
+   * @var \Drupal\metadata_hex\Service\MetadataBatchProcessor
+   */
+  protected $batchProcessor;
+
+  /**
+   * 
+   */
+  protected $config;
+
+  /**
+   * Setup before running the test.
+   */
+  protected function setUp(): void {
+    parent::setUp();
+
+    // Install required entity schemas.
+    $this->installEntitySchema('node');
+    $this->installEntitySchema('file');
+    $this->installEntitySchema('user');
+    $this->installConfig(['taxonomy']);
+    $this->installEntitySchema('taxonomy_term');
+    $this->installEntitySchema('taxonomy_vocabulary');
+        $this->installConfig(['text', 'filter', 'field', 'node']); 
+    Vocabulary::create([
+        'vid' => 'tags',
+        'name' => 'Tags',
+    ])->save();
+
+    $this->installConfig(['metadata_hex']);
+    $this->installSchema('metadata_hex', ['metadata_hex_processed']);
+    $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
+
+    // Default settings
+    $settings = [
+        'extraction_settings.hook_node_types' => ['article', 'page'],
+        'extraction_settings.field_mappings' => "title|field_title\nsubject|field_subject",
+        'extraction_settings.flatten_keys' => TRUE,
+        'extraction_settings.strict_handling' => FALSE,
+        'extraction_settings.data_protected' => TRUE,
+        'extraction_settings.title_protected' => TRUE,
+        'node_process.bundle_types' => ['article'],
+        'node_process.allow_reprocess' => TRUE,
+        'file_ingest.bundle_type_for_generation' => 'article',
+        'file_ingest.file_attachment_field' => 'field_file',
+        'file_ingest.ingest_directory' => 'pdfs/',
+    ];
+
+    // Dynamically set
+    foreach ($settings as $field => $value) {
+      $this->setConfigSetting($field, $value);
+    }
+
+    // Save the configuration
+    $this->config->save();
+    
+    // Create the "article" content type.
+    NodeType::create([
+        'type' => 'article',
+        'name' => 'Article',
+    ])->save();
+
+    // Create field_subject (text field)
+    FieldStorageConfig::create([
+        'field_name' => 'field_subject',
+        'entity_type' => 'node',
+        'type' => 'string',
+    ])->save();
+
+    FieldConfig::create([
+        'field_name' => 'field_subject',
+        'entity_type' => 'node',
+        'bundle' => 'article',
+        'label' => 'Subject',
+    ])->save();
+
+    // Create field_attachment (entity reference to file)
+    FieldStorageConfig::create([
+        'field_name' => 'field_attachment',
+        'entity_type' => 'node',
+        'type' => 'entity_reference',
+        'settings' => ['target_type' => 'file'],
+    ])->save();
+
+    FieldConfig::create([
+        'field_name' => 'field_attachment',
+        'entity_type' => 'node',
+        'bundle' => 'article',
+        'label' => 'Attachment',
+        'settings' => ['handler' => 'default:file'],
+    ])->save();
+
+    // Create a user with necessary permissions.
+    $this->createUser();
+
+    // initialize the batch processor
+    $mdex = new MetadataExtractor(\Drupal::service('logger.channel.default'));
+    $this->batchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
+  }
+
+  /**
+   * Teardown
+   * 
+   * Custom override to allow sqlite to bypass cleanup (and those pesky executedDdlStatement errors)
+   * @return void
+   */
+  protected function tearDown(): void {
+    if (\Drupal::database()->driver() === 'sqlite') {
+        return;
+    }
+
+    // Let the default cleanup run for MySQL/PostgreSQL.
+    parent::tearDown();
+  }
+}

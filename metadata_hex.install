@@ -25,6 +25,7 @@ function metadata_hex_uninstall() {
 /**
  * Implements hook_schema().
  */
+
 function metadata_hex_schema() {
   $schema['metadata_hex_processed'] = [
     'description' => 'Table to track processed entities.',
@@ -53,15 +54,14 @@ function metadata_hex_schema() {
         'description' => 'A flag indicating whether the entity has been processed.',
       ],
     ],
-    'primary key' => ['id'],
+    'primary key' => ['id'], // Fix: Ensure SERIAL ID is the primary key
     'unique keys' => [
-      'entity_type_entity_id' => ['entity_type', 'entity_id'],
+      'entity_type_entity_id' => ['entity_type', 'entity_id'], // Fix: Unique constraint on these
     ],
   ];
 
   return $schema;
 }
-
 /**
  * Implements hook_requirements().
  */

@@ -177,14 +177,19 @@ class NodeBinder extends MetadataHexCore
 
     $node = Node::load($this->nid);
     if (!$node) {
+      echo "no noade---";
       return $metadata;
     }
 
-    // Iterate over all node fields for files 
+    // Iterate over all node fields for files
     foreach ($node->getFields() as $field_name => $field) {
-      if ($field->getFieldDefinition()->getType() === 'file') {
-        foreach ($field->getValue() as $file_item) {
+      $field_definition = $field->getFieldDefinition();
+      $field_type = $field_definition->getType();
+      $target_type = $field_definition->getSetting('target_type') ?? '';
 
+      if ($field_type === 'file' || ($field_type === 'entity_reference' && $target_type === 'file')) {        echo "found a file field";
+        foreach ($field->getValue() as $file_item) {
+          if (!empty($file_item['target_id'])) {
           // loads the file into a drupal model
           $file = File::load($file_item['target_id']);
 
@@ -215,6 +220,7 @@ class NodeBinder extends MetadataHexCore
             }
 
           }
+        }
         }
       }
     }
@@ -321,15 +327,15 @@ class NodeBinder extends MetadataHexCore
     if (!$this->nid) {
       return;
     }
-
-    \Drupal::database()->upsert('metadata_hex_processed')
-      ->key('entity_id')
-      ->fields([
-          'entity_id' => $this->nid,
-          'entity_type' => $this->getBundleType(),
-          'processed' => 1,
+    \Drupal::database()->merge('metadata_hex_processed')
+        ->key([
+            'entity_id' => (int) $this->nid, // ✅ Ensure it's an integer
+            'entity_type' => (string) $this->getBundleType(), // ✅ Ensure it's a string
         ])
-      ->execute();
+        ->fields([
+            'processed' => 1,
+        ])
+        ->execute();
   }
   /**
    * Sets a revision message when updating a node.
@@ -347,8 +353,10 @@ class NodeBinder extends MetadataHexCore
     if (!$node) {
       return;
     }
+    $node_type = $this->getBundleType();
+    $revisions_enabled = \Drupal::config("node.type.$node_type")->get('enable_revisions');
 
-    if ($node->isNewRevision()) {
+    if ($revisions_enabled && $node->isNewRevision()) {
       $node->setRevisionLogMessage("Updated metadata processing.");
       $node->save();
     }
