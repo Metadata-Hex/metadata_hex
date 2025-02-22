@@ -342,8 +342,7 @@ class MetadataEntity extends MetadataHexCore
     try {
       $node->save();
   } catch (\Throwable $e) {
-      echo "Exception: " . $e->getMessage() . "\n";
-      echo "Stack Trace:\n" . $e->getTraceAsString();
+    $this->logger->info($e->getMessage());
   }
     $this->getNodeBinder()->setProcessed();
   }

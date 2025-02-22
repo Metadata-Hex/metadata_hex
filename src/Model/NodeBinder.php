@@ -177,7 +177,6 @@ class NodeBinder extends MetadataHexCore
 
     $node = Node::load($this->nid);
     if (!$node) {
-      echo "no noade---";
       return $metadata;
     }
 
@@ -187,7 +186,7 @@ class NodeBinder extends MetadataHexCore
       $field_type = $field_definition->getType();
       $target_type = $field_definition->getSetting('target_type') ?? '';
 
-      if ($field_type === 'file' || ($field_type === 'entity_reference' && $target_type === 'file')) {        echo "found a file field";
+      if ($field_type === 'file' || ($field_type === 'entity_reference' && $target_type === 'file')) {
         foreach ($field->getValue() as $file_item) {
           if (!empty($file_item['target_id'])) {
           // loads the file into a drupal model
@@ -328,29 +327,15 @@ class NodeBinder extends MetadataHexCore
       return;
     }
     $entity_id = (int) $this->nid;
-$entity_type = (string) $this->getBundleType();
-$processed = 1;
+    $entity_type = (string) $this->getBundleType();
+    $processed = 1;
 
-echo "DEBUG: entity_id = " . gettype($entity_id) . " | " . $entity_id . PHP_EOL;
-echo "DEBUG: entity_type = " . gettype($entity_type) . " | " . $entity_type . PHP_EOL;
-echo "DEBUG: processed = " . gettype($processed) . " | " . $processed . PHP_EOL;
-
-// Now run merge safely
-\Drupal::database()->merge('metadata_hex_processed')
-    ->key('entity_id', $entity_id)  // ✅ Ensure entity_id is passed as a separate argument
-    ->key('entity_type', $entity_type)  // ✅ Same for entity_type
-    ->fields(['processed' => $processed])
-    ->execute();
-    // }
-    // \Drupal::database()->merge('metadata_hex_processed')
-    //     ->key([
-    //         'entity_id' => (int) $this->nid, // ✅ Ensure it's an integer
-    //         'entity_type' => (string) $this->getBundleType(), // ✅ Ensure it's a string
-    //     ])
-    //     ->fields([
-    //         'processed' => 1,
-    //     ])
-    //     ->execute();
+    // Now run merge safely
+    \Drupal::database()->merge('metadata_hex_processed')
+        ->key('entity_id', $entity_id)  // Ensure entity_id is passed as a separate argument
+        ->key('entity_type', $entity_type)  //  Same for entity_type
+        ->fields(['processed' => $processed])
+        ->execute();
   }
   /**
    * Sets a revision message when updating a node.
