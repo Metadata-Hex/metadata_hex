@@ -11,6 +11,10 @@ use Drupal\Tests\metadata_hex\Kernel\BaseKernelTest;
  */
 class MetadataBatchProcessorKernelTest extends BaseKernelTest {
   
+  public function testHasMetadataProcessedTable() {
+    $query = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
+    $this->assertEquals(true, $query, 'Database table exists');
+  }
   
 
   /**

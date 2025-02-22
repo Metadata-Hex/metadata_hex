@@ -327,15 +327,29 @@ class NodeBinder extends MetadataHexCore
     if (!$this->nid) {
       return;
     }
-    \Drupal::database()->merge('metadata_hex_processed')
-        ->key([
-            'entity_id' => (int) $this->nid, // ✅ Ensure it's an integer
-            'entity_type' => (string) $this->getBundleType(), // ✅ Ensure it's a string
-        ])
-        ->fields([
-            'processed' => 1,
-        ])
-        ->execute();
+    $entity_id = (int) $this->nid;
+$entity_type = (string) $this->getBundleType();
+$processed = 1;
+
+echo "DEBUG: entity_id = " . gettype($entity_id) . " | " . $entity_id . PHP_EOL;
+echo "DEBUG: entity_type = " . gettype($entity_type) . " | " . $entity_type . PHP_EOL;
+echo "DEBUG: processed = " . gettype($processed) . " | " . $processed . PHP_EOL;
+
+// Now run merge safely
+\Drupal::database()->merge('metadata_hex_processed')
+    ->key(['entity_id' => $entity_id, 'entity_type' => $entity_type])
+    ->fields(['processed' => $processed])
+    ->execute();
+    // }
+    // \Drupal::database()->merge('metadata_hex_processed')
+    //     ->key([
+    //         'entity_id' => (int) $this->nid, // ✅ Ensure it's an integer
+    //         'entity_type' => (string) $this->getBundleType(), // ✅ Ensure it's a string
+    //     ])
+    //     ->fields([
+    //         'processed' => 1,
+    //     ])
+    //     ->execute();
   }
   /**
    * Sets a revision message when updating a node.
