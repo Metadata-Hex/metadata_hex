@@ -191,7 +191,7 @@ class MetadataEntity extends MetadataHexCore
 
   /**
    * Returns an instance of NodeBinder. Initializes if unset
-   * 
+   *
    * @return NodeBinder
    */
   public function getNodeBinder($nodefile = null)
@@ -239,7 +239,7 @@ class MetadataEntity extends MetadataHexCore
   }
 
   /**
-   * Sets the local metadata arrays. 
+   * Sets the local metadata arrays.
    *
    * @param array $metadata
    * @param mixed $raw
@@ -280,14 +280,16 @@ class MetadataEntity extends MetadataHexCore
       // grab the field info
       $field_definition = $node->getFieldDefinition($field_name);
       $field_type = $field_definition->getType();
-
+      echo $field_type . PHP_EOL;
       switch ($field_type) {
         case 'string':
         case 'string_long':
         case 'text':
         case 'text_long':
         case 'text_with_summary':
+          echo $field_name . ":" . $value . PHP_EOL;
           $node->set($field_name, $value);
+          echo "DFFTER" . PHP_EOL;
           break;
 
         case 'entity_reference':
@@ -343,6 +345,7 @@ class MetadataEntity extends MetadataHexCore
       $node->save();
   } catch (\Throwable $e) {
     $this->logger->info($e->getMessage());
+ throw new \Exception($e->getMessage());
   }
     $this->getNodeBinder()->setProcessed();
   }

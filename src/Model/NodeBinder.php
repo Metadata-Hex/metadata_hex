@@ -261,9 +261,9 @@ class NodeBinder extends MetadataHexCore
 
   /**
    * Saves the node after validation.
-   * 
+   *
    * @return void
-   * 
+   *
    */
   public function save()
   {
@@ -297,9 +297,11 @@ class NodeBinder extends MetadataHexCore
    * @param bool $overwrite
    *   Whether to overwrite existing values.
    */
-  protected function setField(string $field_name, $value, bool $overwrite = true)
+  public function setField(string $field_name, $value, bool $overwrite = true)
   {
-    if (!$this->nid) {
+echo 'this nid ' . $this->nid;
+
+if (!$this->nid) {
       return;
     }
 
@@ -307,7 +309,8 @@ class NodeBinder extends MetadataHexCore
     if (!$node) {
       return;
     }
-
+    echo "almost there...";
+    echo $node->Get($field_name)-getValue();
     // Lets set the field to the new value, ONLY if the target is empty or overwrite is true
     if ($overwrite || empty($node->get($field_name)->getValue())) {
       $node->set($field_name, $value);
@@ -317,9 +320,9 @@ class NodeBinder extends MetadataHexCore
 
   /**
    * Marks the node as processed.
-   * 
+   *
    * @return void
-   * 
+   *
    */
   public function setProcessed()
   {
@@ -339,9 +342,9 @@ class NodeBinder extends MetadataHexCore
   }
   /**
    * Sets a revision message when updating a node.
-   * 
+   *
    * @return void
-   * 
+   *
    */
   public function setRevision()
   {

@@ -10,8 +10,8 @@ use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
 
-/** 
-  * @internal 
+/**
+  * @internal
  */
 abstract class BaseKernelTest extends KernelTestBase {
 
@@ -30,9 +30,9 @@ abstract class BaseKernelTest extends KernelTestBase {
     'taxonomy',
     'text',
     'filter',
-    'system',    
-    'content_moderation', 
-    'workflows', 
+    'system',
+    'content_moderation',
+    'workflows',
   ];
 
   /**
@@ -43,7 +43,7 @@ abstract class BaseKernelTest extends KernelTestBase {
   protected $batchProcessor;
 
   /**
-   * 
+   *
    */
   protected $config;
 
@@ -60,7 +60,7 @@ abstract class BaseKernelTest extends KernelTestBase {
     $this->installConfig(['taxonomy']);
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('taxonomy_vocabulary');
-        $this->installConfig(['text', 'filter', 'field', 'node']); 
+        $this->installConfig(['text', 'filter', 'field', 'node']);
     Vocabulary::create([
         'vid' => 'tags',
         'name' => 'Tags',
@@ -76,7 +76,7 @@ abstract class BaseKernelTest extends KernelTestBase {
         'extraction_settings.field_mappings' => "title|field_title\nsubject|field_subject",
         'extraction_settings.flatten_keys' => TRUE,
         'extraction_settings.strict_handling' => FALSE,
-        'extraction_settings.data_protected' => TRUE,
+        'extraction_settings.data_protected' => FALSE,
         'extraction_settings.title_protected' => TRUE,
         'node_process.bundle_types' => ['article'],
         'node_process.allow_reprocess' => TRUE,
@@ -92,7 +92,7 @@ abstract class BaseKernelTest extends KernelTestBase {
 
     // Save the configuration
     $this->config->save();
-    
+
     // Create the "article" content type.
     NodeType::create([
         'type' => 'article',
@@ -139,7 +139,7 @@ abstract class BaseKernelTest extends KernelTestBase {
 
   /**
    * Teardown
-   * 
+   *
    * Custom override to allow sqlite to bypass cleanup (and those pesky executedDdlStatement errors)
    * @return void
    */
