@@ -337,7 +337,8 @@ echo "DEBUG: processed = " . gettype($processed) . " | " . $processed . PHP_EOL;
 
 // Now run merge safely
 \Drupal::database()->merge('metadata_hex_processed')
-    ->key(['entity_id' => $entity_id, 'entity_type' => $entity_type])
+    ->key('entity_id', $entity_id)  // ✅ Ensure entity_id is passed as a separate argument
+    ->key('entity_type', $entity_type)  // ✅ Same for entity_type
     ->fields(['processed' => $processed])
     ->execute();
     // }
