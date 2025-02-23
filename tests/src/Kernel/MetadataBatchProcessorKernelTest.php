@@ -14,6 +14,7 @@ use Drupal\node\Entity\Node;
 class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
   public function testHasMetadataProcessedTable() {
+    $this->initMetadataHex();
     $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
     $this->assertEquals(true, $table_exists, 'Database table exists');
     if ($table_exists) {
@@ -47,8 +48,10 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing a node with a valid PDF file.
    */
   public function testProcessNodeWithValidFileTypeNoMetadata() {
+    $this->initMetadataHex();
     $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
     $this->expectExceptionMessage("Invalid or unreadable file: vfs://root/test_document.pdf");
+    
     // Setup a basic valid file and node
     $node = $this->createNode('/test_document.pdf');
 
@@ -75,6 +78,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing a node with an invalid file type.
    */
   public function testProcessNodeWithInvalidFileType() {
+    $this->initMetadataHex();
 
     // Setup a basic valid file and node
     $node = $this->createNode('/test_document.txt');
@@ -102,6 +106,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing a node with a valid PDF file.
    */
   public function testProcessNodeWithValidPdfWithMetadata() {
+    $this->initMetadataHex();
+
 //$node_mock = $this->createMock(Node::class);
 //$node_mock->method('getOriginal')->willReturn(null); // ✅ Return `null` to bypass
 $node_mock = $this->getMockBuilder(Node::class)

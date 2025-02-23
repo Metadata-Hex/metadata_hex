@@ -69,45 +69,9 @@ abstract class BaseKernelTestHex extends KernelTestBase {
         'name' => 'Tags',
     ])->save();
 
-    $this->installConfig(['metadata_hex']);
-    $this->installSchema('metadata_hex', ['metadata_hex_processed']);
-    $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
-
-    $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
-    if ($table_exists) {
-      $results = \Drupal::database()->query("PRAGMA table_info(metadata_hex_processed)")->fetchAll();
-      foreach ($results as $result) {
-        echo "Field: {$result->name}\n";
-      }
-   
-    } else {
-      echo "Table metadata_hex_processed does not exist.\n";
-    }
-
     
-    // Default settings
-    $settings = [
-        'extraction_settings.hook_node_types' => ['article', 'page'],
-        'extraction_settings.field_mappings' => "title|field_title\nsubject|field_subject",
-        'extraction_settings.flatten_keys' => TRUE,
-        'extraction_settings.strict_handling' => FALSE,
-        'extraction_settings.data_protected' => FALSE,
-        'extraction_settings.title_protected' => TRUE,
-        'node_process.bundle_types' => ['article'],
-        'node_process.allow_reprocess' => TRUE,
-        'file_ingest.bundle_type_for_generation' => 'article',
-        'file_ingest.file_attachment_field' => 'field_file',
-        'file_ingest.ingest_directory' => 'pdfs/',
-    ];
-
-    // Dynamically set
-    foreach ($settings as $field => $value) {
-      $this->setConfigSetting($field, $value);
-    }
-
-    // Save the configuration
-    $this->config->save();
-
+    $this->initMetadataHex();
+    
     // Create the "article" content type.
     NodeType::create([
         'type' => 'article',
@@ -150,6 +114,48 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     // initialize the batch processor
     $mdex = new MetadataExtractor(\Drupal::service('logger.channel.default'));
     $this->batchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
+  }
+
+  public function initMetadataHex(){
+    $this->installConfig(['metadata_hex']);
+    $this->installSchema('metadata_hex', ['metadata_hex_processed']);
+    $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
+
+    // $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
+    // if ($table_exists) {
+    //   $results = \Drupal::database()->query("PRAGMA table_info(metadata_hex_processed)")->fetchAll();
+    //   foreach ($results as $result) {
+    //     echo "Field: {$result->name}\n";
+    //   }
+   
+    // } else {
+    //   echo "Table metadata_hex_processed does not exist.\n";
+    // }
+
+    
+    // Default settings
+    $settings = [
+        'extraction_settings.hook_node_types' => ['article', 'page'],
+        'extraction_settings.field_mappings' => "title|field_title\nsubject|field_subject",
+        'extraction_settings.flatten_keys' => TRUE,
+        'extraction_settings.strict_handling' => FALSE,
+        'extraction_settings.data_protected' => FALSE,
+        'extraction_settings.title_protected' => TRUE,
+        'node_process.bundle_types' => ['article'],
+        'node_process.allow_reprocess' => TRUE,
+        'file_ingest.bundle_type_for_generation' => 'article',
+        'file_ingest.file_attachment_field' => 'field_file',
+        'file_ingest.ingest_directory' => 'pdfs/',
+    ];
+
+    // Dynamically set
+    foreach ($settings as $field => $value) {
+      $this->setConfigSetting($field, $value);
+    }
+
+    // Save the configuration
+    $this->config->save();
+
   }
 
   /**
