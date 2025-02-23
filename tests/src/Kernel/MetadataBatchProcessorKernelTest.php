@@ -26,16 +26,14 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTest {
         'processed',
       ];
   
-      // Get the actual fields in the table.
-      $actual_fields = \Drupal::database()->schema()->getFieldNames('metadata_hex_processed');
-  
       foreach ($expected_fields as $field) {
-        $field_exists = in_array($field, $actual_fields);
+        $field_exists = \Drupal::database()->schema()->fieldExists('metadata_hex_processed', $field);
         $this->assertEquals(true, $field_exists, "Field '$field' exists in the table.");
       }
+  
     }
   
-    /** ADD THE FIELD MODIFEID + OThers */
+
   }
 
 
