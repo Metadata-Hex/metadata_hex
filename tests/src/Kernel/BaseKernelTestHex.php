@@ -186,10 +186,24 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     // Let the default cleanup run for MySQL/PostgreSQL.
     parent::tearDown();
   }
-
+  /**
+   * 
+   */
   public function hasMetadataProcessedTable() {
-   // $this->initMetadataHex();
+
     $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
+  if ($table_exists) {
+    // Use raw query to list field names.
+    $results = \Drupal::database()->query("PRAGMA table_info(metadata_hex_processed)")->fetchAll();
+    foreach ($results as $result) {
+      echo "Field: {$result->name}\n";
+    }
+  } else {
+    echo "Table metadata_hex_processed does not exist.\n";
+  }
+
+   // $this->initMetadataHex();
+    // $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
     $this->assertEquals(true, $table_exists, 'Database table exists');
     if ($table_exists) {
       // Define expected fields.
