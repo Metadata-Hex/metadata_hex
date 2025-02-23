@@ -75,7 +75,6 @@ function metadata_hex_schema() {
         'type' => 'integer',
         'unsigned' => TRUE,
         'not null' => TRUE,
-        'auto_increment' => TRUE,
       ],
       'entity_type' => [
         'description' => 'The type of the entity (e.g., node, user).',
@@ -103,6 +102,9 @@ function metadata_hex_schema() {
       ],
     ],
     'primary key' => ['id'],
+    'unique keys' => [
+      'id_unique' => ['id'],
+    ],
     'indexes' => [
       'entity_id' => ['entity_id'],
     ],
