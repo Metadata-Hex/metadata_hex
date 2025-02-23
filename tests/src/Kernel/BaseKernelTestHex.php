@@ -131,11 +131,11 @@ $this->enableModules(['metadata_hex']);
     $database->query('DROP TABLE IF EXISTS metadata_hex_processed');
   }
    // Get the schema from the module.
-  $schema_definition = metadata_hex_schema();
+  //$schema_definition = metadata_hex_schema();
 
   // Forcefully create the table using the schema definition.
-  $schema->createTable('metadata_hex_processed', $schema_definition['metadata_hex_processed']);
-
+  //$schema->createTable('metadata_hex_processed', $schema_definition['metadata_hex_processed']);
+  $this->installSchema('metadata_hex', ['metadata_hex_processed']);
   echo "Forced schema installation completed.\n";
   sleep(1);
   //$this->installSchema('metadata_hex', ['metadata_hex_processed']);
