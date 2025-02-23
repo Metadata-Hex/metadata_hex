@@ -363,6 +363,7 @@ public function getWasNodeJustProcessed(): bool
     $processed = 1;
     $ts = (string) date('Y-m-d H:i:s');
 
+    try {
     // Now run merge safely
 \Drupal::database()->merge('metadata_hex_processed')
 ->key(['entity_id' => $entity_id])  // Set the keys properly , 'entity_type' => $entity_type
@@ -371,6 +372,7 @@ public function getWasNodeJustProcessed(): bool
   'processed' => $processed,
 ])
 ->execute();
+    }catch(\Exception $e){}
   }
   /**
    * Sets a revision message when updating a node.
