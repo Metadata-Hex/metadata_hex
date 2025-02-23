@@ -75,8 +75,11 @@ abstract class BaseKernelTestHex extends KernelTestBase {
 
     $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
     if ($table_exists) {
-      $fields = \Drupal::database()->schema()->getFieldNames('metadata_hex_processed');
-      print_r($fields);
+      $results = \Drupal::database()->query("PRAGMA table_info(metadata_hex_processed)")->fetchAll();
+      foreach ($results as $result) {
+        echo "Field: {$result->name}\n";
+      }
+   
     } else {
       echo "Table metadata_hex_processed does not exist.\n";
     }
