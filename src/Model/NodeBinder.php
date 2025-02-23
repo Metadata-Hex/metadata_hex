@@ -166,6 +166,8 @@ public function getWasNodeJustProcessed(): bool
     $currentTime = time();
     echo $currentTime . ' - ' . $lastModifiedTime . PHP_EOL;
     return ($currentTime - $lastModifiedTime) <= 180;
+  } else {
+    return true; // if query is null, dont let it reprocess
   }
 echo "returning false";
   return false;
