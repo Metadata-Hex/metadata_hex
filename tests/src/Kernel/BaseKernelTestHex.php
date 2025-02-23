@@ -125,11 +125,11 @@ $this->enableModules(['metadata_hex']);
     
   $database = \Drupal::database();
   $schema = $database->schema();
-
+    $this->enableModules(['metadata_hex']);
   // Drop table using raw SQL if it exists.
-  if ($schema->tableExists('metadata_hex_processed')) {
-    $database->query('DROP TABLE IF EXISTS metadata_hex_processed');
-  }
+  // if ($schema->tableExists('metadata_hex_processed')) {
+  //   $database->query('DROP TABLE IF EXISTS metadata_hex_processed');
+  // }
    // Get the schema from the module.
   //$schema_definition = metadata_hex_schema();
 
