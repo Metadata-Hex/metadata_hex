@@ -71,6 +71,8 @@ $this->enableModules(['metadata_hex']);
     ])->save();
 
     $this->installConfig(['metadata_hex']);
+    $this->installSchema('metadata_hex', ['metadata_hex_processed']);
+
     $this->initMetadataHex();
 
     // Create the "article" content type.
@@ -135,7 +137,6 @@ $this->enableModules(['metadata_hex']);
 
   // Forcefully create the table using the schema definition.
   //$schema->createTable('metadata_hex_processed', $schema_definition['metadata_hex_processed']);
-  $this->installSchema('metadata_hex', ['metadata_hex_processed']);
   echo "Forced schema installation completed.\n";
   sleep(1);
   //$this->installSchema('metadata_hex', ['metadata_hex_processed']);
