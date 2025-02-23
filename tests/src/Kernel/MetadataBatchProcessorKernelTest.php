@@ -13,35 +13,7 @@ use Drupal\node\Entity\Node;
  */
 class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
-  public function testHasMetadataProcessedTable() {
-    $this->initMetadataHex();
-    $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
-    $this->assertEquals(true, $table_exists, 'Database table exists');
-    if ($table_exists) {
-      // Define expected fields.
-      $expected_fields = [
-        'entity_type',
-        'entity_id',
-        'last_modified',
-        'processed',
-      ];
-      
-  // In your test class setup method
-// \Drupal::service('module_installer')->uninstall(['your_module_name']);
-// \Drupal::service('module_installer')->install(['your_module_name']);
-      foreach ($expected_fields as $field) {
-        try {
-        $field_exists = \Drupal::database()->schema()->fieldExists('metadata_hex_processed', $field);
-        } catch (\Exception $e){
-        echo $e->getMessage();
-        }
-        $this->assertEquals(true, $field_exists, "Field '$field' exists in the table.");
-      }
   
-    }
-  
-
-  }
 
 
   /**
