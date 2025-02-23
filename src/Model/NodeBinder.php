@@ -361,12 +361,13 @@ public function getWasNodeJustProcessed(): bool
     $entity_id = (int) $this->nid;
     $entity_type = (string) $this->getBundleType();
     $processed = 1;
+    $ts = (string) date('Y-m-d H:i:s');
 
     // Now run merge safely
 \Drupal::database()->merge('metadata_hex_processed')
 ->key(['entity_id' => $entity_id, 'entity_type' => $entity_type])  // Set the keys properly
 ->fields([
-  'last_modified' => date('Y-m-d H:i:s'),  // Add last_modified timestamp
+  'last_modified' => $ts,  // Add last_modified timestamp
   'processed' => $processed,
 ])
 ->execute();
