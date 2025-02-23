@@ -150,37 +150,12 @@ public function getWasNodeJustProcessed(): bool
     return false;
   }
   try {
-    // $query = \Drupal::database()->select('metadata_hex_processed', 'mhp')
-    //   ->fields('mhp', ['last_modified'])
-    //   ->condition('entity_id', $this->nid)
-    //   ->execute()
-    //   ->fetchField();
+    $query = \Drupal::database()->select('metadata_hex_processed', 'mhp')
+      ->fields('mhp', ['last_modified'])
+      ->condition('entity_id', $this->nid)
+      ->execute()
+       ->fetchField();
     
-    //echo "Query result: " . $query;
-
-  $query = \Drupal::database()->select('metadata_hex_processed', 'mhp')
-  ->fields('mhp', ['last_modified'])
-  ->condition('entity_id', $this->nid);
-
-$sql = $query->__toString();
-$args = $query->getArguments();
-
-$nid = $this->nid;
-$results = \Drupal::database()->select('metadata_hex_processed', 'mhp')
-  ->fields('mhp')
-  ->execute()
-  ->fetchAll();
-
-foreach ($results as $row) {
-  print_r($row);
-}
-
-echo "Entity ID: " . $nid . "\n";
-echo "SQL Query: $sql\n";
-print_r($args);
-
-$result = $query->execute()->fetchField();
-echo "Result: " . $result;
 } catch (\Exception $e) {
   echo "Error: " . $e->getMessage();
 }
@@ -188,6 +163,7 @@ echo "Result: " . $result;
   if ($query) {
     $lastModifiedTime = strtotime($query);
     $currentTime = time();
+    echo $currentTime . ' - ' . $lastModifiedTime . PHP_EOL;
     return ($currentTime - $lastModifiedTime) <= 180;
   }
 
@@ -354,9 +330,8 @@ echo "Result: " . $result;
    */
   public function setField(string $field_name, $value, bool $overwrite = true)
   {
-echo 'this nid ' . $this->nid;
 
-if (!$this->nid) {
+    if (!$this->nid) {
       return;
     }
 
@@ -364,8 +339,7 @@ if (!$this->nid) {
     if (!$node) {
       return;
     }
-    echo "almost there...";
-    echo $node->Get($field_name)-getValue();
+
     // Lets set the field to the new value, ONLY if the target is empty or overwrite is true
     if ($overwrite || empty($node->get($field_name)->getValue())) {
       $node->set($field_name, $value);

@@ -280,16 +280,14 @@ class MetadataEntity extends MetadataHexCore
       // grab the field info
       $field_definition = $node->getFieldDefinition($field_name);
       $field_type = $field_definition->getType();
-      echo $field_type . PHP_EOL;
+
       switch ($field_type) {
         case 'string':
         case 'string_long':
         case 'text':
         case 'text_long':
         case 'text_with_summary':
-          echo $field_name . ":" . $value . PHP_EOL;
           $node->set($field_name, $value);
-          echo "DFFTER" . PHP_EOL;
           break;
 
         case 'entity_reference':

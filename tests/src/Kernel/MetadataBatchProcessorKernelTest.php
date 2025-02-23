@@ -119,7 +119,7 @@ $node_mock = $this->getMockBuilder(Node::class)
     $modified_alt = $node_alt->getChangedTime();
     $ff = $node_alt->get('field_subject')->getString();
     $this->assertNotEquals('', $ff, 'subject updated');
-    //echo $ff . PHP_EOL;
+
     // Assertions
     $this->assertEquals($created, $created_alt, 'Node creation date should match');
     $this->assertNotEquals($modified, $modified_alt, 'Node modification date should differ');

@@ -13,9 +13,7 @@ trait TestFileHelperTrait {
   public function setConfigSetting($field, $value){
     try {
       $this->config->set($field, $value);
-    } catch (\Exception $e){
-      echo $field . $value . $e->message();
-    }
+    } catch (\Exception $e){}
   }
 
   /**
