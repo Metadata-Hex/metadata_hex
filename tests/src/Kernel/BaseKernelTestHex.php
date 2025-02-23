@@ -129,8 +129,18 @@ abstract class BaseKernelTestHex extends KernelTestBase {
   if ($schema->tableExists('metadata_hex_processed')) {
     $database->query('DROP TABLE IF EXISTS metadata_hex_processed');
   }
-   
-  $this->installSchema('metadata_hex', ['metadata_hex_processed']);
+   // Get the schema from the module.
+  $schema_definition = metadata_hex_schema();
+
+  // Forcefully create the table using the schema definition.
+  $schema->createTable('metadata_hex_processed', $schema_definition['metadata_hex_processed']);
+
+  echo "Forced schema installation completed.\n";
+  sleep(1);
+  //$this->installSchema('metadata_hex', ['metadata_hex_processed']);
+  // right after installing the schema, hasMetadataProcessedTable() toes
+  // 1. confirms the table exists and prints the fields
+  // 2. fieldExists('metadata_hex_processed', $field); fails on all fields
   $this->hasMetadataProcessedTable();
   echo "fart";
   \Drupal::service('kernel')->rebuildContainer();
