@@ -11,9 +11,9 @@ use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
 
 /**
-  * @internal
+  * @abstract
  */
-abstract class BaseKernelTest extends KernelTestBase {
+abstract class BaseKernelTestHex extends KernelTestBase {
 
   use TestFileHelperTrait;
   /**

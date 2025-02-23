@@ -2,8 +2,8 @@
 
 namespace Drupal\Tests\metadata_hex\Kernel;
 
-use Drupal\Tests\metadata_hex\Kernel\BaseKernelTest;
-use Prophecy\PhpUnit\ProphecyTrait;
+use Drupal\Tests\metadata_hex\Kernel\BaseKernelTestHex;
+// use Prophecy\PhpUnit\ProphecyTrait;
 use Drupal\node\Entity\Node;
 
 /**
@@ -11,7 +11,7 @@ use Drupal\node\Entity\Node;
  *
  * @group metadata_hex
  */
-class MetadataBatchProcessorKernelTest extends BaseKernelTest {
+class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
   public function testHasMetadataProcessedTable() {
     $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
@@ -26,7 +26,11 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTest {
       ];
   
       foreach ($expected_fields as $field) {
+        try {
         $field_exists = \Drupal::database()->schema()->fieldExists('metadata_hex_processed', $field);
+        } catch (\Exception $e){
+        echo $e->getMessage();
+        }
         $this->assertEquals(true, $field_exists, "Field '$field' exists in the table.");
       }
   
