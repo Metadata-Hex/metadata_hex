@@ -340,9 +340,11 @@ class MetadataEntity extends MetadataHexCore
       }
     }
 
-    $this->getNodeBinder()->setRevision();
-    $this->getNodeBinder()->setProcessed();
+
     if (!$this->getNodeBinder()->getWasNodeJustProcessed()){
+      echo "was node just processed? " . $this->getNodeBinder()->getWasNodeJustProcessed() . PHP_EOL;
+      $this->getNodeBinder()->setRevision();
+      $this->getNodeBinder()->setProcessed();
       $node->save();
     }
 //     try {
