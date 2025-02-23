@@ -188,7 +188,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
   }
 
   public function hasMetadataProcessedTable() {
-    $this->initMetadataHex();
+   // $this->initMetadataHex();
     $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
     $this->assertEquals(true, $table_exists, 'Database table exists');
     if ($table_exists) {
