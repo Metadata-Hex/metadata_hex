@@ -26,9 +26,9 @@ function metadata_hex_node_insert(EntityInterface $node) {
     $nodeBinder = new NodeBinder(\Drupal::service('logger.channel.default'));
     $nodeBinder->init($node);
     $justProcessed = $nodeBinder->getWasNodeJustProcessed();
-// echo $justProcessed . ':<<';
+ echo 'just: ' .$justProcessed . ':<<';
 // if justProcessed is empty, that means its a stupid test database nothing there shit... i think
-    if ($justProcessed !== null && !$justProcessed){
+    if ($justProcessed !== null && $justProcessed !== true){
       // echo "was node just processed: " . (int)$nodeBinder->getWasNodeJustProcessed() . PHP_EOL;
       $mdex = new Drupal\metadata_hex\Service\MetadataExtractor(\Drupal::service('logger.channel.default'));
       $mdbp = new Drupal\metadata_hex\Service\MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
