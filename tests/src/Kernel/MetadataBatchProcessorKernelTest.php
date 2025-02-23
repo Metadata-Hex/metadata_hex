@@ -3,6 +3,8 @@
 namespace Drupal\Tests\metadata_hex\Kernel;
 
 use Drupal\Tests\metadata_hex\Kernel\BaseKernelTest;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Drupal\node\Entity\Node;
 
 /**
  * Kernel test for the MetadataBatchProcessor service.
@@ -76,8 +78,12 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTest {
    * Tests processing a node with a valid PDF file.
    */
   public function testProcessNodeWithValidPdfWithMetadata() {
-
-    // Setup an actual valid pdf file with metadata and node
+//$node_mock = $this->createMock(Node::class);
+//$node_mock->method('getOriginal')->willReturn(null); // ✅ Return `null` to bypass
+$node_mock = $this->getMockBuilder(Node::class)
+    ->disableOriginalConstructor()
+    ->getMock();
+  // Setup an actual valid pdf file with metadata and node
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
 
