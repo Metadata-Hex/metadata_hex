@@ -129,12 +129,14 @@ abstract class BaseKernelTestHex extends KernelTestBase {
   if ($schema->tableExists('metadata_hex_processed')) {
     $database->query('DROP TABLE IF EXISTS metadata_hex_processed');
   }
-
-    $this->installSchema('metadata_hex', ['metadata_hex_processed']);
-    \Drupal::service('kernel')->rebuildContainer();
-\Drupal::service('cache.bootstrap')->deleteAll();
-\Drupal::service('cache.config')->deleteAll();
-    $this->hasMetadataProcessedTable();
+   
+  $this->installSchema('metadata_hex', ['metadata_hex_processed']);
+  $this->hasMetadataProcessedTable();
+  echo "fart";
+  \Drupal::service('kernel')->rebuildContainer();
+  \Drupal::service('cache.bootstrap')->deleteAll();
+  \Drupal::service('cache.config')->deleteAll();
+  $this->hasMetadataProcessedTable();
     
     $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
 

@@ -325,6 +325,7 @@ class MetadataEntity extends MetadataHexCore
 
         case 'list_string':
           $allowed_values = $field_definition->getSetting('allowed_values');
+          // @TODO this needs to take into account strict handling
           if (in_array($value, $allowed_values, true)) {
             $node->set($field_name, $value);
           } else {
