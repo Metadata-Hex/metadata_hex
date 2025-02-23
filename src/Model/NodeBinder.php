@@ -149,12 +149,41 @@ public function getWasNodeJustProcessed(): bool
   if (!$this->nid) {
     return false;
   }
+  try {
+    // $query = \Drupal::database()->select('metadata_hex_processed', 'mhp')
+    //   ->fields('mhp', ['last_modified'])
+    //   ->condition('entity_id', $this->nid)
+    //   ->execute()
+    //   ->fetchField();
+    
+    //echo "Query result: " . $query;
 
   $query = \Drupal::database()->select('metadata_hex_processed', 'mhp')
-    ->fields('mhp', ['last_modified'])
-    ->condition('entity_id', $this->nid)
-    ->execute()
-    ->fetchField();
+  ->fields('mhp', ['last_modified'])
+  ->condition('entity_id', $this->nid);
+
+$sql = $query->__toString();
+$args = $query->getArguments();
+
+$nid = $this->nid;
+$results = \Drupal::database()->select('metadata_hex_processed', 'mhp')
+  ->fields('mhp')
+  ->execute()
+  ->fetchAll();
+
+foreach ($results as $row) {
+  print_r($row);
+}
+
+echo "Entity ID: " . $nid . "\n";
+echo "SQL Query: $sql\n";
+print_r($args);
+
+$result = $query->execute()->fetchField();
+echo "Result: " . $result;
+} catch (\Exception $e) {
+  echo "Error: " . $e->getMessage();
+}
 
   if ($query) {
     $lastModifiedTime = strtotime($query);
