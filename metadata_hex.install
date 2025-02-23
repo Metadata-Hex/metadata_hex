@@ -27,7 +27,8 @@ function metadata_hex_uninstall() {
  */
 
 function metadata_hex_schema() {
-  // $schema['metadata_hex_processed'] = [
+  echo "metadata_hex_schema() called\n";
+   //$schema['metadata_hex_processed'] = [
   //   'description' => 'Table to track processed entities.',
   //   'fields' => [
   //     'id' => [
@@ -103,7 +104,7 @@ function metadata_hex_schema() {
    // 'primary key' => ['id'],
   ];
 
-
+  // echo print
   return $schema;
 
 }
