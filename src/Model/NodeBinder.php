@@ -363,11 +363,13 @@ public function getWasNodeJustProcessed(): bool
     $processed = 1;
 
     // Now run merge safely
-    \Drupal::database()->merge('metadata_hex_processed')
-        ->key('entity_id', $entity_id)  // Ensure entity_id is passed as a separate argument
-        ->key('entity_type', $entity_type)  //  Same for entity_type
-        ->fields(['processed' => $processed])
-        ->execute();
+\Drupal::database()->merge('metadata_hex_processed')
+->key(['entity_id' => $entity_id, 'entity_type' => $entity_type])  // Set the keys properly
+->fields([
+  'last_modified' => date('Y-m-d H:i:s'),  // Add last_modified timestamp
+  'processed' => $processed,
+])
+->execute();
   }
   /**
    * Sets a revision message when updating a node.
