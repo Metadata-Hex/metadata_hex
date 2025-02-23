@@ -202,9 +202,12 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     echo "Table metadata_hex_processed does not exist.\n";
   }
 
+  //rebgrab to test
+  $table_exists_now = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
+
    // $this->initMetadataHex();
     // $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
-    $this->assertEquals(true, $table_exists, 'Database table exists');
+    $this->assertEquals(true, $table_exists_now, 'Database table exists');
     if ($table_exists) {
       // Define expected fields.
       $expected_fields = [
