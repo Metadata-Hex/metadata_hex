@@ -342,7 +342,9 @@ class MetadataEntity extends MetadataHexCore
 
     $this->getNodeBinder()->setRevision();
     $this->getNodeBinder()->setProcessed();
-    $node->save();
+    if (!$this->getNodeBinder()->getWasNodeJustProcessed()){
+      $node->save();
+    }
 //     try {
       
 //   } catch (\Throwable $e) {
