@@ -53,9 +53,10 @@ abstract class BaseKernelTestHex extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-    \Drupal::service('kernel')->rebuildContainer();
-\Drupal::service('cache.bootstrap')->deleteAll();
-\Drupal::service('cache.config')->deleteAll();
+//     \Drupal::service('kernel')->rebuildContainer();
+// \Drupal::service('cache.bootstrap')->deleteAll();
+// \Drupal::service('cache.config')->deleteAll();
+$this->enableModules(['metadata_hex']);
     // Install required entity schemas.
     $this->installEntitySchema('node');
     $this->installEntitySchema('file');
