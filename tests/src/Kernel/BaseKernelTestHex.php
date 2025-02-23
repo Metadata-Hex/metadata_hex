@@ -131,6 +131,9 @@ abstract class BaseKernelTestHex extends KernelTestBase {
   }
 
     $this->installSchema('metadata_hex', ['metadata_hex_processed']);
+    \Drupal::service('kernel')->rebuildContainer();
+\Drupal::service('cache.bootstrap')->deleteAll();
+\Drupal::service('cache.config')->deleteAll();
     $this->hasMetadataProcessedTable();
     
     $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
@@ -190,7 +193,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
    * 
    */
   public function hasMetadataProcessedTable() {
-
+    
     $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
   if ($table_exists) {
     // Use raw query to list field names.
