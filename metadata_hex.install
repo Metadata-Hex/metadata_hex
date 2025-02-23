@@ -100,7 +100,7 @@ function metadata_hex_schema() {
         'default' => 0,
       ],
     ],
-    'primary key' => ['id'],
+   // 'primary key' => ['id'],
   ];
 
 
