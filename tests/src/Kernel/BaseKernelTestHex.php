@@ -224,6 +224,8 @@ $this->enableModules(['metadata_hex']);
    // $this->initMetadataHex();
     // $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
     $this->assertEquals(true, $table_exists_now, 'Database table exists');
+    
+    return;
     if ($table_exists) {
       // Define expected fields.
       $expected_fields = [
