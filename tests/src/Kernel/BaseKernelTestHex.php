@@ -69,9 +69,9 @@ abstract class BaseKernelTestHex extends KernelTestBase {
         'name' => 'Tags',
     ])->save();
 
-    
+    $this->installConfig(['metadata_hex']);
     $this->initMetadataHex();
-    
+
     // Create the "article" content type.
     NodeType::create([
         'type' => 'article',
@@ -117,7 +117,6 @@ abstract class BaseKernelTestHex extends KernelTestBase {
   }
 
   public function initMetadataHex(){
-    $this->installConfig(['metadata_hex']);
     $this->installSchema('metadata_hex', ['metadata_hex_processed']);
     $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
 
