@@ -47,6 +47,12 @@ function metadata_hex_schema() {
         'not null' => TRUE,
         'description' => 'The ID of the entity.',
       ],
+      'last_modified' => [
+        'description' => 'Timestamp of the last time the node was processed.',
+        'type' => 'timestamp',
+        'not null' => TRUE,
+        'default' => 'CURRENT_TIMESTAMP',
+      ],
       'processed' => [
         'type' => 'int',
         'not null' => TRUE,
