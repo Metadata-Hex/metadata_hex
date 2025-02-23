@@ -24,7 +24,10 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
         'last_modified',
         'processed',
       ];
-  
+      
+  // In your test class setup method
+// \Drupal::service('module_installer')->uninstall(['your_module_name']);
+// \Drupal::service('module_installer')->install(['your_module_name']);
       foreach ($expected_fields as $field) {
         try {
         $field_exists = \Drupal::database()->schema()->fieldExists('metadata_hex_processed', $field);

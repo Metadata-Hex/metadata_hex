@@ -53,6 +53,9 @@ abstract class BaseKernelTestHex extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
+    \Drupal::service('kernel')->rebuildContainer();
+\Drupal::service('cache.bootstrap')->deleteAll();
+\Drupal::service('cache.config')->deleteAll();
     // Install required entity schemas.
     $this->installEntitySchema('node');
     $this->installEntitySchema('file');
@@ -70,6 +73,15 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     $this->installSchema('metadata_hex', ['metadata_hex_processed']);
     $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
 
+    $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
+    if ($table_exists) {
+      $fields = \Drupal::database()->schema()->getFieldNames('metadata_hex_processed');
+      print_r($fields);
+    } else {
+      echo "Table metadata_hex_processed does not exist.\n";
+    }
+
+    
     // Default settings
     $settings = [
         'extraction_settings.hook_node_types' => ['article', 'page'],
