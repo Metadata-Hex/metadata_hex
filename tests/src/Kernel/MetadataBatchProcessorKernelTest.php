@@ -19,7 +19,6 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTest {
     if ($table_exists) {
       // Define expected fields.
       $expected_fields = [
-        'id',
         'entity_type',
         'entity_id',
         'last_modified',
