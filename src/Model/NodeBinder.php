@@ -138,6 +138,32 @@ class NodeBinder extends MetadataHexCore
 
     return $query;
   }
+ /**
+ * Checks whether the node has been processed in the last 3 minutes.
+ *
+ * @return bool
+ *   TRUE if the node's last_modified timestamp is less than 3 minutes old, FALSE otherwise.
+ */
+public function getWasNodeJustProcessed(): bool
+{
+  if (!$this->nid) {
+    return false;
+  }
+
+  $query = \Drupal::database()->select('metadata_hex_processed', 'mhp')
+    ->fields('mhp', ['last_modified'])
+    ->condition('entity_id', $this->nid)
+    ->execute()
+    ->fetchField();
+
+  if ($query) {
+    $lastModifiedTime = strtotime($query);
+    $currentTime = time();
+    return ($currentTime - $lastModifiedTime) <= 180;
+  }
+
+  return false;
+}
 
   /**
    * Retrieves the node from a given NID.

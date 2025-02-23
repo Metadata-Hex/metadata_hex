@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\metadata_hex\Model\NodeBinder;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\metadata_hex\Service\MetadataExtractor;
@@ -22,9 +23,14 @@ function metadata_hex_node_insert(EntityInterface $node) {
   // Check if the node's bundle type is in the allowed types.
   if (is_array($allowed_types) && in_array($node->bundle(), $allowed_types, true)) {
     // Process the node using MetadataBatchProcessor. 
+    $nodeBinder = new NodeBinder(\Drupal::service('logger.channel.default'));
+    $nodeBinder->init($node);
+    $justProcessed = $nodeBinder->getWasNodeJustProcessed();
 
-    $mdex = new Drupal\metadata_hex\Service\MetadataExtractor(\Drupal::service('logger.channel.default'));
-    $mdbp = new Drupal\metadata_hex\Service\MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
-    $mdbp->processNode($node->id());
+    if (!$justProcessed){
+      $mdex = new Drupal\metadata_hex\Service\MetadataExtractor(\Drupal::service('logger.channel.default'));
+      $mdbp = new Drupal\metadata_hex\Service\MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
+      $mdbp->processNode($node->id());
+    }
   }
 }
