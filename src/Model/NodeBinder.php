@@ -157,7 +157,8 @@ public function getWasNodeJustProcessed(): bool
        ->fetchField();
     
 } catch (\Exception $e) {
-  echo "Error: " . $e->getMessage();
+  //echo "Error: " . $e->getMessage();
+  return false;
 }
 
   if ($query) {
@@ -166,7 +167,7 @@ public function getWasNodeJustProcessed(): bool
     echo $currentTime . ' - ' . $lastModifiedTime . PHP_EOL;
     return ($currentTime - $lastModifiedTime) <= 180;
   }
-
+echo "returning false";
   return false;
 }
 
