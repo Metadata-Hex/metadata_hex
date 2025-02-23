@@ -117,9 +117,16 @@ abstract class BaseKernelTestHex extends KernelTestBase {
   }
 
   public function initMetadataHex(){
-    if (\Drupal::database()->schema()->tableExists('metadata_hex_processed')) {
-      \Drupal::database()->schema()->dropTable('metadata_hex_processed');
-    }  
+
+    
+  $database = \Drupal::database();
+  $schema = $database->schema();
+
+  // Drop table using raw SQL if it exists.
+  if ($schema->tableExists('metadata_hex_processed')) {
+    $database->query('DROP TABLE IF EXISTS metadata_hex_processed');
+  }
+
     $this->installSchema('metadata_hex', ['metadata_hex_processed']);
     $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
 
