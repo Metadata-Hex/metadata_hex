@@ -365,7 +365,7 @@ public function getWasNodeJustProcessed(): bool
 
     // Now run merge safely
 \Drupal::database()->merge('metadata_hex_processed')
-->key(['entity_id' => $entity_id, 'entity_type' => $entity_type])  // Set the keys properly
+->key(['entity_id' => $entity_id])  // Set the keys properly , 'entity_type' => $entity_type
 ->fields([
   'last_modified' => $ts,  // Add last_modified timestamp
   'processed' => $processed,
