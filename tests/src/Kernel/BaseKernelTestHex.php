@@ -9,7 +9,7 @@ use Drupal\Tests\metadata_hex\Kernel\Traits\TestFileHelperTrait;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
-
+use Drupal\taxonomy\Entity\Term;
 /**
   * @abstract
  */
