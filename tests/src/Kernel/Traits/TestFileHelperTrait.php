@@ -30,12 +30,23 @@ trait TestFileHelperTrait {
       $pdf->SetTitle('Test PDF Document');
       $pdf->SetSubject('Testing Metadata in PDFs');
       $pdf->SetKeywords('Drupal, TCPDF, Test, Metadata');
-
+      // $pdf->setExtraXMP();
       // Add a page and content
+//field_catalog_number (int)
+// publication_date
+//topics taxonomy
+//publication_status (Published)
+
+//Catalog (int)
+// Status
+//topics taxonomy
+//publication_status (Published)'
+
       $pdf->AddPage();
       $pdf->SetFont('helvetica', '', 12);
       $pdf->Cell(0, 10, 'This is a test PDF with metadata.', 0, 1, 'C');
 
+      //
       // Set XMP metadata for advanced metadata storage
       $xmp_metadata = '<?xpacket begin="..." id="W5M0MpCehiHzreSzNTczkc9d"?>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -47,11 +58,13 @@ trait TestFileHelperTrait {
                   xmp:CreatorTool="Drupal TCPDF Test"
                   xmp:CreateDate="' . date('c') . '"
                   xmp:MetadataDate="' . date('c') . '"
+                  custom:Catalog="12345"
+                  custom:Status="Published"
                   xmp:ModifyDate="' . date('c') . '">
               </rdf:Description>
           </rdf:RDF>
           <?xpacket end="w"?>';
-      //$pdf->SetXmpMetadata($xmp_metadata);
+      $pdf->setExtraXMP($xmp_metadata);
 
       // Output PDF as a string for saving in Drupal
       return $pdf->Output('', 'S'); // Return as string

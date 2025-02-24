@@ -14,8 +14,6 @@ use Drupal\node\Entity\Node;
 class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
   
-
-
   /**
    * Tests processing a node with a valid PDF file.
    */

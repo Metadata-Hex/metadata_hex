@@ -68,10 +68,46 @@ abstract class BaseKernelTestHex extends KernelTestBase {
         'vid' => 'tags',
         'name' => 'Tags',
     ])->save();
+    
+    Vocabulary::create([
+        'vid' => 'topics',
+        'name' => 'Topics',
+    ])->save();
+
+    // Ensure the "Topics" vocabulary exists.
+    $vocabulary = Vocabulary::load('topics');
+    if ($vocabulary) {
+      // Define an array of default tags.
+      $default_tags = ['Science', 'Technology', 'Drupal', 'Metadata'];
+
+      foreach ($default_tags as $tag_name) {
+        // Check if the term already exists to avoid duplicates.
+        $existing_terms = \Drupal::entityTypeManager()
+          ->getStorage('taxonomy_term')
+          ->loadByProperties([
+            'name' => $tag_name,
+            'vid' => 'topics',
+          ]);
+
+        if (empty($existing_terms)) {
+          // Create the taxonomy term.
+          Term::create([
+            'name' => $tag_name,
+            'vid' => 'topics',
+          ])->save();
+          echo "Created term: $tag_name\n";
+        }
+        else {
+          echo "Term '$tag_name' already exists.\n";
+        }
+      }
+    }
+    else {
+      echo "Topics vocabulary not found.\n";
+    }
 
     $this->installConfig(['metadata_hex']);
     $this->installSchema('metadata_hex', ['metadata_hex_processed']);
-
     $this->initMetadataHex();
 
     // Create the "article" content type.
@@ -80,7 +116,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
         'name' => 'Article',
     ])->save();
 
-    // Create field_subject (text field)
+    // Create **STRING** field_subject (text field)
     FieldStorageConfig::create([
         'field_name' => 'field_subject',
         'entity_type' => 'node',
@@ -92,6 +128,81 @@ abstract class BaseKernelTestHex extends KernelTestBase {
         'entity_type' => 'node',
         'bundle' => 'article',
         'label' => 'Subject',
+    ])->save();
+
+    // Create INTEGER field_catalog_number (integer field)
+    FieldStorageConfig::create([
+      'field_name' => 'field_catalog_number',
+      'entity_type' => 'node',
+      'type' => 'integer',
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_catalog_number',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'Catalog Number',
+    ])->save();
+
+    // Create DATETIME field_publication_date (datetime field)
+    FieldStorageConfig::create([
+      'field_name' => 'field_publication_date',
+      'entity_type' => 'node',
+      'type' => 'datetime',
+      'settings' => [
+        'datetime_type' => 'datetime',  // Defines that this field stores both date and time.
+      ],
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_publication_date',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'Publication Date',
+    ])->save();
+
+    // Create the field storage for the taxonomy reference field.
+    FieldStorageConfig::create([
+      'field_name' => 'field_topics',
+      'entity_type' => 'node',
+      'type' => 'entity_reference',
+      'settings' => [
+        'target_type' => 'taxonomy_term',
+      ],
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_topics',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'Topics',
+      'settings' => [
+        'handler' => 'default:taxonomy_term',
+        'handler_settings' => [
+          'target_bundles' => ['topics'],
+        ],
+      ],
+    ])->save();// Create the field storage for the taxonomy reference field.
+
+    // Create LIST_STRING field_publication_status (list_string field)
+    FieldStorageConfig::create([
+      'field_name' => 'field_publication_status',
+      'entity_type' => 'node',
+      'type' => 'list_string',
+      'settings' => [
+        'allowed_values' => [
+          'draft' => 'Draft',
+          'in_review' => 'In Review',
+          'published' => 'Published',
+        ],
+      ],
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_publication_status',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'Publication Status',
     ])->save();
 
     // Create field_attachment (entity reference to file)
@@ -137,7 +248,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     // Default settings
     $settings = [
         'extraction_settings.hook_node_types' => ['article', 'page'],
-        'extraction_settings.field_mappings' => "title|field_title\nsubject|field_subject",
+        'extraction_settings.field_mappings' => "title|label\nsubject|field_subject\nCreateDate|field_publication_date\nCatalog|field_catalog_number\nStatus|field_publication_status",
         'extraction_settings.flatten_keys' => TRUE,
         'extraction_settings.strict_handling' => FALSE,
         'extraction_settings.data_protected' => FALSE,

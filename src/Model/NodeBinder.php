@@ -167,7 +167,7 @@ public function getWasNodeJustProcessed(): bool
   } else {
     return true; // if query is null, dont let it reprocess
   }
-  return false;
+  //return false;
 }
 
   /**
