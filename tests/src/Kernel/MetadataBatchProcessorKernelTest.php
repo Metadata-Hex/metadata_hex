@@ -104,6 +104,7 @@ $node_mock = $this->getMockBuilder(Node::class)
     $created_alt = $node_alt->getCreatedTime();
     $modified_alt = $node_alt->getChangedTime();
     $ff = $node_alt->get('field_subject')->getString();
+    echo $ff;
     $this->assertNotEquals('', $ff, 'subject updated');
 
     // Assertions
