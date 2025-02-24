@@ -102,8 +102,15 @@ $node_mock = $this->getMockBuilder(Node::class)
     $created_alt = $node_alt->getCreatedTime();
     $modified_alt = $node_alt->getChangedTime();
     $ff = $node_alt->get('field_subject')->getString();
-    echo $ff;
+    $fcn = $node_alt->get('field_catalog_number')->getString();
+    $fpd = $node_alt->get('field_publication_date')->getString();
+    $fps = $node_alt->get('field_publication_status')->getString();
+    // $fpd = $node_alt->get('field_topics')->getString();
+    //echo $ff;
     $this->assertNotEquals('', $ff, 'subject updated');
+    $this->assertNotEquals('', $fcn, 'catalog updated');
+    $this->assertNotEquals('', $fpd, 'publication date updated');
+    $this->assertNotEquals('', $fps, 'publication status updated');
 
     // Assertions
     $this->assertEquals($created, $created_alt, 'Node creation date should match');
