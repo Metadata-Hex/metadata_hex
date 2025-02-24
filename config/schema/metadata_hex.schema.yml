@@ -12,10 +12,8 @@ metadata_hex.settings:
           sequence:
             type: string
         field_mappings:
-          type: sequence
+          type: string
           label: 'Field mappings (File to Drupal)'
-          sequence:
-            type: string
         strict_handling:
           type: boolean
           label: 'Strict handling for string comparison'

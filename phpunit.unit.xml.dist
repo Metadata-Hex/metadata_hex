@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <phpunit bootstrap="vendor/autoload.php">
     <testsuites>
-        <testsuite name="MetadataHex Tests">
+        <testsuite name="MetadataHex Unit Tests">
             <directory>tests/src/Unit</directory>
         </testsuite>
     </testsuites>

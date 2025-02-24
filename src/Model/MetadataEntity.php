@@ -188,10 +188,6 @@ class MetadataEntity extends MetadataHexCore
     // cleans up and parses the metadata and sets
     $mtdt = $this->getParser()->cleanMetadata($this->metadataRaw);
     $this->mapMetadata($mtdt);
-
-    // Ingests the metadata and sets
-    // $tmd = $this->getNodeBinder($n)->ingestNodeFileMeta();
-    // $this->setLocalMetadata($tmd);
     $this->setLocalMetadata($this->metadataMapped, false);
   }
 
@@ -330,8 +326,8 @@ class MetadataEntity extends MetadataHexCore
           break;
 
         case 'list_string':
-          //
           $allowed_values = $field_definition->getSetting('allowed_values');
+          // @TODO this needs to take into account strict handling
           if (in_array($value, $allowed_values, true)) {
             $node->set($field_name, $value);
           } else {
@@ -345,9 +341,13 @@ class MetadataEntity extends MetadataHexCore
       }
     }
 
-    $this->getNodeBinder()->setRevision();
-    $node->save();
-    $this->getNodeBinder()->setProcessed();
+
+    if (!$this->getNodeBinder()->getWasNodeJustProcessed()){
+      echo "was node just processed? " . $this->getNodeBinder()->getWasNodeJustProcessed() . PHP_EOL;
+      $this->getNodeBinder()->setRevision();
+      $this->getNodeBinder()->setProcessed();
+      $node->save();
+    }
   }
 
   /**

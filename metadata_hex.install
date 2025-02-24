@@ -25,38 +25,44 @@ function metadata_hex_uninstall() {
 /**
  * Implements hook_schema().
  */
+
 function metadata_hex_schema() {
+  
+  // return $schema;
   $schema['metadata_hex_processed'] = [
-    'description' => 'Table to track processed entities.',
+    'description' => 'Stores information about processed entities.',
     'fields' => [
       'id' => [
-        'type' => 'serial',
-        'unsigned' => TRUE,
+        'description' => 'Primary Key: Unique ID for each record.',
+        'type' => 'integer',
         'not null' => TRUE,
+        'auto_increment' => TRUE, // Ensure auto-increment for primary key.
       ],
       'entity_type' => [
+        'description' => 'The type of the entity (e.g., node, user).',
         'type' => 'varchar',
         'length' => 32,
         'not null' => TRUE,
-        'description' => 'The type of the entity (e.g., node, user).',
       ],
       'entity_id' => [
-        'type' => 'int',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
         'description' => 'The ID of the entity.',
+        'type' => 'integer',
+        'not null' => TRUE,
+      ],
+      'last_modified' => [
+        'description' => 'Timestamp of the last time the entity was processed.',
+        'type' => 'datetime',
+        'not null' => TRUE,
       ],
       'processed' => [
-        'type' => 'int',
+        'description' => 'Flag indicating whether the entity has been processed.',
+        'type' => 'integer',
+        'size' => 'tiny',
         'not null' => TRUE,
-        'default' => 1,
-        'description' => 'A flag indicating whether the entity has been processed.',
+        'default' => 0,
       ],
     ],
-    'primary key' => ['id'],
-    'unique keys' => [
-      'entity_type_entity_id' => ['entity_type', 'entity_id'],
-    ],
+   // 'primary key' => ['id'],
   ];
 
   return $schema;

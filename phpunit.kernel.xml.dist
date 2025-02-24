@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="../../../../web/core/tests/bootstrap.php">
+    <testsuites>
+        <testsuite name="MetadataHex Kernel Tests">
+            <directory>tests/src/Kernel</directory>
+        </testsuite>
+    </testsuites>
+
+    <php>
+        <!-- Set the SimpleTest DB connection (update based on your local environment) -->
+        <env name="SIMPLETEST_DB" value="sqlite://localhost/:memory:"/>
+        <env name="SIMPLETEST_BASE_URL" value="http://localhost"/>
+        <env name="SIMPLETEST_STRICT_CONFIG_SCHEMA" value="0"/>
+        <env name="BROWSERTEST_OUTPUT_DIRECTORY" value="/tmp"/>
+    </php>
+</phpunit>

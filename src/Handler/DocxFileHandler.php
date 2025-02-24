@@ -33,7 +33,6 @@ class DocxFileHandler extends FileHandler {
     try {
       $phpWord = IOFactory::load($this->fileUri);
       $docInfo = $phpWord->getDocInfo();
-      echo print_r($docInfo, true);
       return $docInfo;
     } catch (Exception $e) {
       throw new Exception("Error parsing DOCX file: " . $e->getMessage());
