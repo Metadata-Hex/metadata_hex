@@ -346,12 +346,6 @@ class MetadataEntity extends MetadataHexCore
       $this->getNodeBinder()->setProcessed();
       $node->save();
     }
-//     try {
-      
-//   } catch (\Throwable $e) {
-//     $this->logger->info($e->getMessage());
-//  throw new \Exception($e->getMessage());
-//   }
   }
 
   /**
