@@ -27,6 +27,7 @@ function metadata_hex_node_insert(EntityInterface $node) {
     $nodeBinder->init($node);
     $justProcessed = $nodeBinder->getWasNodeJustProcessed();
 
+
     if ($justProcessed !== null && $justProcessed !== true){
       $mdex = new Drupal\metadata_hex\Service\MetadataExtractor(\Drupal::service('logger.channel.default'));
       $mdbp = new Drupal\metadata_hex\Service\MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);

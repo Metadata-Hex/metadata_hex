@@ -6,9 +6,9 @@ use Drush\Commands\DrushCommands;
 
 /**
  * A Drush command file.
+
  */
 class MetadataHexCommands extends DrushCommands {
-
 
   /**
    * Initializes services.
@@ -23,6 +23,7 @@ class MetadataHexCommands extends DrushCommands {
    * @aliases mdhext
    */
   public function testFunctionality() {
+
    
   }
 }

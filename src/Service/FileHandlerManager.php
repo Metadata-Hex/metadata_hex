@@ -41,14 +41,13 @@ class FileHandlerManager {
    */
  public function getHandlerForExtension(string $extension) {
 
-foreach ($this->pluginManager->getDefinitions() as $plugin_id => $definition) {
-
-  if (isset($definition['extensions']) && in_array($extension, $definition['extensions'], true)) {
-        return $this->pluginManager->createInstance($plugin_id);
+  foreach ($this->pluginManager->getDefinitions() as $plugin_id => $definition) {
+    if (isset($definition['extensions']) && in_array($extension, $definition['extensions'], true)) {
+          return $this->pluginManager->createInstance($plugin_id);
+        }
       }
-    }
 
-    return null;
+      return null;
   }
 
   /**
@@ -65,7 +64,7 @@ foreach ($this->pluginManager->getDefinitions() as $plugin_id => $definition) {
         $extensions = array_merge($extensions, $definition['extensions']);
       }
     }
-    
+
     return array_unique($extensions);
   }
 }
