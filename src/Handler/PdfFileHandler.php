@@ -32,7 +32,6 @@ class PdfFileHandler extends FileHandler {
    */
   public function extractMetadata(): array {
     if (!$this->isValidFile()) {
-      $this->logger->error("Invalid or unreadable file: {$this->fileUri}");
       throw new Exception("Invalid or unreadable file: {$this->fileUri}");
     }
 

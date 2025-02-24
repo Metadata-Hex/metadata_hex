@@ -41,8 +41,9 @@ class FileHandlerManager {
    */
  public function getHandlerForExtension(string $extension) {
 
-  foreach ($this->pluginManager->getDefinitions() as $plugin_id => $definition) {
-      if (isset($definition['extensions']) && in_array($extension, $definition['extensions'], true)) {
+foreach ($this->pluginManager->getDefinitions() as $plugin_id => $definition) {
+
+  if (isset($definition['extensions']) && in_array($extension, $definition['extensions'], true)) {
         return $this->pluginManager->createInstance($plugin_id);
       }
     }

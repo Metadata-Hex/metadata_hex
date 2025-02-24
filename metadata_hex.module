@@ -1,5 +1,6 @@
 <?php
 
+use Drupal\metadata_hex\Model\NodeBinder;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\metadata_hex\Service\MetadataExtractor;
@@ -18,16 +19,20 @@ function metadata_hex_node_insert(EntityInterface $node) {
   // Load the configuration settings.
   $settingsManager = new \Drupal\metadata_hex\Service\SettingsManager();
   $allowed_types = $settingsManager->getAllowedNodeTypes();
-  // $config = \Drupal::config('metadata_hex.settings');
-  // $allowed_types = $config->get('extraction_settings.hook_node_types') ?? [];
 
   // Check if the node's bundle type is in the allowed types.
-  if (in_array($node->bundle(), $allowed_types, true)) {
+  if (is_array($allowed_types) && in_array($node->bundle(), $allowed_types, true)) {
     // Process the node using MetadataBatchProcessor. 
-
-    $node = \Drupal\node\Entity\Node::load('1');
-    $mdex = new Drupal\metadata_hex\Service\MetadataExtractor(\Drupal::service('logger.channel.default'));
-    $mdbp = new Drupal\metadata_hex\Service\MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
-    $mdbp->processNode($node->id());
+    $nodeBinder = new NodeBinder(\Drupal::service('logger.channel.default'));
+    $nodeBinder->init($node);
+    $justProcessed = $nodeBinder->getWasNodeJustProcessed();
+ echo 'just: ' .$justProcessed . ':<<';
+// if justProcessed is empty, that means its a stupid test database nothing there shit... i think
+    if ($justProcessed !== null && $justProcessed !== true){
+      // echo "was node just processed: " . (int)$nodeBinder->getWasNodeJustProcessed() . PHP_EOL;
+      $mdex = new Drupal\metadata_hex\Service\MetadataExtractor(\Drupal::service('logger.channel.default'));
+      $mdbp = new Drupal\metadata_hex\Service\MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
+      $mdbp->processNode($node->id());
+    }
   }
 }

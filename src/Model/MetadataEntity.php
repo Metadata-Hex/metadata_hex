@@ -114,7 +114,7 @@ class MetadataEntity extends MetadataHexCore
 
   /**
    * Returns an instance of MetadataParser. If it hasnt been initialized yet, init it
-   * 
+   *
    * @return MetadataParser
    */
   public function getParser(): MetadataParser
@@ -186,16 +186,12 @@ class MetadataEntity extends MetadataHexCore
     // cleans up and parses the metadata and sets
     $mtdt = $this->getParser()->cleanMetadata($this->metadataRaw);
     $this->mapMetadata($mtdt);
-
-    // Ingests the metadata and sets
-    $tmd = $this->getNodeBinder($node)->ingestNodeFileMeta();
-    $this->setLocalMetadata($tmd);
     $this->setLocalMetadata($this->metadataMapped, false);
   }
 
   /**
    * Returns an instance of NodeBinder. Initializes if unset
-   * 
+   *
    * @return NodeBinder
    */
   public function getNodeBinder($nodefile = null)
@@ -243,7 +239,7 @@ class MetadataEntity extends MetadataHexCore
   }
 
   /**
-   * Sets the local metadata arrays. 
+   * Sets the local metadata arrays.
    *
    * @param array $metadata
    * @param mixed $raw
@@ -328,8 +324,8 @@ class MetadataEntity extends MetadataHexCore
           break;
 
         case 'list_string':
-          // 
           $allowed_values = $field_definition->getSetting('allowed_values');
+          // @TODO this needs to take into account strict handling
           if (in_array($value, $allowed_values, true)) {
             $node->set($field_name, $value);
           } else {
@@ -343,9 +339,19 @@ class MetadataEntity extends MetadataHexCore
       }
     }
 
-    $this->getNodeBinder()->setRevision();
-    $node->save();
-    $this->getNodeBinder()->setProcessed();
+
+    if (!$this->getNodeBinder()->getWasNodeJustProcessed()){
+      echo "was node just processed? " . $this->getNodeBinder()->getWasNodeJustProcessed() . PHP_EOL;
+      $this->getNodeBinder()->setRevision();
+      $this->getNodeBinder()->setProcessed();
+      $node->save();
+    }
+//     try {
+      
+//   } catch (\Throwable $e) {
+//     $this->logger->info($e->getMessage());
+//  throw new \Exception($e->getMessage());
+//   }
   }
 
   /**

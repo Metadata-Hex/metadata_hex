@@ -138,6 +138,40 @@ class NodeBinder extends MetadataHexCore
 
     return $query;
   }
+ /**
+ * Checks whether the node has been processed in the last 3 minutes.
+ *
+ * @return bool
+ *   TRUE if the node's last_modified timestamp is less than 3 minutes old, FALSE otherwise.
+ */
+public function getWasNodeJustProcessed(): bool
+{
+  if (!$this->nid) {
+    return false;
+  }
+  try {
+    $query = \Drupal::database()->select('metadata_hex_processed', 'mhp')
+      ->fields('mhp', ['last_modified'])
+      ->condition('entity_id', $this->nid)
+      ->execute()
+       ->fetchField();
+    
+} catch (\Exception $e) {
+  //echo "Error: " . $e->getMessage();
+  return false;
+}
+
+  if ($query) {
+    $lastModifiedTime = strtotime($query);
+    $currentTime = time();
+    echo $currentTime . ' - ' . $lastModifiedTime . PHP_EOL;
+    return ($currentTime - $lastModifiedTime) <= 180;
+  } else {
+    return true; // if query is null, dont let it reprocess
+  }
+echo "returning false";
+  return false;
+}
 
   /**
    * Retrieves the node from a given NID.
@@ -180,11 +214,15 @@ class NodeBinder extends MetadataHexCore
       return $metadata;
     }
 
-    // Iterate over all node fields for files 
+    // Iterate over all node fields for files
     foreach ($node->getFields() as $field_name => $field) {
-      if ($field->getFieldDefinition()->getType() === 'file') {
-        foreach ($field->getValue() as $file_item) {
+      $field_definition = $field->getFieldDefinition();
+      $field_type = $field_definition->getType();
+      $target_type = $field_definition->getSetting('target_type') ?? '';
 
+      if ($field_type === 'file' || ($field_type === 'entity_reference' && $target_type === 'file')) {
+        foreach ($field->getValue() as $file_item) {
+          if (!empty($file_item['target_id'])) {
           // loads the file into a drupal model
           $file = File::load($file_item['target_id']);
 
@@ -215,6 +253,7 @@ class NodeBinder extends MetadataHexCore
             }
 
           }
+        }
         }
       }
     }
@@ -256,9 +295,9 @@ class NodeBinder extends MetadataHexCore
 
   /**
    * Saves the node after validation.
-   * 
+   *
    * @return void
-   * 
+   *
    */
   public function save()
   {
@@ -292,8 +331,9 @@ class NodeBinder extends MetadataHexCore
    * @param bool $overwrite
    *   Whether to overwrite existing values.
    */
-  protected function setField(string $field_name, $value, bool $overwrite = true)
+  public function setField(string $field_name, $value, bool $overwrite = true)
   {
+
     if (!$this->nid) {
       return;
     }
@@ -312,30 +352,36 @@ class NodeBinder extends MetadataHexCore
 
   /**
    * Marks the node as processed.
-   * 
+   *
    * @return void
-   * 
+   *
    */
   public function setProcessed()
   {
     if (!$this->nid) {
       return;
     }
+    $entity_id = (int) $this->nid;
+    $entity_type = (string) $this->getBundleType();
+    $processed = 1;
+    $ts = (string) date('Y-m-d H:i:s');
 
-    \Drupal::database()->upsert('metadata_hex_processed')
-      ->key('entity_id')
-      ->fields([
-          'entity_id' => $this->nid,
-          'entity_type' => $this->getBundleType(),
-          'processed' => 1,
-        ])
-      ->execute();
+    try {
+    // Now run merge safely
+\Drupal::database()->merge('metadata_hex_processed')
+->key(['entity_id' => $entity_id])  // Set the keys properly , 'entity_type' => $entity_type
+->fields([
+  'last_modified' => $ts,  // Add last_modified timestamp
+  'processed' => $processed,
+])
+->execute();
+    }catch(\Exception $e){}
   }
   /**
    * Sets a revision message when updating a node.
-   * 
+   *
    * @return void
-   * 
+   *
    */
   public function setRevision()
   {
@@ -347,8 +393,10 @@ class NodeBinder extends MetadataHexCore
     if (!$node) {
       return;
     }
+    $node_type = $this->getBundleType();
+    $revisions_enabled = \Drupal::config("node.type.$node_type")->get('enable_revisions');
 
-    if ($node->isNewRevision()) {
+    if ($revisions_enabled && $node->isNewRevision()) {
       $node->setRevisionLogMessage("Updated metadata processing.");
       $node->save();
     }
