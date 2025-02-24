@@ -155,11 +155,9 @@ public function getWasNodeJustProcessed(): bool
       ->condition('entity_id', $this->nid)
       ->execute()
        ->fetchField();
-    
-} catch (\Exception $e) {
-  //echo "Error: " . $e->getMessage();
-  return false;
-}
+    } catch (\Exception $e) {
+      return false;
+    }
 
   if ($query) {
     $lastModifiedTime = strtotime($query);
@@ -169,7 +167,6 @@ public function getWasNodeJustProcessed(): bool
   } else {
     return true; // if query is null, dont let it reprocess
   }
-echo "returning false";
   return false;
 }
 
@@ -368,14 +365,14 @@ echo "returning false";
 
     try {
     // Now run merge safely
-\Drupal::database()->merge('metadata_hex_processed')
-->key(['entity_id' => $entity_id])  // Set the keys properly , 'entity_type' => $entity_type
-->fields([
-  'last_modified' => $ts,  // Add last_modified timestamp
-  'processed' => $processed,
-])
-->execute();
-    }catch(\Exception $e){}
+      \Drupal::database()->merge('metadata_hex_processed')
+      ->key(['entity_id' => $entity_id])  // Set the keys properly , 'entity_type' => $entity_type
+      ->fields([
+        'last_modified' => $ts,  // Add last_modified timestamp
+        'processed' => $processed,
+      ])
+      ->execute();
+    } catch(\Exception $e){}
   }
   /**
    * Sets a revision message when updating a node.
