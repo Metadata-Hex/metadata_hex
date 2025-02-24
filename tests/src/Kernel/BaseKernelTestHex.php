@@ -53,19 +53,18 @@ abstract class BaseKernelTestHex extends KernelTestBase {
   protected function setUp(): void {
     parent::setUp();
 
-//     \Drupal::service('kernel')->rebuildContainer();
-// \Drupal::service('cache.bootstrap')->deleteAll();
-// \Drupal::service('cache.config')->deleteAll();
-$this->enableModules(['metadata_hex']);
-    // Install required entity schemas.
+    $this->enableModules(['metadata_hex']);
+    
+   // Install required entity schemas.
     $this->installEntitySchema('node');
     $this->installEntitySchema('file');
     $this->installEntitySchema('user');
     $this->installConfig(['taxonomy']);
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('taxonomy_vocabulary');
-        $this->installConfig(['text', 'filter', 'field', 'node']);
-    Vocabulary::create([
+    $this->installConfig(['text', 'filter', 'field', 'node']);
+    
+   Vocabulary::create([
         'vid' => 'tags',
         'name' => 'Tags',
     ])->save();
@@ -120,49 +119,20 @@ $this->enableModules(['metadata_hex']);
   }
 
   /**
-   * 
+   * Initialize the metadata tables
    */
   public function initMetadataHex(){
-
-    
-  $database = \Drupal::database();
-  $schema = $database->schema();
+    $database = \Drupal::database();
+    $schema = $database->schema();
     $this->enableModules(['metadata_hex']);
-  // Drop table using raw SQL if it exists.
-  // if ($schema->tableExists('metadata_hex_processed')) {
-  //   $database->query('DROP TABLE IF EXISTS metadata_hex_processed');
-  // }
-   // Get the schema from the module.
-  //$schema_definition = metadata_hex_schema();
-
-  // Forcefully create the table using the schema definition.
-  //$schema->createTable('metadata_hex_processed', $schema_definition['metadata_hex_processed']);
-  echo "Forced schema installation completed.\n";
-  sleep(1);
-  //$this->installSchema('metadata_hex', ['metadata_hex_processed']);
-  // right after installing the schema, hasMetadataProcessedTable() toes
-  // 1. confirms the table exists and prints the fields
-  // 2. fieldExists('metadata_hex_processed', $field); fails on all fields
-  $this->hasMetadataProcessedTable();
-  echo "fart";
-  \Drupal::service('kernel')->rebuildContainer();
-  \Drupal::service('cache.bootstrap')->deleteAll();
-  \Drupal::service('cache.config')->deleteAll();
-  $this->hasMetadataProcessedTable();
-    
-    $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
-
-    // $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
-    // if ($table_exists) {
-    //   $results = \Drupal::database()->query("PRAGMA table_info(metadata_hex_processed)")->fetchAll();
-    //   foreach ($results as $result) {
-    //     echo "Field: {$result->name}\n";
-    //   }
+    sleep(1);
    
-    // } else {
-    //   echo "Table metadata_hex_processed does not exist.\n";
-    // }
-
+    \Drupal::service('kernel')->rebuildContainer();
+    \Drupal::service('cache.bootstrap')->deleteAll();
+    \Drupal::service('cache.config')->deleteAll();
+    $this->hasMetadataProcessedTable();
+      
+    $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
     
     // Default settings
     $settings = [
@@ -186,7 +156,6 @@ $this->enableModules(['metadata_hex']);
 
     // Save the configuration
     $this->config->save();
-
   }
 
   /**
@@ -203,53 +172,27 @@ $this->enableModules(['metadata_hex']);
     // Let the default cleanup run for MySQL/PostgreSQL.
     parent::tearDown();
   }
+ 
   /**
-   * 
+   * Checks to see if the required table exists
    */
   public function hasMetadataProcessedTable() {
     
     $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
-  if ($table_exists) {
-    // Use raw query to list field names.
-    $results = \Drupal::database()->query("PRAGMA table_info(metadata_hex_processed)")->fetchAll();
-    foreach ($results as $result) {
-      echo "Field: {$result->name}\n";
+    if ($table_exists) {
+      // Use raw query to list field names.
+      $results = \Drupal::database()->query("PRAGMA table_info(metadata_hex_processed)")->fetchAll();
+      foreach ($results as $result) {
+        echo "Field: {$result->name}\n";
+      }
+    } else {
+      echo "Table metadata_hex_processed does not exist.\n";
     }
-  } else {
-    echo "Table metadata_hex_processed does not exist.\n";
-  }
-
-  //rebgrab to test
-  $table_exists_now = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
-
-   // $this->initMetadataHex();
-    // $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
+  
+    //rebgrab to test
+    $table_exists_now = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
     $this->assertEquals(true, $table_exists_now, 'Database table exists');
     
     return;
-    if ($table_exists) {
-      // Define expected fields.
-      $expected_fields = [
-        'entity_type',
-        'entity_id',
-        'last_modified',
-        'processed',
-      ];
-      
-  // In your test class setup method
-// \Drupal::service('module_installer')->uninstall(['your_module_name']);
-// \Drupal::service('module_installer')->install(['your_module_name']);
-      foreach ($expected_fields as $field) {
-        try {
-        $field_exists = \Drupal::database()->schema()->fieldExists('metadata_hex_processed', $field);
-        } catch (\Exception $e){
-        echo $e->getMessage();
-        }
-        $this->assertEquals(true, $field_exists, "Field '$field' doesnt exist in the table.");
-      }
-  
-    }
-  
-
   }
 }
