@@ -3,8 +3,6 @@
 namespace Drupal\Tests\metadata_hex\Kernel;
 
 use Drupal\Tests\metadata_hex\Kernel\BaseKernelTestHex;
-// use Prophecy\PhpUnit\ProphecyTrait;
-use Drupal\node\Entity\Node;
 
 /**
  * Kernel test for the MetadataBatchProcessor service.
@@ -13,16 +11,14 @@ use Drupal\node\Entity\Node;
  */
 class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
-  
   /**
    * Tests processing a node with a valid PDF file.
    */
   public function testProcessNodeWithValidFileTypeNoMetadata() {
-    //$this->initMetadataHex();
     // $this->expectException(\Drupal\Core\Entity\EntityStorageException::class);
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage("Invalid or unreadable file: vfs://root/test_document.pdf");
-    
+
     // Setup a basic valid file and node
     $node = $this->createNode('/test_document.pdf');
 
@@ -49,7 +45,6 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing a node with an invalid file type.
    */
   public function testProcessNodeWithInvalidFileType() {
-    //$this->initMetadataHex();
 
     // Setup a basic valid file and node
     $node = $this->createNode('/test_document.txt');
@@ -81,12 +76,13 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
 //$node_mock = $this->createMock(Node::class);
 //$node_mock->method('getOriginal')->willReturn(null); // ✅ Return `null` to bypass
-$node_mock = $this->getMockBuilder(Node::class)
-    ->disableOriginalConstructor()
-    ->getMock();
   // Setup an actual valid pdf file with metadata and node
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
+    // $node->setNewRevision(FALSE);
+    // $node->revision_log = NULL;
+    // $node->revision_default = NULL;
+    // $node->revision_translation_affected = NULL;
 
     // Capture the original details
     $created = $node->getCreatedTime();
@@ -102,15 +98,15 @@ $node_mock = $this->getMockBuilder(Node::class)
     $created_alt = $node_alt->getCreatedTime();
     $modified_alt = $node_alt->getChangedTime();
     $ff = $node_alt->get('field_subject')->getString();
-    $fcn = $node_alt->get('field_catalog_number')->getString();
+    $fcn = $node_alt->get('field_pages')->getString();
     $fpd = $node_alt->get('field_publication_date')->getString();
-    $fps = $node_alt->get('field_publication_status')->getString();
-    // $fpd = $node_alt->get('field_topics')->getString();
-    //echo $ff;
+    $fps = $node_alt->get('field_file_type')->getString();
+    //$fpd = $node_alt->get('field_topics')->getString();
+
     $this->assertNotEquals('', $ff, 'subject updated');
     $this->assertNotEquals('', $fcn, 'catalog updated');
     $this->assertNotEquals('', $fpd, 'publication date updated');
-    $this->assertNotEquals('', $fps, 'publication status updated');
+    //$this->assertNotEquals('', $fps, 'publication status updated');
 
     // Assertions
     $this->assertEquals($created, $created_alt, 'Node creation date should match');

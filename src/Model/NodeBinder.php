@@ -2,6 +2,7 @@
 
 namespace Drupal\metadata_hex\Model;
 
+use Drupal\Core\Database\Database;
 use Drupal\file\Entity\File;
 use Drupal\metadata_hex\Base\MetadataHexCore;
 use Drupal\metadata_hex\Service\FileHandlerManager;
@@ -167,7 +168,6 @@ public function getWasNodeJustProcessed(): bool
   } else {
     return true; // if query is null, dont let it reprocess
   }
-  //return false;
 }
 
   /**
@@ -353,27 +353,48 @@ public function getWasNodeJustProcessed(): bool
    * @return void
    *
    */
-  public function setProcessed()
-  {
-    if (!$this->nid) {
-      return;
-    }
-    $entity_id = (int) $this->nid;
-    $entity_type = (string) $this->getBundleType();
-    $processed = 1;
-    $ts = (string) date('Y-m-d H:i:s');
-
-    try {
-    // Now run merge safely
-      \Drupal::database()->merge('metadata_hex_processed')
-      ->key(['entity_id' => $entity_id])  // Set the keys properly , 'entity_type' => $entity_type
-      ->fields([
-        'last_modified' => $ts,  // Add last_modified timestamp
-        'processed' => $processed,
-      ])
-      ->execute();
-    } catch(\Exception $e){}
+public function setProcessed()
+{
+  if (!$this->nid) {
+    return;
   }
+  $entity_id = (int) $this->nid;
+  $entity_type = (string) $this->getBundleType();
+  $processed = 1;
+  $ts = (string) date('Y-m-d H:i:s');
+
+  try {
+    $db = Database::getConnection();
+    $query = $db->select('metadata_hex_processed', 'mhp')
+      ->fields('mhp', ['entity_id'])
+      ->condition('entity_id', $entity_id)
+      ->execute()
+      ->fetchField();
+
+    if ($query) {
+      // Update the existing record
+      $db->update('metadata_hex_processed')
+        ->fields([
+          'last_modified' => $ts,
+          'processed' => $processed,
+        ])
+        ->condition('entity_id', $entity_id)
+        ->execute();
+    } else {
+      // Insert a new record
+      $db->insert('metadata_hex_processed')
+        ->fields([
+          'entity_id' => $entity_id,
+          'last_modified' => $ts,
+          'processed' => $processed,
+        ])
+        ->execute();
+    }
+  } catch (\Exception $e) {
+    // Handle the exception as needed
+  }
+}
+
   /**
    * Sets a revision message when updating a node.
    *

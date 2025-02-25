@@ -102,6 +102,7 @@ class MetadataEntity extends MetadataHexCore
     $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
 
   }
+
   /**
    * public initialize
    * @param mixed $input
@@ -271,6 +272,9 @@ class MetadataEntity extends MetadataHexCore
       throw new Exception("No valid node found for metadata writing.");
     }
 
+    if (empty($this->metadataMapped)){
+      return;
+    }
     // iterates over all matching mapped fields
     foreach ($this->metadataMapped as $field_name => $value) {
 
@@ -322,12 +326,14 @@ class MetadataEntity extends MetadataHexCore
           break;
 
         case 'datetime':
+        case 'timestamp':
           $node->set($field_name, date('Y-m-d\TH:i:s', strtotime($value)));
           break;
 
         case 'list_string':
           $allowed_values = $field_definition->getSetting('allowed_values');
-          // @TODO this needs to take into account strict handling
+// $allowed_values = array_change_key_case($allowed_values, CASE_LOWER);
+// @TODO this needs to take into account strict handling
           if (in_array($value, $allowed_values, true)) {
             $node->set($field_name, $value);
           } else {
@@ -342,12 +348,9 @@ class MetadataEntity extends MetadataHexCore
     }
 
 
-    if (!$this->getNodeBinder()->getWasNodeJustProcessed()){
-      echo "was node just processed? " . $this->getNodeBinder()->getWasNodeJustProcessed() . PHP_EOL;
       $this->getNodeBinder()->setRevision();
       $this->getNodeBinder()->setProcessed();
       $node->save();
-    }
   }
 
   /**

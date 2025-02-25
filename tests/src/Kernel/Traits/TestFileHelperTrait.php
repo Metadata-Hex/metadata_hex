@@ -1,12 +1,12 @@
 <?php
 namespace Drupal\Tests\metadata_hex\Kernel\Traits;
 
-use Drupal\file\Entity\File;
 use Drupal\Core\File\FileSystemInterface;
-use TCPDF;
+use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
 use org\bovigo\vfs\vfsStream;
+use TCPDF;
 
 trait TestFileHelperTrait {
 
@@ -30,23 +30,11 @@ trait TestFileHelperTrait {
       $pdf->SetTitle('Test PDF Document');
       $pdf->SetSubject('Testing Metadata in PDFs');
       $pdf->SetKeywords('Drupal, TCPDF, Test, Metadata');
-      // $pdf->setExtraXMP();
-      // Add a page and content
-//field_catalog_number (int)
-// publication_date
-//topics taxonomy
-//publication_status (Published)
-
-//Catalog (int)
-// Status
-//topics taxonomy
-//publication_status (Published)'
 
       $pdf->AddPage();
       $pdf->SetFont('helvetica', '', 12);
       $pdf->Cell(0, 10, 'This is a test PDF with metadata.', 0, 1, 'C');
 
-      //
       // Set XMP metadata for advanced metadata storage
       $xmp_metadata = '<?xpacket begin="..." id="W5M0MpCehiHzreSzNTczkc9d"?>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
@@ -111,6 +99,7 @@ trait TestFileHelperTrait {
       'field_attachment' => [  // Adjust field name based on actual setup.
         'target_id' => $file?->id()??null,
       ],
+      'revision' => FALSE,
     ]);
     $node->save();
     return $node;
