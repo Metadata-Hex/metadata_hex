@@ -72,17 +72,9 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing a node with a valid PDF file.
    */
   public function testProcessNodeWithValidPdfWithMetadata() {
-    //$this->initMetadataHex();
-
-//$node_mock = $this->createMock(Node::class);
-//$node_mock->method('getOriginal')->willReturn(null); // ✅ Return `null` to bypass
   // Setup an actual valid pdf file with metadata and node
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
-    // $node->setNewRevision(FALSE);
-    // $node->revision_log = NULL;
-    // $node->revision_default = NULL;
-    // $node->revision_translation_affected = NULL;
 
     // Capture the original details
     $created = $node->getCreatedTime();
@@ -100,16 +92,13 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $ff = $node_alt->get('field_subject')->getString();
     $fcn = $node_alt->get('field_pages')->getString();
     $fpd = $node_alt->get('field_publication_date')->getString();
-    $fps = $node_alt->get('field_file_type')->getString();
-    //$fpd = $node_alt->get('field_topics')->getString();
-
+    $fps = $node_alt->get('field_file_type')->value;
+    $fpdi = $node_alt->get('field_topics')->getValue();
     $this->assertNotEquals('', $ff, 'subject updated');
     $this->assertNotEquals('', $fcn, 'catalog updated');
     $this->assertNotEquals('', $fpd, 'publication date updated');
-    //$this->assertNotEquals('', $fps, 'publication status updated');
-
-    // Assertions
+    $this->assertNotEquals('', $fps, 'field_file_type');
+    $this->assertNotEquals('', $fpdi, 'topic tags');
     $this->assertEquals($created, $created_alt, 'Node creation date should match');
-    //$this->assertNotEquals($modified, $modified_alt, 'Node modification date should differ');
   }
 }

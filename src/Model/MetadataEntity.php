@@ -133,13 +133,15 @@ class MetadataEntity extends MetadataHexCore
    * @param string $term_to_find
    *   The term to find.
    *
+    @param string $vid
+   *
    * @return array
    *   The matching taxonomy IDs.
    *
    * @throws Exception
    *   If the input is not a string.
    */
-  protected function findMatchingTaxonomy(string $term_to_find): array
+  protected function findMatchingTaxonomy(string $term_to_find, $vid): array
   {
     // only strings are allowed
     if (!is_string($term_to_find)) {
@@ -149,8 +151,7 @@ class MetadataEntity extends MetadataHexCore
     $term_to_find = strtolower($term_to_find);
     $matching_terms = [];
 
-    $vocabulary = 'taxonomy_vocabulary'; // @todo does this need Replace with actual vocabulary?
-    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vocabulary);
+    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadTree($vid);
 
     foreach ($terms as $term) {
       if (strtolower($term->name) === $term_to_find) {
@@ -182,7 +183,6 @@ class MetadataEntity extends MetadataHexCore
 
     // Ingest and set the raw metadata
     $tmd = $this->getNodeBinder($file)->ingestNodeFileMeta();
-    echo print_r($tmd, true);
 
     $this->setLocalMetadata($tmd);
 
@@ -297,15 +297,19 @@ class MetadataEntity extends MetadataHexCore
           break;
 
         case 'entity_reference':
+
           $target_type = $field_definition->getSetting('target_type');
+          $handler_settings = $field_definition->getSetting('handler_settings');
+          $vid = !empty($handler_settings['target_bundles']) ? reset($handler_settings['target_bundles']) : NULL;
+
           if ($target_type === 'taxonomy_term') {
             $term_ids = [];
             foreach (explode(',', $value) as $term_name) {
               $term_name = trim($term_name);
-              $matching_terms = $this->findMatchingTaxonomy($term_name);
+              $matching_terms = $this->findMatchingTaxonomy($term_name, $vid);
               if (empty($matching_terms)) {
                 $term = \Drupal\taxonomy\Entity\Term::create([
-                  'vid' => $field_definition->getSetting('target_bundle'),
+                  'vid' => $vid,
                   'name' => $term_name,
                 ]);
                 $term->save();
@@ -332,10 +336,10 @@ class MetadataEntity extends MetadataHexCore
 
         case 'list_string':
           $allowed_values = $field_definition->getSetting('allowed_values');
-// $allowed_values = array_change_key_case($allowed_values, CASE_LOWER);
-// @TODO this needs to take into account strict handling
-          if (in_array($value, $allowed_values, true)) {
-            $node->set($field_name, $value);
+
+          if (array_key_exists($value, $allowed_values) || in_array($value, $allowed_values)) {
+            $node->set($field_name, $allowed_values[$value]);
+          $check_value = $node->get($field_name)->value;
           } else {
             $this->logger->error("Invalid value '{$value}' for field {$field_name}.");
           }

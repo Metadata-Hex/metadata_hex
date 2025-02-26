@@ -100,15 +100,12 @@ abstract class BaseKernelTestHex extends KernelTestBase {
             'name' => $tag_name,
             'vid' => 'topics',
           ])->save();
-          echo "Created term: $tag_name\n";
         }
         else {
-          //echo "Term '$tag_name' already exists.\n";
         }
       }
     }
     else {
-     // echo "Topics vocabulary not found.\n";
     }
 
     $this->installSchema('node', ['node_access']);
@@ -173,6 +170,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
       'field_name' => 'field_topics',
       'entity_type' => 'node',
       'type' => 'entity_reference',
+    'cardinality' => -1, // -1 means unlimited
       'settings' => [
         'target_type' => 'taxonomy_term',
       ],
@@ -254,7 +252,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     // Default settings
     $settings = [
         'extraction_settings.hook_node_types' => ['article', 'page'],
-        'extraction_settings.field_mappings' => "title|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nDC:Format|field_file_type",
+        'extraction_settings.field_mappings' => "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nDC:Format|field_file_type",
         'extraction_settings.flatten_keys' => TRUE,
         'extraction_settings.strict_handling' => FALSE,
         'extraction_settings.data_protected' => FALSE,
@@ -300,10 +298,8 @@ abstract class BaseKernelTestHex extends KernelTestBase {
       // Use raw query to list field names.
       $results = \Drupal::database()->query("PRAGMA table_info(metadata_hex_processed)")->fetchAll();
       foreach ($results as $result) {
-        echo "Field: {$result->name}\n";
       }
     } else {
-      echo "Table metadata_hex_processed does not exist.\n";
     }
 
     //regrab to test
@@ -315,7 +311,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
 
   /**
    * Disable content type revisions
-   * 
+   *
    * @var string $content_type_id
    * @return void
    */
@@ -333,7 +329,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
 
   /**
    * Clean up any odd config schema
-   * 
+   *
    * @var string $content_type
    * @return void
    */

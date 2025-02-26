@@ -135,6 +135,7 @@ class MetadataParser extends MetadataHexCore
   {
     $this->availableFields = array_fill_keys($data, true);//array_flip(array_map('strval', $data));
   }
+
   /**
    * Returns an instance of the entity_field manager
    */
