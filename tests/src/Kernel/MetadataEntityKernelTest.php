@@ -27,10 +27,9 @@ $n = $me->getNodeBinder();
 
 $this->assertEquals($n->getBundleType(), 'article', 'Node creation dates dont match');
 $this->assertEquals($n->getNode()->id(), $node->id(), 'Node creation dates dont match');
-
-console.log('meta', $meta);
+echo print_r($meta, true);
 // $this->assertContains('Drup/al', $term_names, "The expected taxonomy term name Drupal is not present.");
 
-   
+
   }
 }
