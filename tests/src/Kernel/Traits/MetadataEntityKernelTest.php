@@ -21,7 +21,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $node = $this->createNode($file);
 
 $me = new MetadataEntity(\Drupal::logger('info'));
-$me->init($node);
+$me->loadFromNode($node->id());
 $meta = $me->getMetadata();
 $n = $me->getNodeBinder();
 
