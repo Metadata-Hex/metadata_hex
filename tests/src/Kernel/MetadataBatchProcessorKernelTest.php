@@ -93,7 +93,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $fpages = $node_alt->get('field_pages')->getString();
     $fdate = $node_alt->get('field_publication_date')->getString();
     $ftype = $node_alt->get('field_file_type')->value;
-    $ftype = $node_alt->get('field_topics')->getValue();
+    $ftop = $node_alt->get('field_topics')->getValue();
     $term_names = [];
     foreach ($node_alt->get('field_topics')->referencedEntities() as $term) {
         $term_names[] = $term->label();
@@ -110,11 +110,11 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
     $this->assertNotEquals('', $fdate, 'Publication date is blank');
     $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
-    
+
     $this->assertNotEquals('', $ftype, 'FileType is blank');
     $this->assertEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
 
-    $this->assertNotEquals('', $ftype, 'Topic is blank');
+    $this->assertNotEquals('', $ftop, 'Topic is blank');
     $this->assertContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
     $this->assertContains('TCPDF', $term_names, "The expected taxonomy term name TCPDF is not present.");
     $this->assertContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
