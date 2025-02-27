@@ -373,4 +373,12 @@ class MetadataEntity extends MetadataHexCore
       }
     }
   }
+
+  /**
+   *
+   */
+  public function getMetadata(){
+    return ['mapped' => $this->metadataMapped, 'processed' => $this->metadataProcessed, 'raw' => $this->metadataRaw];
+
+  }
 }
