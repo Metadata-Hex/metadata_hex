@@ -121,81 +121,12 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     ])->save();
 
     $this->disableRevisionsForContentType();
-      $this->cleanContentTypeConfig('article');
-    // Create **STRING** field_subject (text field)
+    $this->cleanContentTypeConfig('article');
 
     $this->createField('field_subject', 'Subject', 'string');
-
-    // FieldStorageConfig::create([
-    //     'field_name' => 'field_subject',
-    //     'entity_type' => 'node',
-    //     'type' => 'string',
-    // ])->save();
-
-    // FieldConfig::create([
-    //     'field_name' => 'field_subject',
-    //     'entity_type' => 'node',
-    //     'bundle' => 'article',
-    //     'label' => 'Subject',
-    // ])->save();
-
     $this->createField('field_pages', 'Pages', 'integer');
-
-    // Create INTEGER field_catalog_number (integer field)
-    // FieldStorageConfig::create([
-    //   'field_name' => 'field_pages',
-    //   'entity_type' => 'node',
-    //   'type' => 'integer',
-    // ])->save();
-
-    // FieldConfig::create([
-    //   'field_name' => 'field_pages',
-    //   'entity_type' => 'node',
-    //   'bundle' => 'article',
-    //   'label' => 'Pages',
-    // ])->save();
-
     $this->createField('field_publication_date', 'Publication Date', 'timestamp',  ['datetime_type' => 'datetime']);
   
-    // FieldStorageConfig::create([
-    //   'field_name' => 'field_publication_date',
-    //   'entity_type' => 'node',
-    //   'type' => 'timestamp',
-    //   'settings' => [
-    //     'datetime_type' => 'datetime',
-    //   ],
-    // ])->save();
-    // FieldConfig::create([
-    //   'field_name' => 'field_publication_date',
-    //   'entity_type' => 'node',
-    //   'bundle' => 'article',
-    //   'label' => 'Publication Date',
-    // ])->save();
-
-    // Create the field storage for the taxonomy reference field.
-    FieldStorageConfig::create([
-      'field_name' => 'field_topics',
-      'entity_type' => 'node',
-      'type' => 'entity_reference',
-    'cardinality' => -1, // -1 means unlimited
-      'settings' => [
-        'target_type' => 'taxonomy_term',
-      ],
-    ])->save();
-
-    FieldConfig::create([
-      'field_name' => 'field_topics',
-      'entity_type' => 'node',
-      'bundle' => 'article',
-      'label' => 'Topics',
-      'settings' => [
-        'handler' => 'default:taxonomy_term',
-        'handler_settings' => [
-          'target_bundles' => ['topics'],
-        ],
-      ],
-    ])->save();// Create the field storage for the taxonomy reference field.
-
     $this->createField('field_file_type', 'File Type', 'list_string',  [
       'allowed_values' => [
         'application/pdf' => 'pdf',
@@ -204,42 +135,58 @@ abstract class BaseKernelTestHex extends KernelTestBase {
       ],
     ]);
 
-    // Create LIST_STRING field_publication_status (list_string field)
+    $this->createField('field_attachment', 'Attachment', 'entity_reference', ['target_type' => 'file'], ['handler' => 'default:file']);
+    
+    
+    $this->createField('field_topics', 'Topics', 'entity_reference', ['target_type' => 'taxonomy_term'], [
+      'handler' => 'default:taxonomy_term',
+      'handler_settings' => [
+        'target_bundles' => ['topics'],
+      ],
+    ], -1);
+
+    // ['target_type' => 'taxonomy_term']
+
+    // // Create the field storage for the taxonomy reference field.
     // FieldStorageConfig::create([
-    //   'field_name' => 'field_file_type',
+    //   'field_name' => 'field_topics',
     //   'entity_type' => 'node',
-    //   'type' => 'list_string',
+    //   'type' => 'entity_reference',
+    // 'cardinality' => -1, // -1 means unlimited
     //   'settings' => [
-    //     'allowed_values' => [
-    //       'application/pdf' => 'pdf',
-    //       'application/docx' => 'docx',
-    //       'application/txt' => 'txt'
-    //     ],
+    //     'target_type' => 'taxonomy_term',
     //   ],
     // ])->save();
 
     // FieldConfig::create([
-    //   'field_name' => 'field_file_type',
+    //   'field_name' => 'field_topics',
     //   'entity_type' => 'node',
     //   'bundle' => 'article',
-    //   'label' => 'File Type',
-    // ])->save();
+    //   'label' => 'Topics',
+    //   'settings' => [
+    //     'handler' => 'default:taxonomy_term',
+    //     'handler_settings' => [
+    //       'target_bundles' => ['topics'],
+    //     ],
+    //   ],
+    // ])->save();// Create the field storage for the taxonomy reference field.
+
 
     // Create field_attachment (entity reference to file)
-    FieldStorageConfig::create([
-        'field_name' => 'field_attachment',
-        'entity_type' => 'node',
-        'type' => 'entity_reference',
-        'settings' => ['target_type' => 'file'],
-    ])->save();
+    // FieldStorageConfig::create([
+    //     'field_name' => 'field_attachment',
+    //     'entity_type' => 'node',
+    //     'type' => 'entity_reference',
+    //     'settings' => ['target_type' => 'file'],
+    // ])->save();
 
-    FieldConfig::create([
-        'field_name' => 'field_attachment',
-        'entity_type' => 'node',
-        'bundle' => 'article',
-        'label' => 'Attachment',
-        'settings' => ['handler' => 'default:file'],
-    ])->save();
+    // FieldConfig::create([
+    //     'field_name' => 'field_attachment',
+    //     'entity_type' => 'node',
+    //     'bundle' => 'article',
+    //     'label' => 'Attachment',
+    //     'settings' => ['handler' => 'default:file'],
+    // ])->save();
 
     // Create a user with necessary permissions.
     $this->createUser();
@@ -362,17 +309,19 @@ abstract class BaseKernelTestHex extends KernelTestBase {
  * @var string $field_name
  * @var string $label
  * @var string $type
- * @var array $settings
+ * @var array $fsc_settings
+ * @var array $fc_settings
  * @var string $bundle
  * 
  * @return void
  */
-  protected function createField($field_name, $label, $type, $settings=[], $bundle = 'article'){
+  protected function createField($field_name, $label, $type, $fsc_settings=[], $fc_settings = [], $cardn ='', $bundle = 'article'){
        FieldStorageConfig::create([
         'field_name' => $field_name,
         'entity_type' => 'node',
         'type' => $type,
-        'settings' => $settings
+        'cardinality' => $cardn, // -1 means unlimited
+        'settings' => $fsc_settings
       ])->save();
   
       FieldConfig::create([
@@ -380,6 +329,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
         'entity_type' => 'node',
         'bundle' => $bundle,
         'label' => $label,
+        'settings' => $fc_settings,
       ])->save();
   }
 }
