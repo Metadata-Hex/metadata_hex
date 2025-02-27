@@ -15,21 +15,55 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
   /**
    * Tests processing a node with a valid PDF file.
    */
-  public function testProcessNodeWithValidPdfWithMetadata() {
+  public function testMetadataEntityCanProcessNodes() {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
 
-$me = new MetadataEntity(\Drupal::logger('info'));
-$me->loadFromNode($node->id());
-$meta = $me->getMetadata();
-$n = $me->getNodeBinder();
+    $me = new MetadataEntity(\Drupal::logger('info'));
+    $me->loadFromNode($node->id());
+    $n = $me->getNodeBinder();
 
-$this->assertEquals($n->getBundleType(), 'article', 'Node creation dates dont match');
-$this->assertEquals($n->getNode()->id(), $node->id(), 'Node creation dates dont match');
-echo print_r($meta, true);
-// $this->assertContains('Drup/al', $term_names, "The expected taxonomy term name Drupal is not present.");
+    $this->assertEquals($n->getBundleType(), 'article', 'Bundle type doesnt match');
+    $this->assertEquals($n->getNode()->id(), $node->id(), 'Nodes arent the same');
 
+
+    $meta = $me->getMetadata();
+    $meta_raw = $meta['raw'];
+    $meta_processed = $meta['raw'];
+    $meta_mapped = $meta['mapped'];
+    $this->assertContains('title', $meta_raw, "The expected term is not present.");
+    $this->assertContains('title', $meta_processed, "The expected term is not present.");
+    $this->assertContains('title', $meta_mapped, "The expected term is not present.");
+
+    // Assert that mapped metadata does not have more keys than processed metadata
+    $this->assertLessThanOrEqual(
+      count(array_keys($meta_mapped)),
+      count(array_keys($meta_processed)),
+      "Mapped metadata has more keys than processed metadata."
+    );
+
+    // Assert that all mapped keys exist in processed metadata
+    foreach (array_keys($meta_mapped) as $key) {
+      $this->assertContains(
+          $key,
+          array_keys($meta_processed),
+          "Mapped key '$key' is missing from processed metadata."
+      );
+    }
+
+    // Assert that the number of entries in raw metadata is greater than processed and mapped
+    $this->assertGreaterThan(
+      count(array_keys($meta_processed)),
+      count(array_keys($meta_raw)),
+      "Raw metadata should have more entries than processed metadata."
+    );
+
+    $this->assertGreaterThan(
+      count(array_keys($meta_mapped)),
+      count(array_keys($meta_raw)),
+      "Raw metadata should have more entries than mapped metadata."
+    );
 
   }
 }
