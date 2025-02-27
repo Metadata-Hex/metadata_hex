@@ -170,22 +170,6 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     ])->save();// Create the field storage for the taxonomy reference field.
 
 
-    // Create field_attachment (entity reference to file)
-    // FieldStorageConfig::create([
-    //     'field_name' => 'field_attachment',
-    //     'entity_type' => 'node',
-    //     'type' => 'entity_reference',
-    //     'settings' => ['target_type' => 'file'],
-    // ])->save();
-
-    // FieldConfig::create([
-    //     'field_name' => 'field_attachment',
-    //     'entity_type' => 'node',
-    //     'bundle' => 'article',
-    //     'label' => 'Attachment',
-    //     'settings' => ['handler' => 'default:file'],
-    // ])->save();
-
     // Create a user with necessary permissions.
     $this->createUser();
 
