@@ -89,16 +89,36 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     // Capture the current details
     $created_alt = $node_alt->getCreatedTime();
     $modified_alt = $node_alt->getChangedTime();
-    $ff = $node_alt->get('field_subject')->getString();
-    $fcn = $node_alt->get('field_pages')->getString();
-    $fpd = $node_alt->get('field_publication_date')->getString();
-    $fps = $node_alt->get('field_file_type')->value;
-    $fpdi = $node_alt->get('field_topics')->getValue();
-    $this->assertNotEquals('', $ff, 'subject updated');
-    $this->assertNotEquals('', $fcn, 'catalog updated');
-    $this->assertNotEquals('', $fpd, 'publication date updated');
-    $this->assertNotEquals('', $fps, 'field_file_type');
-    $this->assertNotEquals('', $fpdi, 'topic tags');
-    $this->assertEquals($created, $created_alt, 'Node creation date should match');
+    $fsubj = $node_alt->get('field_subject')->getString();
+    $fpages = $node_alt->get('field_pages')->getString();
+    $fdate = $node_alt->get('field_publication_date')->getString();
+    $ftype = $node_alt->get('field_file_type')->value;
+    $ftype = $node_alt->get('field_topics')->getValue();
+    $term_names = [];
+    foreach ($node_alt->get('field_topics')->referencedEntities() as $term) {
+        $term_names[] = $term->label();
+    }
+
+    // ASSERTATIONS
+    $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
+
+    $this->assertNotEquals('', $fsubj, 'Subject is blank');
+    $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
+
+    $this->assertNotEquals('', $fpages, 'Catalog is blank');
+    $this->assertEquals(1, $fpages, 'Extracted catalog doesnt match expected');
+
+    $this->assertNotEquals('', $fdate, 'Publication date is blank');
+    $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
+    
+    $this->assertNotEquals('', $ftype, 'FileType is blank');
+    $this->assertEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
+
+    $this->assertNotEquals('', $ftype, 'Topic is blank');
+    $this->assertContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
+    $this->assertContains('TCPDF', $term_names, "The expected taxonomy term name TCPDF is not present.");
+    $this->assertContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
+    $this->assertContains('Metadata', $term_names, "The expected taxonomy term name Metadata is not present.");
+
   }
 }
