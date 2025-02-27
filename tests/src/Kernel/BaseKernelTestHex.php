@@ -138,38 +138,36 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     $this->createField('field_attachment', 'Attachment', 'entity_reference', ['target_type' => 'file'], ['handler' => 'default:file']);
     
     
-    $this->createField('field_topics', 'Topics', 'entity_reference', ['target_type' => 'taxonomy_term'], [
-      'handler' => 'default:taxonomy_term',
-      'handler_settings' => [
-        'target_bundles' => ['topics'],
+    // $this->createField('field_topics', 'Topics', 'entity_reference', ['target_type' => 'taxonomy_term'], [
+    //   'handler' => 'default:taxonomy_term',
+    //   'handler_settings' => [
+    //     'target_bundles' => ['topics'],
+    //   ],
+    // ], -1);
+
+    // Create the field storage for the taxonomy reference field.
+    FieldStorageConfig::create([
+      'field_name' => 'field_topics',
+      'entity_type' => 'node',
+      'type' => 'entity_reference',
+    'cardinality' => -1, // -1 means unlimited
+      'settings' => [
+        'target_type' => 'taxonomy_term',
       ],
-    ], -1);
+    ])->save();
 
-    // ['target_type' => 'taxonomy_term']
-
-    // // Create the field storage for the taxonomy reference field.
-    // FieldStorageConfig::create([
-    //   'field_name' => 'field_topics',
-    //   'entity_type' => 'node',
-    //   'type' => 'entity_reference',
-    // 'cardinality' => -1, // -1 means unlimited
-    //   'settings' => [
-    //     'target_type' => 'taxonomy_term',
-    //   ],
-    // ])->save();
-
-    // FieldConfig::create([
-    //   'field_name' => 'field_topics',
-    //   'entity_type' => 'node',
-    //   'bundle' => 'article',
-    //   'label' => 'Topics',
-    //   'settings' => [
-    //     'handler' => 'default:taxonomy_term',
-    //     'handler_settings' => [
-    //       'target_bundles' => ['topics'],
-    //     ],
-    //   ],
-    // ])->save();// Create the field storage for the taxonomy reference field.
+    FieldConfig::create([
+      'field_name' => 'field_topics',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'Topics',
+      'settings' => [
+        'handler' => 'default:taxonomy_term',
+        'handler_settings' => [
+          'target_bundles' => ['topics'],
+        ],
+      ],
+    ])->save();// Create the field storage for the taxonomy reference field.
 
 
     // Create field_attachment (entity reference to file)
@@ -315,12 +313,11 @@ abstract class BaseKernelTestHex extends KernelTestBase {
  * 
  * @return void
  */
-  protected function createField($field_name, $label, $type, $fsc_settings=[], $fc_settings = [], $cardn ='', $bundle = 'article'){
+  protected function createField($field_name, $label, $type, $fsc_settings=[], $fc_settings = [], $bundle = 'article'){
        FieldStorageConfig::create([
         'field_name' => $field_name,
         'entity_type' => 'node',
         'type' => $type,
-        'cardinality' => $cardn, // -1 means unlimited
         'settings' => $fsc_settings
       ])->save();
   
