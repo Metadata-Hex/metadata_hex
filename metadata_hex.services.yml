@@ -21,7 +21,7 @@ services:
 
   # DOCX File Handler
   metadata_hex.file_handler.docx:
-    class: Drupal\metadata_hex\Handler\DocXFileHandler
+    class: Drupal\metadata_hex\Handler\DocxFileHandler
     arguments: ['@logger.channel.default']
     public: true
     tags:

@@ -1,12 +1,12 @@
 <?php
 namespace Drupal\Tests\metadata_hex\Kernel\Traits;
 
-use Drupal\file\Entity\File;
 use Drupal\Core\File\FileSystemInterface;
-use TCPDF;
+use Drupal\file\Entity\File;
 use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
 use org\bovigo\vfs\vfsStream;
+use TCPDF;
 
 trait TestFileHelperTrait {
 
@@ -31,7 +31,6 @@ trait TestFileHelperTrait {
       $pdf->SetSubject('Testing Metadata in PDFs');
       $pdf->SetKeywords('Drupal, TCPDF, Test, Metadata');
 
-      // Add a page and content
       $pdf->AddPage();
       $pdf->SetFont('helvetica', '', 12);
       $pdf->Cell(0, 10, 'This is a test PDF with metadata.', 0, 1, 'C');
@@ -47,11 +46,13 @@ trait TestFileHelperTrait {
                   xmp:CreatorTool="Drupal TCPDF Test"
                   xmp:CreateDate="' . date('c') . '"
                   xmp:MetadataDate="' . date('c') . '"
+                  custom:Catalog="12345"
+                  custom:Status="Published"
                   xmp:ModifyDate="' . date('c') . '">
               </rdf:Description>
           </rdf:RDF>
           <?xpacket end="w"?>';
-      //$pdf->SetXmpMetadata($xmp_metadata);
+      $pdf->setExtraXMP($xmp_metadata);
 
       // Output PDF as a string for saving in Drupal
       return $pdf->Output('', 'S'); // Return as string
@@ -98,6 +99,7 @@ trait TestFileHelperTrait {
       'field_attachment' => [  // Adjust field name based on actual setup.
         'target_id' => $file?->id()??null,
       ],
+      'revision' => FALSE,
     ]);
     $node->save();
     return $node;

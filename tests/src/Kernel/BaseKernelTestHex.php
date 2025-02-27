@@ -1,14 +1,18 @@
 <?php
 namespace Drupal\Tests\metadata_hex\Kernel;
 
-use Drupal\KernelTests\KernelTestBase;
-use Drupal\node\Entity\NodeType;
-use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\field\Entity\FieldConfig;
-use Drupal\Tests\metadata_hex\Kernel\Traits\TestFileHelperTrait;
-use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\KernelTests\KernelTestBase;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
+use Drupal\node\Entity\Node;
+use Drupal\node\Entity\NodeType;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\taxonomy\Entity\Vocabulary;
+use Drupal\Tests\metadata_hex\Kernel\Traits\TestFileHelperTrait;
+use stdClass;
 
 /**
   * @abstract
@@ -33,6 +37,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     'system',
     'content_moderation',
     'workflows',
+    'options'
   ];
 
   /**
@@ -54,8 +59,8 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     parent::setUp();
 
     $this->enableModules(['metadata_hex']);
-    
-   // Install required entity schemas.
+
+    // Install required entity schemas.
     $this->installEntitySchema('node');
     $this->installEntitySchema('file');
     $this->installEntitySchema('user');
@@ -63,24 +68,61 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('taxonomy_vocabulary');
     $this->installConfig(['text', 'filter', 'field', 'node']);
-    
+
    Vocabulary::create([
         'vid' => 'tags',
         'name' => 'Tags',
     ])->save();
 
+    Vocabulary::create([
+        'vid' => 'topics',
+        'name' => 'Topics',
+    ])->save();
+
+    // Ensure the "Topics" vocabulary exists.
+    $vocabulary = Vocabulary::load('topics');
+    if ($vocabulary) {
+      // Define an array of default tags.
+      $default_tags = ['Science', 'Technology', 'Drupal', 'Metadata'];
+
+      foreach ($default_tags as $tag_name) {
+        // Check if the term already exists to avoid duplicates.
+        $existing_terms = \Drupal::entityTypeManager()
+          ->getStorage('taxonomy_term')
+          ->loadByProperties([
+            'name' => $tag_name,
+            'vid' => 'topics',
+          ]);
+
+        if (empty($existing_terms)) {
+          // Create the taxonomy term.
+          Term::create([
+            'name' => $tag_name,
+            'vid' => 'topics',
+          ])->save();
+        }
+        else {
+        }
+      }
+    }
+    else {
+    }
+
+    $this->installSchema('node', ['node_access']);
     $this->installConfig(['metadata_hex']);
     $this->installSchema('metadata_hex', ['metadata_hex_processed']);
-
     $this->initMetadataHex();
 
     // Create the "article" content type.
     NodeType::create([
         'type' => 'article',
         'name' => 'Article',
+        'revision' => FALSE,
     ])->save();
 
-    // Create field_subject (text field)
+    $this->disableRevisionsForContentType();
+      $this->cleanContentTypeConfig('article');
+    // Create **STRING** field_subject (text field)
     FieldStorageConfig::create([
         'field_name' => 'field_subject',
         'entity_type' => 'node',
@@ -92,6 +134,80 @@ abstract class BaseKernelTestHex extends KernelTestBase {
         'entity_type' => 'node',
         'bundle' => 'article',
         'label' => 'Subject',
+    ])->save();
+
+    // Create INTEGER field_catalog_number (integer field)
+    FieldStorageConfig::create([
+      'field_name' => 'field_pages',
+      'entity_type' => 'node',
+      'type' => 'integer',
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_pages',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'Pages',
+    ])->save();
+
+    FieldStorageConfig::create([
+      'field_name' => 'field_publication_date',
+      'entity_type' => 'node',
+      'type' => 'timestamp',
+      'settings' => [
+        'datetime_type' => 'datetime',
+      ],
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'field_publication_date',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'Publication Date',
+    ])->save();
+
+    // Create the field storage for the taxonomy reference field.
+    FieldStorageConfig::create([
+      'field_name' => 'field_topics',
+      'entity_type' => 'node',
+      'type' => 'entity_reference',
+    'cardinality' => -1, // -1 means unlimited
+      'settings' => [
+        'target_type' => 'taxonomy_term',
+      ],
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_topics',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'Topics',
+      'settings' => [
+        'handler' => 'default:taxonomy_term',
+        'handler_settings' => [
+          'target_bundles' => ['topics'],
+        ],
+      ],
+    ])->save();// Create the field storage for the taxonomy reference field.
+
+    // Create LIST_STRING field_publication_status (list_string field)
+    FieldStorageConfig::create([
+      'field_name' => 'field_file_type',
+      'entity_type' => 'node',
+      'type' => 'list_string',
+      'settings' => [
+        'allowed_values' => [
+          'application/pdf' => 'pdf',
+          'application/docx' => 'docx',
+          'application/txt' => 'txt'
+        ],
+      ],
+    ])->save();
+
+    FieldConfig::create([
+      'field_name' => 'field_file_type',
+      'entity_type' => 'node',
+      'bundle' => 'article',
+      'label' => 'File Type',
     ])->save();
 
     // Create field_attachment (entity reference to file)
@@ -126,18 +242,17 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     $schema = $database->schema();
     $this->enableModules(['metadata_hex']);
     sleep(1);
-   
+
     \Drupal::service('kernel')->rebuildContainer();
     \Drupal::service('cache.bootstrap')->deleteAll();
     \Drupal::service('cache.config')->deleteAll();
     $this->hasMetadataProcessedTable();
-      
     $this->config = \Drupal::configFactory()->getEditable('metadata_hex.settings');
-    
+
     // Default settings
     $settings = [
         'extraction_settings.hook_node_types' => ['article', 'page'],
-        'extraction_settings.field_mappings' => "title|field_title\nsubject|field_subject",
+        'extraction_settings.field_mappings' => "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nDC:Format|field_file_type",
         'extraction_settings.flatten_keys' => TRUE,
         'extraction_settings.strict_handling' => FALSE,
         'extraction_settings.data_protected' => FALSE,
@@ -172,27 +287,58 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     // Let the default cleanup run for MySQL/PostgreSQL.
     parent::tearDown();
   }
- 
+
   /**
    * Checks to see if the required table exists
    */
   public function hasMetadataProcessedTable() {
-    
+
     $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
     if ($table_exists) {
       // Use raw query to list field names.
       $results = \Drupal::database()->query("PRAGMA table_info(metadata_hex_processed)")->fetchAll();
       foreach ($results as $result) {
-        echo "Field: {$result->name}\n";
       }
     } else {
-      echo "Table metadata_hex_processed does not exist.\n";
     }
-  
-    //rebgrab to test
+
+    //regrab to test
     $table_exists_now = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
     $this->assertEquals(true, $table_exists_now, 'Database table exists');
-    
+
     return;
   }
+
+  /**
+   * Disable content type revisions
+   *
+   * @var string $content_type_id
+   * @return void
+   */
+  protected function disableRevisionsForContentType($content_type_id = 'article') {
+    $content_type = \Drupal::entityTypeManager()
+      ->getStorage('node_type')
+      ->load($content_type_id);
+
+    if ($content_type) {
+      $content_type->setNewRevision(FALSE);
+      $content_type->set('preview_mode', 0);
+      $content_type->save();
+    }
+  }
+
+  /**
+   * Clean up any odd config schema
+   *
+   * @var string $content_type
+   * @return void
+   */
+  protected function cleanContentTypeConfig(string $content_type) {
+    $config = \Drupal::configFactory()->getEditable("node.type.$content_type");
+
+    if ($config->get('third_party_settings.node.default_revision') !== NULL) {
+      $config->clear('third_party_settings.node.default_revision')->save();
+    }
+  }
 }
+
