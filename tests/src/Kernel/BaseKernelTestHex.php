@@ -123,47 +123,54 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     $this->disableRevisionsForContentType();
       $this->cleanContentTypeConfig('article');
     // Create **STRING** field_subject (text field)
-    FieldStorageConfig::create([
-        'field_name' => 'field_subject',
-        'entity_type' => 'node',
-        'type' => 'string',
-    ])->save();
 
-    FieldConfig::create([
-        'field_name' => 'field_subject',
-        'entity_type' => 'node',
-        'bundle' => 'article',
-        'label' => 'Subject',
-    ])->save();
+    $this->createField('field_subject', 'Subject', 'string');
+
+    // FieldStorageConfig::create([
+    //     'field_name' => 'field_subject',
+    //     'entity_type' => 'node',
+    //     'type' => 'string',
+    // ])->save();
+
+    // FieldConfig::create([
+    //     'field_name' => 'field_subject',
+    //     'entity_type' => 'node',
+    //     'bundle' => 'article',
+    //     'label' => 'Subject',
+    // ])->save();
+
+    $this->createField('field_pages', 'Pages', 'integer');
 
     // Create INTEGER field_catalog_number (integer field)
-    FieldStorageConfig::create([
-      'field_name' => 'field_pages',
-      'entity_type' => 'node',
-      'type' => 'integer',
-    ])->save();
+    // FieldStorageConfig::create([
+    //   'field_name' => 'field_pages',
+    //   'entity_type' => 'node',
+    //   'type' => 'integer',
+    // ])->save();
 
-    FieldConfig::create([
-      'field_name' => 'field_pages',
-      'entity_type' => 'node',
-      'bundle' => 'article',
-      'label' => 'Pages',
-    ])->save();
+    // FieldConfig::create([
+    //   'field_name' => 'field_pages',
+    //   'entity_type' => 'node',
+    //   'bundle' => 'article',
+    //   'label' => 'Pages',
+    // ])->save();
 
-    FieldStorageConfig::create([
-      'field_name' => 'field_publication_date',
-      'entity_type' => 'node',
-      'type' => 'timestamp',
-      'settings' => [
-        'datetime_type' => 'datetime',
-      ],
-    ])->save();
-    FieldConfig::create([
-      'field_name' => 'field_publication_date',
-      'entity_type' => 'node',
-      'bundle' => 'article',
-      'label' => 'Publication Date',
-    ])->save();
+    $this->createField('field_publication_date', 'Publication Date', 'timestamp',  ['datetime_type' => 'datetime']);
+  
+    // FieldStorageConfig::create([
+    //   'field_name' => 'field_publication_date',
+    //   'entity_type' => 'node',
+    //   'type' => 'timestamp',
+    //   'settings' => [
+    //     'datetime_type' => 'datetime',
+    //   ],
+    // ])->save();
+    // FieldConfig::create([
+    //   'field_name' => 'field_publication_date',
+    //   'entity_type' => 'node',
+    //   'bundle' => 'article',
+    //   'label' => 'Publication Date',
+    // ])->save();
 
     // Create the field storage for the taxonomy reference field.
     FieldStorageConfig::create([
@@ -189,26 +196,34 @@ abstract class BaseKernelTestHex extends KernelTestBase {
       ],
     ])->save();// Create the field storage for the taxonomy reference field.
 
-    // Create LIST_STRING field_publication_status (list_string field)
-    FieldStorageConfig::create([
-      'field_name' => 'field_file_type',
-      'entity_type' => 'node',
-      'type' => 'list_string',
-      'settings' => [
-        'allowed_values' => [
-          'application/pdf' => 'pdf',
-          'application/docx' => 'docx',
-          'application/txt' => 'txt'
-        ],
+    $this->createField('field_file_type', 'File Type', 'list_string',  [
+      'allowed_values' => [
+        'application/pdf' => 'pdf',
+        'application/docx' => 'docx',
+        'application/txt' => 'txt'
       ],
-    ])->save();
+    ]);
 
-    FieldConfig::create([
-      'field_name' => 'field_file_type',
-      'entity_type' => 'node',
-      'bundle' => 'article',
-      'label' => 'File Type',
-    ])->save();
+    // Create LIST_STRING field_publication_status (list_string field)
+    // FieldStorageConfig::create([
+    //   'field_name' => 'field_file_type',
+    //   'entity_type' => 'node',
+    //   'type' => 'list_string',
+    //   'settings' => [
+    //     'allowed_values' => [
+    //       'application/pdf' => 'pdf',
+    //       'application/docx' => 'docx',
+    //       'application/txt' => 'txt'
+    //     ],
+    //   ],
+    // ])->save();
+
+    // FieldConfig::create([
+    //   'field_name' => 'field_file_type',
+    //   'entity_type' => 'node',
+    //   'bundle' => 'article',
+    //   'label' => 'File Type',
+    // ])->save();
 
     // Create field_attachment (entity reference to file)
     FieldStorageConfig::create([
@@ -339,6 +354,33 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     if ($config->get('third_party_settings.node.default_revision') !== NULL) {
       $config->clear('third_party_settings.node.default_revision')->save();
     }
+  }
+
+/**
+ * Creates a drupal field for testing
+ * 
+ * @var string $field_name
+ * @var string $label
+ * @var string $type
+ * @var array $settings
+ * @var string $bundle
+ * 
+ * @return void
+ */
+  protected function createField($field_name, $label, $type, $settings=[], $bundle = 'article'){
+       FieldStorageConfig::create([
+        'field_name' => $field_name,
+        'entity_type' => 'node',
+        'type' => $type,
+        'settings' => $settings
+      ])->save();
+  
+      FieldConfig::create([
+        'field_name' => $field_name,
+        'entity_type' => 'node',
+        'bundle' => $bundle,
+        'label' => $label,
+      ])->save();
   }
 }
 
