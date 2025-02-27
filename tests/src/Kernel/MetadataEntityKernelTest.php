@@ -12,24 +12,51 @@ use Drupal\Tests\metadata_hex\Kernel\BaseKernelTestHex;
  */
 class MetadataEntityKernelTest extends BaseKernelTestHex {
 
+  private $me;
+
+  private $nb;
+
   /**
-   * Tests processing a node with a valid PDF file.
+   * Tests processing a node with a valid node.
    */
-  public function testMetadataEntityCanProcessNodes() {
+  public function testMetadataEntityCanProcessNode() {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
 
-    $me = new MetadataEntity(\Drupal::logger('info'));
-    $me->loadFromNode($node->id());
-    $n = $me->getNodeBinder();
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromNode($node->id());
+    $this->runAssertions();
+  }
+
+  /**
+   * Tests processing a  file.
+   */
+  public function testMetadataEntityCanProcessFile() {
+
+    $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
+
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($file->getFileUri());
+    $this->runAssertions();
+  }
+    
+  
+  /**
+   * Run Assertions
+   */
+  public function runAssertions(){
+    $n = $this->me->getNodeBinder();
 
     $this->assertEquals($n->getBundleType(), 'article', 'Bundle type doesnt match');
-    $this->assertEquals($n->getNode()->id(), $node->id(), 'Nodes arent the same');
+    $this->assertEquals($n->getNode()->id(), 1, 'Nodes arent the same');
 
 
-    $meta = $me->getMetadata();
-    $meta_raw = array_merge(...$meta['raw']);
+    $meta = $this->me->getMetadata();
+    $meta_raw = [];
+    array_walk_recursive($meta['raw'], function($value, $key) use (&$meta_raw) {
+        $meta_raw[$key] = $value;
+    });
     $meta_processed = $meta['raw'];
     $meta_mapped = $meta['mapped'];
 
@@ -55,5 +82,6 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
       "Raw metadata should have more entries than mapped metadata."
     );
 
+  
   }
 }
