@@ -32,9 +32,9 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $meta_raw = $meta['raw'];
     $meta_processed = $meta['raw'];
     $meta_mapped = $meta['mapped'];
-    $this->assertContains('title', $meta_raw, "The expected term is not present.");
-    $this->assertContains('title', $meta_processed, "The expected term is not present.");
-    $this->assertContains('title', $meta_mapped, "The expected term is not present.");
+    $this->assertContains('title', array_keys($meta_raw), "The expected term is not present.");
+    $this->assertContains('title', array_keys($meta_processed), "The expected term is not present.");
+    $this->assertContains('title', array_keys($meta_mapped), "The expected term is not present.");
 
     // Assert that mapped metadata does not have more keys than processed metadata
     $this->assertLessThanOrEqual(
