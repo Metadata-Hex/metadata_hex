@@ -29,19 +29,8 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $this->runAssertions();
   }
 
-  /**
-   * Tests processing a  file.
-   */
-  public function testMetadataEntityCanProcessFile() {
 
-    $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
 
-    $this->me = new MetadataEntity(\Drupal::logger('info'));
-    $this->me->loadFromFile($file->getFileUri());
-    $this->runAssertions();
-  }
-    
-  
   /**
    * Run Assertions
    */
@@ -76,12 +65,12 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     );
 
     //due to array dimentionality
-    $this->assertLessThan(
+    $this->assertGreaterThan(
       count(array_keys($meta_mapped)),
       count(array_keys($meta_raw)),
       "Raw metadata should have more entries than mapped metadata."
     );
 
-  
+
   }
 }

@@ -173,9 +173,20 @@ class MetadataEntity extends MetadataHexCore
    */
   public function loadFromFile(string $file_uri)
   {
-    $file = File::load(\Drupal::entityQuery('file')
-      ->condition('uri', $file_uri)
-      ->execute());
+$fid = \Drupal::entityQuery('file')
+    ->condition('uri', $file_uri)
+    ->accessCheck(false)
+    ->execute();
+
+    // Ensure we get the first result (if any)
+    $fid = reset($fid);
+
+    if ($fid) {
+        $file = File::load($fid);
+    } else {
+        $file = NULL; // Handle the case where no file was found
+    }
+
 
     if (!$file) {
       throw new Exception("File not found: $file_uri");

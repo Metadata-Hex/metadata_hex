@@ -17,7 +17,7 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
   /**
    * Tests processing a node with a valid PDF file.
    */
-  
+
   public function testNodeBinderWithNode() {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
@@ -48,19 +48,24 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
    */
   public function runAssertions(){
 
-    $n = $this->bind->getNodeBinder();
+    $n = $this->bind->getNode();
+    $meta = $this->bind->ingestNodeFileMeta();//();
+    $meta_raw = [];
+    array_walk_recursive($meta, function($value, $key) use (&$meta_raw) {
+        $meta_raw[$key] = $value;
+    });
 
-    $this->assertEquals($n->getBundleType(), 'article', 'Bundle type doesnt match');
-    $this->assertEquals($n->getNode()->id(), $this->original->id(), 'Nodes arent the same');
+    $this->assertEquals($n->bundle(), 'article', 'Bundle type doesnt match');
+    $this->assertEquals($n->id(), $this->original->id(), 'Nodes arent the same');
 
-    $meta = $n->ingestNodeFileMeta();//();
+    $meta = $this->bind->ingestNodeFileMeta();//();
     // Assert that meta is an array
     $this->assertIsArray($meta, "Metadata should be an array.");
 
     // Assert that meta has more than 5 entries
-    $this->assertGreaterThan(5, count($meta), "Metadata should contain more than 5 entries.");
-    
-    $files = $n->getFileUris();
+    $this->assertGreaterThan(5, count($meta_raw), "Metadata should contain more than 5 entries.");
+
+    $files = $this->bind->getFileUris();
     echo print_r($files, true);
   }
 }
