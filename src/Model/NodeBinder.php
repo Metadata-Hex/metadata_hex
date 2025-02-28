@@ -44,6 +44,11 @@ class NodeBinder extends MetadataHexCore
    */
   protected $fileHandlerManager;
 
+  /** 
+   * MetadataHex Settings Manager
+   * @var 
+   */
+  protected $settingsManager;
   /**
    * Constructs the NodeBinder class.
    *
@@ -55,6 +60,7 @@ class NodeBinder extends MetadataHexCore
     parent::__construct($logger);
     $this->uuid = $this->generateUuid();
     $this->fileHandlerManager = \Drupal::service('metadata_hex.file_handler_manager');
+    $this->settingsManager = new \Drupal\metadata_hex\Service\SettingsManager();
   }
 
   public function generateUuid()
@@ -80,7 +86,7 @@ class NodeBinder extends MetadataHexCore
     if ($input instanceof File) {
       $this->fid = $input->id();
       $file = $input;
-      $input = initNode($file->getFileUri(), 'article', 'field_attachment'); // TODO this needs to be dynamic
+      $input = initNode($file->getFileUri(), $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
     }
     if ($input instanceof Node) {
       $this->nid = $input->id();
