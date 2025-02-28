@@ -44,6 +44,11 @@ class NodeBinder extends MetadataHexCore
    */
   protected $fileHandlerManager;
 
+  /** 
+   * MetadataHex Settings Manager
+   * @var 
+   */
+  protected $settingsManager;
   /**
    * Constructs the NodeBinder class.
    *
@@ -55,6 +60,7 @@ class NodeBinder extends MetadataHexCore
     parent::__construct($logger);
     $this->uuid = $this->generateUuid();
     $this->fileHandlerManager = \Drupal::service('metadata_hex.file_handler_manager');
+    $this->settingsManager = new \Drupal\metadata_hex\Service\SettingsManager();
   }
 
   public function generateUuid()
@@ -79,7 +85,10 @@ class NodeBinder extends MetadataHexCore
   {
     if ($input instanceof File) {
       $this->fid = $input->id();
-    } elseif ($input instanceof Node) {
+      $file = $input;
+      $input = $this->initNode($file->getFileUri(), $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
+    }
+    if ($input instanceof Node) {
       $this->nid = $input->id();
     } else {
       throw new \InvalidArgumentException("Invalid input provided.");
@@ -92,7 +101,7 @@ class NodeBinder extends MetadataHexCore
    * @return array
    *   An array of file URIs.
    */
-  protected function getFileUris(): array
+  public function getFileUris(): array
   {
     if (!$this->nid) {
       return [];
@@ -188,7 +197,7 @@ public function getWasNodeJustProcessed(): bool
    */
   public function getBundleType(): ?string
   {
-    return $this->getNode()->bundle();
+    return $this->getNode()?->bundle();
   }
 
   /**
@@ -377,6 +386,7 @@ public function setProcessed()
           'last_modified' => $ts,
           'processed' => $processed,
         ])
+    // Assert that all mapped keys exist in processed metadata
         ->condition('entity_id', $entity_id)
         ->execute();
     } else {

@@ -172,7 +172,7 @@ class MetadataBatchProcessor extends MetadataHexCore
    */
   protected function processFiles()
   { 
-    $ingestDir = $this->settingsManager->getIngestDir()??'';
+    $ingestDir = $this->settingsManager->getIngestDirectory()??'';
     $this->ingestFiles('public://'.$ingestDir);
     $categorized = $this->categorizeFiles();
 
