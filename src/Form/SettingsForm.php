@@ -68,7 +68,7 @@ class SettingsForm extends ConfigFormBase {
         $operations = [];
         foreach ($selectedNodeTypes as $bundleType) {
             $operations[] = [
-                ['Drupal\metadata_hex\Batch\MetadataBatch', 'processNodes'],
+                ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'processNodes'],
                 [$bundleType, $willReprocess],
             ];
         }
@@ -80,7 +80,7 @@ class SettingsForm extends ConfigFormBase {
             'init_message' => $this->t('Starting metadata processing...'),
             'progress_message' => $this->t('Processing...'),
             'error_message' => $this->t('Metadata processing encountered an error.'),
-            'finished' => ['Drupal\metadata_hex\Batch\MetadataBatch', 'batchFinished'],
+            'finished' => ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'batchFinished'],
         ];
 
         batch_set($batch);
@@ -99,7 +99,7 @@ class SettingsForm extends ConfigFormBase {
     $config->save();
 
     $operations[] = [
-      ['Drupal\metadata_hex\Batch\MetadataBatch', 'processFiles'],
+      ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'processFiles'],
     ];
 
     // Define batch
@@ -109,7 +109,7 @@ class SettingsForm extends ConfigFormBase {
       'init_message' => $this->t('Starting file ingestion...'),
       'progress_message' => $this->t('Processing...'),
       'error_message' => $this->t('File ingest or Metadata processing encountered an error.'),
-      'finished' => ['Drupal\metadata_hex\Batch\MetadataBatch', 'batchFinished'],
+      'finished' => ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'batchFinished'],
     ];
 
     batch_set($batch);

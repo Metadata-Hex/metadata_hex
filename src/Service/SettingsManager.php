@@ -98,15 +98,6 @@ class SettingsManager extends MetadataHexCore {
     return $this->config->get('extraction_settings.hook_node_types') ?? '';
   }
 
- /**
-   * Retrieves the user set directory to ingest
-   * 
-   * @return string
-   *  The directory to ingest
-   */
-  public function getIngestDir(){
-    return $this->getFileIngestSettings()['ingest_directory'];
-  }
 
   /**
    * Retrieves node processing settings.
