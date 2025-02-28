@@ -204,7 +204,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
         'node_process.bundle_types' => ['article'],
         'node_process.allow_reprocess' => TRUE,
         'file_ingest.bundle_type_for_generation' => 'article',
-        'file_ingest.file_attachment_field' => 'field_file',
+        'file_ingest.file_attachment_field' => 'field_attachment',
         'file_ingest.ingest_directory' => 'pdfs/',
     ];
 
