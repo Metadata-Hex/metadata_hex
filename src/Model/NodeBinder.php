@@ -86,7 +86,7 @@ class NodeBinder extends MetadataHexCore
     if ($input instanceof File) {
       $this->fid = $input->id();
       $file = $input;
-      $input = initNode($file->getFileUri(), $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
+      $input = $this->initNode($file->getFileUri(), $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
     }
     if ($input instanceof Node) {
       $this->nid = $input->id();
