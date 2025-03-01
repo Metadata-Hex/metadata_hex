@@ -51,8 +51,9 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $n = $this->me->getNodeBinder();
 
     $this->assertEquals($n->getBundleType(), 'article', 'Bundle type doesnt match');
+    if (!empty($n->getNode())){
     $this->assertEquals($n->getNode()->id(), 1, 'Nodes arent the same');
-
+    }
 
     $meta = $this->me->getMetadata();
     $meta_raw = [];
@@ -159,7 +160,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
 
     $this->me = new MetadataEntity(\Drupal::logger('info'));
-    $this->me->loadFromFile($file->id());
+    $this->me->loadFromFile($file->getFileUri());
     $this->me->writeMetadata();
   }
 

@@ -41,7 +41,7 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
     $this->runAssertions();
   }
 
-  /**
+  /** 
    * Tests processing a node with a valid PDF file.
    */
   public function testNodeBinderWithInvalidFile() {
