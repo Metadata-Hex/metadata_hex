@@ -59,7 +59,7 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
    */
   public function testNodeBinderWithInvalidType() {
     $this->expectException(\InvalidArgumentException::class);//changed again
-    $this->expectExceptionMessage('Argument #1 ($uri) must be of type string, null given');
+    $this->expectExceptionMessage('Invalid input provided.');
 
     $file = \Drupal\user\Entity\User::load(1);
     $this->bind = new NodeBinder(\Drupal::logger('info'));
