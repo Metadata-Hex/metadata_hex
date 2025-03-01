@@ -37,7 +37,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
 
     $this->me = new MetadataEntity(\Drupal::logger('info'));
-    $this->me->loadFromFile($file->id());
+    $this->me->loadFromFile($file->getFileUri());
     $this->runAssertions();
   }
 
