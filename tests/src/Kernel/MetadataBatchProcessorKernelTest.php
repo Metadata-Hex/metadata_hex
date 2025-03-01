@@ -141,6 +141,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing .
    */
   public function testProcessNodeWithTitleProtected() {
+    echo __FUNCTION__;
+
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
     $this->setConfigSetting('extraction_settings.title_protected', FALSE);
@@ -197,6 +199,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing .
    */
   public function testProcessNodeWithDataProtected() {
+    echo __FUNCTION__;
+
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
     $this->setConfigSetting('extraction_settings.data_protected', TRUE);
@@ -253,6 +257,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing .
    */
   public function testProcessNodeWithStrictHandling() {
+    echo __FUNCTION__;
+
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
     $this->setConfigSetting('extraction_settings.strict_handling', TRUE);
@@ -309,6 +315,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing .
    */
   public function testProcessNodeWithFlattenKeys() {
+    echo __FUNCTION__;
+
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
     $this->setConfigSetting('extraction_settings.flatten_keys', FALSE);
@@ -365,6 +373,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing .
    */
   public function testProcessNodeWithBundleNotSelected() {
+    echo __FUNCTION__;
+
   // Setup an actual valid pdf file with metadata and node
   $this->setConfigSetting('extraction_settings.hook_node_types', ['page']);
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
@@ -378,7 +388,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
     // Process the node
     $this->batchProcessor->processNode($node->id());
-
+    echo $node->id();
     // Reload the node now that batch processes have occured
     $node_alt = \Drupal::entityTypeManager()->getStorage('node')->load($node->id());
 
@@ -394,6 +404,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
   public function testProcessNodeWithFieldMapping() {
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
+    echo __FUNCTION__;
     $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_pub_date\nPages|field_pages\nDC:Format|field_file_type");
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
