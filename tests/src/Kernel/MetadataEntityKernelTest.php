@@ -158,7 +158,6 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
   public function testMetadataEntityCannotWriteMetadataToEmptyNode() {
     $this->expectException(\Error::class);
 
-//    ..$file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $file = $this->createFile($file);
 
     $this->me = new MetadataEntity(\Drupal::logger('info'));
