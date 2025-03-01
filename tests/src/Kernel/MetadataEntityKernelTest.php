@@ -104,7 +104,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
    */
   public function testMetadataEntityWithInvalidType() {
     $this->expectException(\TypeError::class);
-    $this->expectExceptionMessage('Argument #1 ($uri) must be of type string, null given');
+    $this->expectExceptionMessage('Argument #1 ($file_uri) must be of type string, Drupal\user\Entity\User given');
 
     $file = \Drupal\user\Entity\User::load(1);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
@@ -131,7 +131,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
    */
   public function testMetadataEntityNodeWithInvalidType() {
     $this->expectException(\TypeError::class);
-    $this->expectExceptionMessage('Argument #1 ($uri) must be of type string, null given');
+    $this->expectExceptionMessage('Argument #1 ($file_uri) must be of type string, Drupal\user\Entity\User given');
 
     $file = \Drupal\user\Entity\User::load(1);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
@@ -143,7 +143,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
    * Tests processing a node with a valid PDF file.
    */
   public function testMetadataEntityWithInvalidTermType() {
-    $this->expectException(\InvalidArgumentException::class);
+    $this->expectException(\Error::class);
     $this->expectExceptionMessage("Call to protected method Drupal\metadata_hex\Model\MetadataEntity::findMatchingTaxonomy() from scope Drupal\Tests\metadata_hex\Kernel\MetadataEntityKernelTest");
 
     $file = \Drupal\user\Entity\User::load(1);
