@@ -195,8 +195,9 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $node = $this->createNode($file);
     $timestamp = time();
     $pages = 45;
-    $node->setField('field_publication_date', $timestamp);
-    $node->setField('field_pages', $pages);
+    $node->set('field_publication_date', $timestamp);
+    $node->set('field_pages', $pages);
+    $node->save();
 
     // Capture the original details
     $created = $node->getCreatedTime();
