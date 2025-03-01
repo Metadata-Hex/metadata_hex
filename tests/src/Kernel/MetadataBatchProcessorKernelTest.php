@@ -123,19 +123,6 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
   }
 
  
-  /**
-   * 
-   
-
-    - remove article, dooesnt run/extract 
-    - change field_mappings, doesnt extract changed
-    - flatten keys = false
-    - strict_handling = true
-    - data_protected = true
-    - title_protechted = false
-   * 
-   * 
-   */
 
    /**
    * Tests processing .
@@ -143,8 +130,6 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
   public function testProcessNodeWithTitleProtected() {
     echo __FUNCTION__.PHP_EOL;
 
-    // Setup an actual valid pdf file with metadata and node
-    // CHANGE
     $this->setConfigSetting('extraction_settings.title_protected', FALSE);
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
@@ -153,6 +138,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     // Capture the original details
     $created = $node->getCreatedTime();
     $modified = $node->getChangedTime();
+    $title = $node->get('title')->getString();
 
     // Process the node
     $this->batchProcessor->processNode($node->id());
@@ -163,6 +149,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     // Capture the current details
     $created_alt = $node_alt->getCreatedTime();
     $modified_alt = $node_alt->getChangedTime();
+    $ftitle = $node_alt->get('title')->getString();
     $fsubj = $node_alt->get('field_subject')->getString();
     $fpages = $node_alt->get('field_pages')->getString();
     $fdate = $node_alt->get('field_publication_date')->getString();
@@ -175,6 +162,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
     // ASSERTATIONS
     $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
+
+    $this->assertNotEquals($title, $ftitle, 'Titles match on non-protected title');
 
     $this->assertNotEquals('', $fsubj, 'Subject is blank');
     $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
@@ -200,6 +189,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    */
   public function testProcessNodeWithDataProtected() {
     echo __FUNCTION__.PHP_EOL;
+    //@TODO add some data to check against especially terms or lists
 
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
@@ -207,7 +197,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
-
+    $timestamp = now();
+    $node->setField('field_publication_date', $timestamp);
     // Capture the original details
     $created = $node->getCreatedTime();
     $modified = $node->getChangedTime();
@@ -242,6 +233,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
     $this->assertNotEquals('', $fdate, 'Publication date is blank');
     $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
+    $this->assertEquals($timestamp, $fdate, "The publication date doesnt match");
 
     $this->assertNotEquals('', $ftype, 'FileType is blank');
     $this->assertEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
@@ -258,9 +250,9 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    */
   public function testProcessNodeWithStrictHandling() {
     echo __FUNCTION__.PHP_EOL;
+    // @TODO gonna hafta change something here, prob field_mappings
 
-    // Setup an actual valid pdf file with metadata and node
-    // CHANGE
+
     $this->setConfigSetting('extraction_settings.strict_handling', TRUE);
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
@@ -317,8 +309,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
   public function testProcessNodeWithFlattenKeys() {
     echo __FUNCTION__.PHP_EOL;
 
-    // Setup an actual valid pdf file with metadata and node
-    // CHANGE
+// @TODO need to change... something. DC:Format maybE? or maybe the logic is backwards?
     $this->setConfigSetting('extraction_settings.flatten_keys', FALSE);
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
@@ -403,7 +394,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    */
   public function testProcessNodeWithFieldMapping() {
     // Setup an actual valid pdf file with metadata and node
-    // CHANGE
+    // @TODO is there anything else here to change? a doesnt equal?
     echo __FUNCTION__.PHP_EOL;
     $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_pub_date\nPages|field_pages\nDC:Format|field_file_type");
 
@@ -432,6 +423,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     foreach ($node_alt->get('field_topics')->referencedEntities() as $term) {
         $term_names[] = $term->label();
     }
+    echo PHP_EOL.'pubdate: '.$fdate.PHP_EOL;
 
     // ASSERTATIONS
     $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
