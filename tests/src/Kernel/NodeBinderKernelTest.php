@@ -39,9 +39,34 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
     $this->bind->init($file);
 
     $this->runAssertions();
+  }
 
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testNodeBinderWithInvalidFile() {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("Invalid input provided.");
+    $file = $this->createFile($file);
+    $this->bind = new NodeBinder(\Drupal::logger('info'));
+    $this->bind->init($file);
 
   }
+
+
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testNodeBinderWithInvalidType() {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("Invalid input provided.");
+
+    $file = \Drupal\user\Entity\User::load(1);
+    $this->bind = new NodeBinder(\Drupal::logger('info'));
+    $this->bind->init($file);
+
+  }
+
 // maybe set settings incorrectly and confirm etc?
   /**
    * Run Assertions
@@ -66,6 +91,6 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
     $this->assertGreaterThan(5, count($meta_raw), "Metadata should contain more than 5 entries.");
 
     $files = $this->bind->getFileUris();
-    echo print_r($files, true);
+
   }
 }

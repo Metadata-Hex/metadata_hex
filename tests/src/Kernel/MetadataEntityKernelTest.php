@@ -29,6 +29,19 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $this->runAssertions();
   }
 
+  /**
+   * Tests processing a node with a valid file.
+   */
+  public function testMetadataEntityCanProcessFile() {
+
+    $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
+
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($node->id());
+    $this->runAssertions();
+  }
+
+
 
 
   /**
@@ -70,7 +83,85 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
       count(array_keys($meta_raw)),
       "Raw metadata should have more entries than mapped metadata."
     );
+  }
+
+
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testMetadataEntityWithInvalidFile() {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("Invalid input provided.");
+    $file = $this->createFile($file);
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($file);
+
+  }
+
+
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testMetadataEntityWithInvalidType() {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("Invalid input provided.");
+
+    $file = \Drupal\user\Entity\User::load(1);
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($file);
 
 
   }
+
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testMetadataEntityNodeWithInvalidFile() {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("Invalid input provided.");
+    $file = $this->createFile($file);
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromNode($file);
+
+  }
+
+
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testMetadataEntityNodeWithInvalidType() {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("Invalid input provided.");
+
+    $file = \Drupal\user\Entity\User::load(1);
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromNode($file);
+
+
+  }
+    /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testMetadataEntityWithInvalidTermType() {
+    $this->expectException(\InvalidArgumentException::class);
+    $this->expectExceptionMessage("Invalid input provided.");
+
+    $file = \Drupal\user\Entity\User::load(1);
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->findMatchingTaxonomy(['term1', 'term2'], 'taxonomy');
+  }
+
+ /**
+   * Tests processing a node with a valid file.
+   */
+  public function testMetadataEntityCannotWriteMetadataToEmptyNode() {
+
+    $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
+
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($file->id());
+    $this->me->writeMetadata();
+  }
+
+
 }
