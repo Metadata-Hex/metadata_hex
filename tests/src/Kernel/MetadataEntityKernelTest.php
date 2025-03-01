@@ -90,8 +90,8 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
    * Tests processing a node with a valid PDF file.
    */
   public function testMetadataEntityWithInvalidFile() {
-    $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("Invalid input provided.");
+    $this->expectException(\TypeError::class);
+    $this->expectExceptionMessage('Argument #1 ($uri) must be of type string, null given');
     $file = $this->createFile($file);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
     $this->me->loadFromFile($file);
@@ -103,8 +103,8 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
    * Tests processing a node with a valid PDF file.
    */
   public function testMetadataEntityWithInvalidType() {
-    $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("Invalid input provided.");
+    $this->expectException(\TypeError::class);
+    $this->expectExceptionMessage('Argument #1 ($uri) must be of type string, null given');
 
     $file = \Drupal\user\Entity\User::load(1);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
@@ -117,8 +117,8 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
    * Tests processing a node with a valid PDF file.
    */
   public function testMetadataEntityNodeWithInvalidFile() {
-    $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("Invalid input provided.");
+    $this->expectException(\TypeError::class);
+    $this->expectExceptionMessage('Argument #1 ($uri) must be of type string, null given');
     $file = $this->createFile($file);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
     $this->me->loadFromNode($file);
@@ -130,8 +130,8 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
    * Tests processing a node with a valid PDF file.
    */
   public function testMetadataEntityNodeWithInvalidType() {
-    $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("Invalid input provided.");
+    $this->expectException(\TypeError::class);
+    $this->expectExceptionMessage('Argument #1 ($uri) must be of type string, null given');
 
     $file = \Drupal\user\Entity\User::load(1);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
@@ -144,7 +144,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
    */
   public function testMetadataEntityWithInvalidTermType() {
     $this->expectException(\InvalidArgumentException::class);
-    $this->expectExceptionMessage("Invalid input provided.");
+    $this->expectExceptionMessage("Call to protected method Drupal\metadata_hex\Model\MetadataEntity::findMatchingTaxonomy() from scope Drupal\Tests\metadata_hex\Kernel\MetadataEntityKernelTest");
 
     $file = \Drupal\user\Entity\User::load(1);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
