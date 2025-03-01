@@ -90,8 +90,12 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
 
     // Assert that meta has more than 5 entries
     $this->assertGreaterThan(5, count($meta_raw), "Metadata should contain more than 5 entries.");
-// @TODO stuff with this 
+
     $files = $this->bind->getFileUris();
 
+$this->assertTrue(
+    (bool) array_filter($filesuris, fn($uri) => str_contains($uri, 'test_metadata.pdf')),
+    "The array does not contain 'test_metadata.pdf' in any form."
+);
   }
 }
