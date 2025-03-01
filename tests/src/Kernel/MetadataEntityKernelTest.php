@@ -37,7 +37,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
 
     $this->me = new MetadataEntity(\Drupal::logger('info'));
-    $this->me->loadFromFile($node->id());
+    $this->me->loadFromFile($file->id());
     $this->runAssertions();
   }
 
@@ -132,7 +132,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
    */
   public function testMetadataEntityNodeWithInvalidType() {
     $this->expectException(\TypeError::class);
-    $this->expectExceptionMessage('Argument #1 ($file_uri) must be of type string, Drupal\user\Entity\User given');
+    $this->expectExceptionMessage('Argument #1 ($nid) must be of type string, Drupal\user\Entity\User given');
 
     $file = \Drupal\user\Entity\User::load(1);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
