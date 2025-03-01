@@ -141,7 +141,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing .
    */
   public function testProcessNodeWithTitleProtected() {
-    echo __FUNCTION__;
+    echo __FUNCTION__.PHP_EOL;
 
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
@@ -199,7 +199,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing .
    */
   public function testProcessNodeWithDataProtected() {
-    echo __FUNCTION__;
+    echo __FUNCTION__.PHP_EOL;
 
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
@@ -257,7 +257,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing .
    */
   public function testProcessNodeWithStrictHandling() {
-    echo __FUNCTION__;
+    echo __FUNCTION__.PHP_EOL;
 
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
@@ -315,7 +315,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing .
    */
   public function testProcessNodeWithFlattenKeys() {
-    echo __FUNCTION__;
+    echo __FUNCTION__.PHP_EOL;
 
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
@@ -373,7 +373,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing .
    */
   public function testProcessNodeWithBundleNotSelected() {
-    echo __FUNCTION__;
+    echo __FUNCTION__.PHP_EOL;
 
   // Setup an actual valid pdf file with metadata and node
   $this->setConfigSetting('extraction_settings.hook_node_types', ['page']);
@@ -404,7 +404,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
   public function testProcessNodeWithFieldMapping() {
     // Setup an actual valid pdf file with metadata and node
     // CHANGE
-    echo __FUNCTION__;
+    echo __FUNCTION__.PHP_EOL;
     $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_pub_date\nPages|field_pages\nDC:Format|field_file_type");
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
