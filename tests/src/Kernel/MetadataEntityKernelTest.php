@@ -88,7 +88,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
 
 
   /**
-   * Tests processing a node with a valid PDF file.
+   * Tests processing a node with an invalid file.
    */
   public function testMetadataEntityWithInvalidFile() {
     $this->expectException(\TypeError::class);
@@ -101,7 +101,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
 
 
   /**
-   * Tests processing a node with a valid PDF file.
+   * Tests processing a file with an invalid class type.
    */
   public function testMetadataEntityWithInvalidType() {
     $this->expectException(\TypeError::class);
@@ -115,7 +115,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
   }
 
   /**
-   * Tests processing a node with a valid PDF file.
+   * Tests processing a node with an invalid file.
    */
   public function testMetadataEntityNodeWithInvalidFile() {
     $this->expectException(\TypeError::class);
@@ -128,7 +128,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
 
 
   /**
-   * Tests processing a node with a valid PDF file.
+   * Tests processing a node with an invalid class type.
    */
   public function testMetadataEntityNodeWithInvalidType() {
     $this->expectException(\TypeError::class);
@@ -141,7 +141,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
 
   }
     /**
-   * Tests processing a node with a valid PDF file.
+   * Tests processing terms with invalid variable types.
    */
   public function testMetadataEntityWithInvalidTermType() {
     $this->expectException(\Error::class);
@@ -153,9 +153,10 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
   }
 
  /**
-   * Tests processing a node with a valid file.
+   * Tests writing metadata to empty node.
    */
   public function testMetadataEntityCannotWriteMetadataToEmptyNode() {
+    $this->expectException(\Error::class);
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
 
