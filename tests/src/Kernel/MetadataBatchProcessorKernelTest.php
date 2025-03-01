@@ -249,8 +249,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    */
   public function testProcessNodeWithStrictHandling() {
 
-    $this->setConfigSettings('extraction_settings.strict_handling', TRUE);
-    $this->setConfigSettings('', 'keyWoRds|field_topics\ntiTle|title\nsuBjEct|field_subject\nCReationDaTE|field_publication_date\nPAGES|field_pages\nDC:FormAt|field_file_type');
+    $this->setConfigSetting('extraction_settings.strict_handling', TRUE);
+    $this->setConfigSetting('', 'keyWoRds|field_topics\ntiTle|title\nsuBjEct|field_subject\nCReationDaTE|field_publication_date\nPAGES|field_pages\nDC:FormAt|field_file_type');
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
 
@@ -304,8 +304,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    */
   public function testProcessNodeWithFlattenKeys() {
 
-    $this->setConfigSettings('extraction_settings.flatten_keys', FALSE);
-    $this->setConfigSettings('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nformat|field_file_type");
+    $this->setConfigSetting('extraction_settings.flatten_keys', FALSE);
+    $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nformat|field_file_type");
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
 
@@ -384,7 +384,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * 
    */
   public function testProcessNodeWithFieldMapping() {
-    $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubjects|field_subject\nCreationDate|field_pub_date\nPages|field_pages\nDC:Format|field_file_type");
+    $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubjcts|field_subject\nCreationDate|field_pub_date\nPages|field_pages\nDC:Format|field_file_type");
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
