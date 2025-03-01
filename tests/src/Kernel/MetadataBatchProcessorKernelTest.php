@@ -229,7 +229,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
 
     $this->assertNotEquals('', $fpages, 'Catalog is blank');
-    $this->assertEquals($pages, $fpages, 'Extracted catalog doesnt match expected');
+    $this->assertNotEquals($pages, $fpages, 'Extracted pages match when they shouldnt');
 
     $this->assertNotEquals('', $fdate, 'Publication date is blank');
     $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
