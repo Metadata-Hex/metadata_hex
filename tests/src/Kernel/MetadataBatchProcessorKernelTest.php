@@ -385,7 +385,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     // ASSERTATIONS
     $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
   }
-}
+
 
 
 /**
