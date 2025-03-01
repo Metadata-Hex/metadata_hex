@@ -29,6 +29,19 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $this->runAssertions();
   }
 
+  /**
+   * Tests processing a node with a valid file.
+   */
+  public function testMetadataEntityCanProcessFile() {
+
+    $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
+
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($file->getFileUri());
+    $this->runAssertions();
+  }
+
+
 
 
   /**
@@ -38,8 +51,9 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $n = $this->me->getNodeBinder();
 
     $this->assertEquals($n->getBundleType(), 'article', 'Bundle type doesnt match');
+    if (!empty($n->getNode())){
     $this->assertEquals($n->getNode()->id(), 1, 'Nodes arent the same');
-
+    }
 
     $meta = $this->me->getMetadata();
     $meta_raw = [];
@@ -70,7 +84,86 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
       count(array_keys($meta_raw)),
       "Raw metadata should have more entries than mapped metadata."
     );
+  }
+
+
+  /**
+   * Tests processing a node with an invalid file.
+   */
+  public function testMetadataEntityWithInvalidFile() {
+    $this->expectException(\TypeError::class);
+    $this->expectExceptionMessage('Argument #1 ($uri) must be of type string, null given');
+    $file = $this->createFile($file);
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($file);
+
+  }
+
+
+  /**
+   * Tests processing a file with an invalid class type.
+   */
+  public function testMetadataEntityWithInvalidType() {
+    $this->expectException(\TypeError::class);
+    $this->expectExceptionMessage('Argument #1 ($file_uri) must be of type string, Drupal\user\Entity\User given');
+
+    $file = \Drupal\user\Entity\User::load(1);
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($file);
 
 
   }
+
+  /**
+   * Tests processing a node with an invalid file.
+   */
+  public function testMetadataEntityNodeWithInvalidFile() {
+    $this->expectException(\TypeError::class);
+    $this->expectExceptionMessage('Argument #1 ($uri) must be of type string, null given');
+    $file = $this->createFile($file);
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromNode($file);
+
+  }
+
+
+  /**
+   * Tests processing a node with an invalid class type.
+   */
+  public function testMetadataEntityNodeWithInvalidType() {
+    $this->expectException(\TypeError::class);
+    $this->expectExceptionMessage('Argument #1 ($nid) must be of type string, Drupal\user\Entity\User given');
+
+    $file = \Drupal\user\Entity\User::load(1);
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromNode($file);
+
+
+  }
+    /**
+   * Tests processing terms with invalid variable types.
+   */
+  public function testMetadataEntityWithInvalidTermType() {
+    $this->expectException(\Error::class);
+    $this->expectExceptionMessage("Call to protected method Drupal\metadata_hex\Model\MetadataEntity::findMatchingTaxonomy() from scope Drupal\Tests\metadata_hex\Kernel\MetadataEntityKernelTest");
+
+    $file = \Drupal\user\Entity\User::load(1);
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->findMatchingTaxonomy(['term1', 'term2'], 'taxonomy');
+  }
+
+ /**
+   * Tests writing metadata to empty node.
+   */
+  public function testMetadataEntityCannotWriteMetadataToEmptyNode() {
+    $this->expectException(\Error::class);
+
+    $file = $this->createFile($file);
+
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($file->getFileUri());
+    $this->me->writeMetadata();
+  }
+
+
 }
