@@ -75,6 +75,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
 
+
     // Capture the original details
     $created = $node->getCreatedTime();
     $modified = $node->getChangedTime();

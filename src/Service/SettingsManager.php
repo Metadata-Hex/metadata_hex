@@ -94,6 +94,26 @@ class SettingsManager extends MetadataHexCore {
     return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_STRICT;
   }
 
+  /**
+   * Retrieves if we are strict handling
+   * 
+   * @return bool
+   *  The node types
+   */
+  public function getProtectedData(){
+    return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_STRICT;
+  }
+
+  /**
+   * Retrieves if we are strict handling
+   * 
+   * @return bool
+   *  The node types
+   */
+  public function getProtectedTitle(){
+    return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_STRICT;
+  }
+
 
   /**
    * Retrieves if we are strict handling

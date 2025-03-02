@@ -46,7 +46,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
    * @var \Drupal\metadata_hex\Service\MetadataBatchProcessor
    */
   protected $batchProcessor;
-
+protected $settingsManager;
   /**
    *
    */
@@ -113,7 +113,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
     $this->installSchema('metadata_hex', ['metadata_hex_processed']);
     $this->initMetadataHex();
 
-    // Create the "article" content type.
+    // Create the "article" content type. 
     NodeType::create([
         'type' => 'article',
         'name' => 'Article',
@@ -215,6 +215,12 @@ abstract class BaseKernelTestHex extends KernelTestBase {
 
     // Save the configuration
     $this->config->save();
+    $this->settingsManager = new \Drupal\metadata_hex\Service\SettingsManager();
+
+    $this->assertEquals(false, $this->settingsManager->getStrictHandling(), 'Strict handling should be false');
+    $this->assertEquals(true, $this->settingsManager->getFlattenKeys(), 'flatten keys should be true');
+    $this->assertEquals(false, $this->settingsManager->getProtectedData(), 'data protection should be false');
+    $this->assertEquals(true, $this->settingsManager->getProtectedTitle(), 'title protection should be false');
   }
 
   /**
