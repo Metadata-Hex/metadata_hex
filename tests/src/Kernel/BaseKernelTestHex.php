@@ -220,7 +220,7 @@ protected $settingsManager;
     $this->assertEquals(false, $this->settingsManager->getStrictHandling(), 'Strict handling should be false');
     $this->assertEquals(true, $this->settingsManager->getFlattenKeys(), 'flatten keys should be true');
     $this->assertEquals(false, $this->settingsManager->getProtectedData(), 'data protection should be false');
-    $this->assertEquals(true, $this->settingsManager->getProtectedTitle(), 'title protection should be false');
+    $this->assertEquals(true, $this->settingsManager->getProtectedTitle(), 'title protection should be true');
   }
 
   /**
