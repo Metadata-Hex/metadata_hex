@@ -242,7 +242,8 @@ class MetadataParser extends MetadataHexCore
     foreach ($lines as $line) {
       if (strpos($line, '|') !== false) {
         list($key, $value) = explode('|', $line); // @todo this strict handling isnt working
-        $result[trim($value)] = !$this->strictHandling ? trim($key) : strtolower(trim($key));
+        // If we are strictly handling strings, dont mess with thier case
+        $result[trim($value)] = $this->strictHandling ? trim($key) : strtolower(trim($key));
       }
     }
 
