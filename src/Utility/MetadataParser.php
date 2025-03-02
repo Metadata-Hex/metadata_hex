@@ -94,6 +94,7 @@ class MetadataParser extends MetadataHexCore
       $this->setBundleType($bundleType);
     }
     $this->strictHandling = (bool) $this->settingsManager->getStrictHandling();
+    $this->flattenKeys = (bool) $this->settingsManager->getFlattenKeys();
 
   }
 
@@ -106,11 +107,6 @@ class MetadataParser extends MetadataHexCore
     if ($this->bundleType !== null) {
       $this->availableFields = $this->entityFieldManager->getFieldDefinitions('node', $this->bundleType->id());
     }
-
-    // init the settings manager
-    //$this->settingsManager = new SettingsManager();
-
-    // TODO set flatten_keys in here
 
     // setup field mappings
     $this->fieldMapping = $this->getFieldMappings();
@@ -211,6 +207,7 @@ class MetadataParser extends MetadataHexCore
 
       // if we arent strict handling, normalize all keys
       if (!$this->strictHandling) {
+        console.log(!$this->strictHandling, 'normalizing');
         $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '$0', $key));
       }
 
@@ -296,6 +293,7 @@ class MetadataParser extends MetadataHexCore
       }
 
       if ($this->flattenKeys && strpos($cleanKey, ':') !== false) {
+        console.log($this->flattenKeys, 'lets flatten');
         $cleanKey = substr(strrchr($cleanKey, ':'), 1);
       }
 
