@@ -207,7 +207,7 @@ class MetadataParser extends MetadataHexCore
 
       // if we arent strict handling, normalize all keys
       if (!$this->strictHandling) {
-        echo (!$this->strictHandling?'no':'yes' + ' strict handling');
+        echo PHP_EOL.(!$this->strictHandling?'no':'yes') . ' strict handling'.PHP_EOL;
         $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '$0', $key));
       }
 
@@ -293,7 +293,7 @@ class MetadataParser extends MetadataHexCore
       }
 
       if ($this->flattenKeys && strpos($cleanKey, ':') !== false) {
-        echo ($this->flattenKeys?'true':'false' . 'lets flatten');
+        echo PHP_EOL.($this->flattenKeys?'true':'false') . 'lets flatten'.PHP_EOL;
         $cleanKey = substr(strrchr($cleanKey, ':'), 1);
       }
 
