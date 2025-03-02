@@ -198,7 +198,7 @@ class MetadataParser extends MetadataHexCore
 
     // Sanitize the array.
     $sanitizedArray = $this->sanitizeArray($flattenedArray);
-    echo PHP_EOL.(!$this->strictHandling?'no':'yes') . ' strict handling'.PHP_EOL;
+    echo (!$this->strictHandling?'':PHP_EOL.'yes strict HANDLE'.PHP_EOL); 
     $cleanedMetadata = [];
     foreach ($sanitizedArray as $key => $value) {
       if (empty($key) || empty($value)) {
@@ -271,7 +271,7 @@ class MetadataParser extends MetadataHexCore
     if (!is_array($unsanitized_array)) {
       throw new Exception("Invalid input for sanitization. Expected an array.");
     }
-    echo PHP_EOL.($this->flattenKeys?'true':'false') . 'lets flatten'.PHP_EOL;
+    echo ($this->flattenKeys?'':PHP_EOL.'FLATTEN KEYS'.PHP_EOL);
 
     $sanitized = [];
     foreach ($unsanitized_array as $key => $value) {
