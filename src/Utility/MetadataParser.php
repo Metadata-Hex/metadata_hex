@@ -285,7 +285,7 @@ class MetadataParser extends MetadataHexCore
       $cleanValue = is_array($cleanValue)
         ? array_map(fn($v) => preg_replace('/[^\x20-\x7E]/u', '', $v), $cleanValue)
         : preg_replace('/[^\x20-\x7E]/u', '', $cleanValue);
-      if ($this->strictHandling) {
+      if (!$this->strictHandling) {
         $cleanKey = preg_replace('/[^a-zA-Z0-9_]/', '', $cleanKey);
         $cleanValue = is_array($cleanValue)
           ? array_map(fn($v) => preg_replace('/[^a-zA-Z0-9_ ]/', '', $v), $cleanValue)
