@@ -88,6 +88,17 @@ class SettingsManager extends MetadataHexCore {
     return $this->config->get('extraction_settings.strict_handling') ?? false;
   }
 
+
+  /**
+   * Retrieves if we are strict handling
+   * 
+   * @return bool
+   *  The node types
+   */
+  public function getFlattenKeys(){
+    return $this->config->get('extraction_settings.flatten_keys') ?? false;
+  }
+
   /**
    * Retrieves the allowed node types setup for parsing
    * 

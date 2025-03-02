@@ -282,7 +282,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
 
     $this->assertNotEquals('', $fsubj, 'Subject is blank');
-    $this->assertNotEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
+    $this->assertNotEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected'); //fails, it equals
 
     $this->assertNotEquals('', $fpages, 'Catalog is blank');
     $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected');
@@ -346,7 +346,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
 
     $this->assertNotEquals('', $ftype, 'FileType is blank');
-    $this->assertNotEquals('pdf', $ftype, 'Extracted file_type matches when it shouldnt');
+    $this->assertNotEquals('pdf', $ftype, 'Extracted file_type matches when it shouldnt'); // it shouldnt be pdf == pdf 
 
     $this->assertNotEquals('', $ftop, 'Topic is blank');
     $this->assertContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
@@ -385,7 +385,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * 
    */
   public function testProcessNodeWithFieldMapping() {
-    $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubjcts|field_subject\nCreationDate|field_pub_date\nPages|field_pages\nDC:Format|field_file_type");
+    $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubjcts|field_subject\nCreationDate|field_pub_date\nPgs|field_pages\nDC:Format|field_file_type");
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
@@ -420,7 +420,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
 
     $this->assertNotEquals('', $fpages, 'Catalog is blank');
-    $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected');
+    $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected'); // this should = 1 = 
 
     $this->assertNotEquals('', $fdate, 'Publication date is blank');
     $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");

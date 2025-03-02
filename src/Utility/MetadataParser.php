@@ -93,6 +93,8 @@ class MetadataParser extends MetadataHexCore
     if ($bundleType !== null) {
       $this->setBundleType($bundleType);
     }
+    $this->strictHandling = (bool) $this->settingsManager->getStrictHandling();
+
   }
 
   /**
@@ -106,7 +108,7 @@ class MetadataParser extends MetadataHexCore
     }
 
     // init the settings manager
-    $this->settingsManager = new SettingsManager();
+    //$this->settingsManager = new SettingsManager();
 
     // TODO set flatten_keys in here
 
@@ -242,11 +244,10 @@ class MetadataParser extends MetadataHexCore
 
     $lines = explode("\n", $fieldMappings);
     $result = [];
-    $sh = (bool) $this->settingsManager->getStrictHandling();
     foreach ($lines as $line) {
       if (strpos($line, '|') !== false) {
-        list($key, $value) = explode('|', $line);
-        $result[trim($value)] = $sh ? trim($key) : strtolower(trim($key));
+        list($key, $value) = explode('|', $line); // @todo this strict handling isnt working
+        $result[trim($value)] = $this->strictHandling ? trim($key) : strtolower(trim($key));
       }
     }
 
