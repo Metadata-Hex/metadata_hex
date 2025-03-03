@@ -28,6 +28,8 @@ class SettingsManager extends MetadataHexCore {
    */
   const DEFAULT_STRICT = false;
   const DEFAULT_FLATTEN = true;
+  const DEFAULT_PROTECT_TITLE = true;
+  const DEFAULT_PROTECT_DATA = false;
 
   /**
    * Constructs the SettingsManager class.
@@ -101,7 +103,7 @@ class SettingsManager extends MetadataHexCore {
    *  The node types
    */
   public function getProtectedData(){
-    return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_STRICT;
+    return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_PROTECT_DATA;
   }
 
   /**
@@ -111,7 +113,7 @@ class SettingsManager extends MetadataHexCore {
    *  The node types
    */
   public function getProtectedTitle(){
-    return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_STRICT;
+    return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_PROTECT_TITLE;
   }
 
 
