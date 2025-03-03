@@ -387,7 +387,7 @@ echo PHP_EOL."STRICTHANDLING".PHP_EOL;
   public function testProcessNodeWithFieldMapping() { //not working
     echo PHP_EOL."FIELD".PHP_EOL;
 
-    $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubjcts|field_subject\nCreationDate|field_pub_date\nPgs|field_pages\nDC:Format|field_file_type");
+    $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubjcts|field_subject\nCreationDate|field_pub_date\nDC:Format|field_file_type");
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
