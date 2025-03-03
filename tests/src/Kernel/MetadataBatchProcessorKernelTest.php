@@ -253,7 +253,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
   public function testProcessNodeWithStrictHandling() { //not working
 
     $this->setConfigSetting('extraction_settings.strict_handling', TRUE);
-    $this->setConfigSetting('', 'keyWoRds|field_topics\ntiTle|title\nsuBjEct|field_subject\nCReationDaTE|field_publication_date\nPAGES|field_pages\nDC:FormAt|field_file_type');
+    $this->setConfigSetting('extraction_settings.field_mappings', 'keyWoRds|field_topics\ntiTlE|title\nsuBjEct|field_subject\nCReationDaTE|field_publication_date\nPAGES|field_pages\nDC:FormAt|field_file_type');
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
 
