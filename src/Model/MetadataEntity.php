@@ -265,7 +265,6 @@ $fid = \Drupal::entityQuery('file')
       $this->metadataRaw = array_merge($this->metadataRaw, $metadata);
     } else {
       $this->metadataProcessed = array_merge($this->metadataProcessed, $metadata);
-      echo PHP_EOL.print_r($this->metadataProcessed, true).PHP_EOL;
     }
   }
 
@@ -305,7 +304,6 @@ $fid = \Drupal::entityQuery('file')
         case 'text':
         case 'text_long':
         case 'text_with_summary':
-          echo PHP_EOL.$field_name.':'.$value.PHP_EOL;
           $node->set($field_name, $value);
           break;
 

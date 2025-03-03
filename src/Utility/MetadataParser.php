@@ -271,7 +271,6 @@ class MetadataParser extends MetadataHexCore
     if (!is_array($unsanitized_array)) {
       throw new Exception("Invalid input for sanitization. Expected an array.");
     }
-    echo ($this->flattenKeys?'':PHP_EOL.'FLATTEN KEYS'.PHP_EOL);
 
     $sanitized = [];
     foreach ($unsanitized_array as $key => $value) {
