@@ -264,7 +264,7 @@ $fid = \Drupal::entityQuery('file')
     if ($raw) {
       $this->metadataRaw = array_merge($this->metadataRaw, $metadata);
     } else {
-      echo PHP_EOL.print_r($this->metadataProcessed, true).PHP_EOL;
+      echo PHP_EOL.print_r($metadata, true).PHP_EOL;
       $this->metadataProcessed = array_merge($this->metadataProcessed, $metadata);
     }
   }
