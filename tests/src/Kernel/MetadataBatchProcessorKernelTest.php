@@ -90,7 +90,6 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $created_alt = $node_alt->getCreatedTime();
     $modified_alt = $node_alt->getChangedTime();
     $fsubj = $node_alt->get('field_subject')->getString();
-    echo $fsubj;
     $fpages = $node_alt->get('field_pages')->getString();
     $fdate = $node_alt->get('field_publication_date')->getString();
     $ftype = $node_alt->get('field_file_type')->value;
