@@ -262,6 +262,7 @@ public function getWasNodeJustProcessed(): bool
         }
       }
     }
+    echo PHP_EOL.print_r($metadata, true);
     return $metadata;
   }
 
