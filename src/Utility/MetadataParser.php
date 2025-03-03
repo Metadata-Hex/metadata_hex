@@ -294,9 +294,11 @@ class MetadataParser extends MetadataHexCore
       }
 
       if ($this->flattenKeys && strpos($cleanKey, ':') !== false) {
+        $x = $cleanKey;
         $cleanKey = substr(strrchr($cleanKey, ':'), 1);
+echo PHP_EOL.$x.'::'.$cleanKey.PHP_EOL;
       }else {
-        echo PHP_EOL.'cleankey not flattened'.$cleanKey.PHP_EOL;
+       // echo PHP_EOL.'cleankey not flattened'.$cleanKey.PHP_EOL;
       }
 
       $sanitized[$cleanKey] = $cleanValue;
