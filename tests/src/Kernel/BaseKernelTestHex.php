@@ -197,7 +197,7 @@ protected $settingsManager;
     $settings = [
         'extraction_settings.hook_node_types' => ['article', 'page'],
         'extraction_settings.field_mappings' => "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nDC:Format|field_file_type",
-        'extraction_settings.flatten_keys' => TRUE,
+        'extraction_settings.flatten_keys' => FALSE,
         'extraction_settings.strict_handling' => FALSE,
         'extraction_settings.data_protected' => FALSE,
         'extraction_settings.title_protected' => TRUE,
@@ -218,7 +218,7 @@ protected $settingsManager;
     $this->settingsManager = new \Drupal\metadata_hex\Service\SettingsManager();
 
     $this->assertEquals(false, $this->settingsManager->getStrictHandling(), 'Strict handling should be false');
-    $this->assertEquals(true, $this->settingsManager->getFlattenKeys(), 'flatten keys should be true');
+    $this->assertEquals(FALSE, $this->settingsManager->getFlattenKeys(), 'flatten keys should be true');
     $this->assertEquals(false, $this->settingsManager->getProtectedData(), 'data protection should be false');
     $this->assertEquals(true, $this->settingsManager->getProtectedTitle(), 'title protection should be true');
   }
