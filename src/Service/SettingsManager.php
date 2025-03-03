@@ -27,7 +27,7 @@ class SettingsManager extends MetadataHexCore {
    * Defaults
    */
   const DEFAULT_STRICT = false;
-  const DEFAULT_FLATTEN = true;
+  const DEFAULT_FLATTEN = false;
   const DEFAULT_PROTECT_TITLE = true;
   const DEFAULT_PROTECT_DATA = false;
 
