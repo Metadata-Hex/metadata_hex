@@ -251,7 +251,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing with strict handling
    */
   public function testProcessNodeWithStrictHandling() { //not working
-
+echo PHP_EOL."STRICTHANDLING".PHP_EOL;
     $this->setConfigSetting('extraction_settings.strict_handling', TRUE);
     $this->setConfigSetting('extraction_settings.field_mappings', 'keyWoRds|field_topics\ntiTlE|title\nsuBjEct|field_subject\nCReationDaTE|field_publication_date\nPAGES|field_pages\nDC:FormAt|field_file_type');
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
@@ -306,6 +306,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing with flatten keys 
    */
   public function testProcessNodeWithFlattenKeys() { //not working
+    echo PHP_EOL."FLATTEN".PHP_EOL;
 
     $this->setConfigSetting('extraction_settings.flatten_keys', TRUE);
     $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nformat|field_file_type");
@@ -385,6 +386,8 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * 
    */
   public function testProcessNodeWithFieldMapping() { //not working
+    echo PHP_EOL."FIELD".PHP_EOL;
+
     $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\nsubjcts|field_subject\nCreationDate|field_pub_date\nPgs|field_pages\nDC:Format|field_file_type");
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
