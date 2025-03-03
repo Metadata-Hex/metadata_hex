@@ -103,7 +103,7 @@ class SettingsManager extends MetadataHexCore {
    *  The node types
    */
   public function getProtectedData(){
-    return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_PROTECT_DATA;
+    return $this->config->get('extraction_settings.data_protected') ?? $this->DEFAULT_PROTECT_DATA;
   }
 
   /**
@@ -113,7 +113,7 @@ class SettingsManager extends MetadataHexCore {
    *  The node types
    */
   public function getProtectedTitle(){
-    return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_PROTECT_TITLE;
+    return $this->config->get('extraction_settings.title_protected') ?? $this->DEFAULT_PROTECT_TITLE;
   }
 
 
