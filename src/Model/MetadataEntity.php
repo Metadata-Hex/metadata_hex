@@ -133,7 +133,7 @@ class MetadataEntity extends MetadataHexCore
    * @param string $term_to_find
    *   The term to find.
    *
-    @param string $vid
+   * @param string $vid
    *
    * @return array
    *   The matching taxonomy IDs.
@@ -304,6 +304,7 @@ $fid = \Drupal::entityQuery('file')
         case 'text':
         case 'text_long':
         case 'text_with_summary':
+          echo PHP_EOL.$field_name.':'.$value.PHP_EOL;
           $node->set($field_name, $value);
           break;
 
@@ -312,7 +313,7 @@ $fid = \Drupal::entityQuery('file')
           $target_type = $field_definition->getSetting('target_type');
           $handler_settings = $field_definition->getSetting('handler_settings');
           $vid = !empty($handler_settings['target_bundles']) ? reset($handler_settings['target_bundles']) : NULL;
-
+          
           if ($target_type === 'taxonomy_term') {
             $term_ids = [];
             foreach (explode(',', $value) as $term_name) {
