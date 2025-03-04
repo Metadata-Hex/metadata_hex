@@ -69,11 +69,6 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
     ->accessCheck(false)
     ->execute();
 
-$nids = array_values($query); // Get node IDs$query = \Drupal::entityQuery('node')
-    ->condition('field_attachment', $fid)
-    ->accessCheck(false)
-    ->execute();
-
 $nids = array_values($query); // Get node IDs
 $nid = reset($nids); // Get the first node ID (if any)
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
