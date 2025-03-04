@@ -191,6 +191,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
      * TODO: Add checks against taxonomy/string_lists
     */
     $this->setConfigSetting('extraction_settings.data_protected', TRUE);
+    $this->assertEquals($this->settingsManager->getStrictHandling(), true, 'strict handling isnt enabled');
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
@@ -390,8 +391,9 @@ echo PHP_EOL."STRICTHANDLING".PHP_EOL;
    */
   public function testProcessNodeWithFieldMapping() { //not working
     echo PHP_EOL."FIELD".PHP_EOL;
-
-    $this->setConfigSetting('extraction_settings.field_mappings', "keywords|field_topics\ntitle|title\ndx:subjcts|field_subject\nCreationDate|field_pub_date\nDC:Format|field_file_type");
+    $updatedMapping = "keywords|field_topics\ntitle|title\ndx:subjcts|field_subject\nCreationDate|field_pub_date\nDC:Format|field_file_type";
+    $this->setConfigSetting('extraction_settings.field_mappings', $updatedMapping);
+    $this->assertEquals($this->settingsManager->getFieldMappings(), $updatedMapping, 'Mapping doesnt match');
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
