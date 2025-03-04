@@ -197,7 +197,7 @@ class MetadataParser extends MetadataHexCore
 
     // Sanitize the array.
     $sanitizedArray = $this->sanitizeArray($flattenedArray);
-    echo (!$this->strictHandling?'':PHP_EOL.'yes strict HANDLE'.PHP_EOL); 
+   // echo (!$this->strictHandling?'':PHP_EOL.'yes strict HANDLE'.PHP_EOL); 
     $cleanedMetadata = [];
     foreach ($sanitizedArray as $key => $value) {
       if (empty($key) || empty($value)) {
@@ -208,7 +208,7 @@ class MetadataParser extends MetadataHexCore
       if (!$this->strictHandling) {
         $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '$0', $key));
       } else {
-        echo PHP_EOL.'key'.$key.PHP_EOL;
+        // PHP_EOL.'key'.$key.PHP_EOL;
 
       }
       $cleanedMetadata[$key] = is_array($value) ? array_map('trim', $value) : trim($value);
@@ -296,7 +296,7 @@ class MetadataParser extends MetadataHexCore
       if ($this->flattenKeys && strpos($cleanKey, ':') !== false) {
         $x = $cleanKey;
         $cleanKey = substr(strrchr($cleanKey, ':'), 1);
-echo PHP_EOL.$x.'::'.$cleanKey.PHP_EOL;
+      //echo PHP_EOL.$x.'::'.$cleanKey.PHP_EOL;
       }else {
        // echo PHP_EOL.'cleankey not flattened'.$cleanKey.PHP_EOL;
       }

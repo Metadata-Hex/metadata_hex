@@ -14,7 +14,7 @@ trait TestFileHelperTrait {
     try {
       $this->config->set($field, $value)->save();
     } catch (\Exception $e){
-      echo print_r($e->getMessage(), true);
+      // print_r($e->getMessage(), true);
     }
   }
 
