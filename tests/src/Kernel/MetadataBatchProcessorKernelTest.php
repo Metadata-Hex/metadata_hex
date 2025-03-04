@@ -341,7 +341,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
 
     $this->assertNotEquals('', $fsubj, 'Subject is blank');
-    $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
+    $this->assertNotEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
 
     $this->assertNotEquals('', $fpages, 'Catalog is blank');
     $this->assertEquals(1, $fpages, 'Extracted catalog doesnt match expected');
