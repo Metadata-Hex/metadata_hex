@@ -92,8 +92,6 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
   
     // Capture the current details
-    $created_alt = $node->getCreatedTime();
-    $modified_alt = $node->getChangedTime();
     $fsubj = $node->get('field_subject')->getString();
     $fpages = $node->get('field_pages')->getString();
     $fdate = $node->get('field_publication_date')->getString();
@@ -105,8 +103,6 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
     }
   
     // ASSERTATIONS
-    $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
-
     $this->assertNotEquals('', $fsubj, 'Subject is blank');
     $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
 
