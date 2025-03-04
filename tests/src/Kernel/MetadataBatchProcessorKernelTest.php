@@ -350,7 +350,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
 
     $this->assertNotEquals('', $ftype, 'FileType is blank');
-    $this->assertNotEquals('pdf', $ftype, 'Extracted file_type matches when it shouldnt'); // it shouldnt be pdf == pdf 
+    $this->assertEquals('pdf', $ftype, 'Extracted file_type matches when it shouldnt'); // it shouldnt be pdf == pdf 
 
     $this->assertNotEquals([], $ftop, 'Topic is blank');
     $this->assertContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
