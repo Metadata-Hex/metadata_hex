@@ -57,6 +57,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
    * 
    */
   public function lookingForNoData($nid){ 
+    $this->assertNotEquals('', $nid, 'Nid is empty');
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
   
@@ -91,6 +92,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
    * 
    */
   public function lookingForCorrectData($nid){ 
+    $this->assertNotEquals('', $nid, 'Nid is empty');
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
   

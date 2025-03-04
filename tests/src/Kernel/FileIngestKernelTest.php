@@ -64,6 +64,7 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
    * 
    */
   public function lookingForNoData($fid){ 
+    $this->assertNotEquals('', $fid, 'Fid is empty');
 
     $query = \Drupal::entityQuery('node')
     ->condition('field_attachment', $fid)
@@ -108,6 +109,7 @@ echo print_r($nids, true);
    */
   public function lookingForCorrectData($nid){ 
 
+    $this->assertNotEquals('', $nid, 'Nid is empty');
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
   
     // Capture the current details
