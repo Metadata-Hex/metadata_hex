@@ -45,7 +45,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
     }
 
     foreach ($popped as $pop){
-      $this->lookingForNoData($nid);
+      $this->lookingForNoData($pop);
     }
 
   }

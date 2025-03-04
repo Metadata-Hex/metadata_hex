@@ -54,7 +54,7 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 
     // Ensure that files already attached to nodes aren't messed with
     foreach ($popped as $pop){
-      $this->lookingForNoData($fid);
+      $this->lookingForNoData($pop);
     }
 
   }
