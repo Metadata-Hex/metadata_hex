@@ -118,7 +118,7 @@ echo print_r($nid, true);
 
 $nids = array_values($query); // Get node IDs
 $nid = reset($nids); // Get the first node ID (if any)
-echo print_r($nid, true);
+echo 'NID '.$nid.PHP_EOL;
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);    
     // Capture the current details
