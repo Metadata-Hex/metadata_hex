@@ -28,13 +28,15 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 
     $fids = [];
     $popped = [];
-
+    $i = 0;
     // create files
     foreach ($files as $name) {
       $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf');
       $fids[] = $file->id();
+      echo PHP_EOL.$i.PHP_EOL;
+      $i++;
     }
-
+echo PHP_EOL.'FIDS!! '.print_r($fids, true).PHPEOL;
     // pop off the first and attach it to a node
     $popped[] = array_shift($fids); 
 
