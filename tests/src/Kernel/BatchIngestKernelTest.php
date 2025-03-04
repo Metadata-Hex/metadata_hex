@@ -109,7 +109,6 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
         $term_names[] = $term->label();
     }
   
-    echo PHP_EOL.print_r($node->toArray(), true);
     // ASSERTATIONS
     $this->assertNotEquals('', $fsubj, 'Subject is blank');
     $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
