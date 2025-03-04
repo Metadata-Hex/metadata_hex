@@ -45,6 +45,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
     }
 
     foreach ($popped as $pop){
+      echo PHP_EOL.$pop.PHP_EOL;
       $this->lookingForNoData($pop);
     }
 

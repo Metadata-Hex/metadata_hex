@@ -11,8 +11,6 @@ use Drupal\Tests\metadata_hex\Kernel\BaseKernelTestHex;
  */
 class BatchFileIngestKernelTest extends BaseKernelTestHex {
 
-  
-
   /**
    * Tests processing a node with a valid PDF file.
    */
@@ -54,6 +52,7 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 
     // Ensure that files already attached to nodes aren't messed with
     foreach ($popped as $pop){
+      echo PHP_EOL.$pop.PHP_EOL;
       $this->lookingForNoData($pop);
     }
 
@@ -71,6 +70,8 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 
 $nids = array_values($query); // Get node IDs
 $nid = reset($nids); // Get the first node ID (if any)
+echo print_r($nids, true);
+
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
   
     // Capture the current details
