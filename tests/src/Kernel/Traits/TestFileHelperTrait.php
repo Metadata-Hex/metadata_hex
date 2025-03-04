@@ -12,7 +12,7 @@ trait TestFileHelperTrait {
 
   public function setConfigSetting($field, $value){
     try {
-      $this->config->set($field, $value);
+      $this->config->set($field, $value)->save();
     } catch (\Exception $e){
       echo print_r($e->getMessage(), true);
     }

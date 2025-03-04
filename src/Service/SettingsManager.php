@@ -40,7 +40,7 @@ class SettingsManager extends MetadataHexCore {
    */ 
   public function __construct(?ConfigFactoryInterface $configFactory = null) {
     $this->configFactory = $configFactory ?? \Drupal::service('config.factory'); 
-    $this->config = $this->configFactory->get('metadata_hex.settings');
+    $this->config = $this->configFactory->getEditable('metadata_hex.settings');
   }
 
   /**
