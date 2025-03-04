@@ -255,7 +255,7 @@ echo PHP_EOL."STRICTHANDLING".PHP_EOL;
     $this->setConfigSetting('extraction_settings.field_mappings', 'keyWoRds|field_topics\ntiTlE|title\nsuBjEct|field_subject\nCReationDaTE|field_publication_date\nPAGES|field_pages\nDC:FormAt|field_file_type');
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
-    $this->assertEquals($this->SettingsManager->getStrictHandling(), true, 'strict handling isnt enabled');
+    $this->assertEquals($this->settingsManager->getStrictHandling(), true, 'strict handling isnt enabled');
 
     // Capture the original details
     $created = $node->getCreatedTime();
@@ -310,7 +310,7 @@ echo PHP_EOL."STRICTHANDLING".PHP_EOL;
 
     $updatedMapping = "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nformat|field_file_type";
     $this->setConfigSetting('extraction_settings.flatten_keys', TRUE);
-    $this->setConfigSetting('extraction_settings.field_mappings', );
+    $this->setConfigSetting('extraction_settings.field_mappings', $updatedMapping);
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
     $this->assertEquals($this->settingsManager->getFlattenKeys(), true, 'flatten keys isnt enabled');
