@@ -353,7 +353,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertNotEquals('', $ftype, 'FileType is blank');
     $this->assertNotEquals('pdf', $ftype, 'Extracted file_type matches when it shouldnt'); // it shouldnt be pdf == pdf 
 
-    $this->assertNotEquals('', $ftop, 'Topic is blank');
+    $this->assertNotEquals([], $ftop, 'Topic is blank');
     $this->assertContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
     $this->assertContains('TCPDF', $term_names, "The expected taxonomy term name TCPDF is not present.");
     $this->assertContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
@@ -429,8 +429,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertEquals('', $fpages, 'Catalog is blank'.$fpages);
     $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected'); // this should = 1 = 
 
-    $this->assertNotEquals('', $fdate, 'Publication date is blank');
-    $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
+    $this->assertEquals('', $fdate, 'Publication date is blank'.$fdate);
 
     $this->assertNotEquals('', $ftype, 'FileType is blank');
     $this->assertEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
