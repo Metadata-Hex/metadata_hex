@@ -24,6 +24,14 @@ class SettingsManager extends MetadataHexCore {
   protected $config;
 
   /**
+   * Defaults
+   */
+  const DEFAULT_STRICT = false;
+  const DEFAULT_FLATTEN = false;
+  const DEFAULT_PROTECT_TITLE = true;
+  const DEFAULT_PROTECT_DATA = false;
+
+  /**
    * Constructs the SettingsManager class.
    *
    * @param ConfigFactoryInterface $configFactory
@@ -32,7 +40,7 @@ class SettingsManager extends MetadataHexCore {
    */ 
   public function __construct(?ConfigFactoryInterface $configFactory = null) {
     $this->configFactory = $configFactory ?? \Drupal::service('config.factory'); 
-    $this->config = $this->configFactory->get('metadata_hex.settings');
+    $this->config = $this->configFactory->getEditable('metadata_hex.settings');
   }
 
   /**
@@ -85,7 +93,41 @@ class SettingsManager extends MetadataHexCore {
    *  The node types
    */
   public function getStrictHandling(){
-    return $this->config->get('extraction_settings.strict_handling') ?? false;
+   // echo PHP_EOL.print_r($this->config->get('extraction_settings'), true).PHP_EOL;
+    return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_STRICT;
+  }
+
+  /**
+   * Retrieves if we are strict handling
+   * 
+   * @return bool
+   *  The node types
+   */
+  public function getProtectedData(){
+    return $this->config->get('extraction_settings.data_protected') ?? $this->DEFAULT_PROTECT_DATA;
+  }
+
+  /**
+   * Retrieves if we are strict handling
+   * 
+   * @return bool
+   *  The node types
+   */
+  public function getProtectedTitle(){
+    return $this->config->get('extraction_settings.title_protected') ?? $this->DEFAULT_PROTECT_TITLE;
+  }
+
+
+  /**
+   * Retrieves if we are strict handling
+   * 
+   * @return bool
+   *  The node types
+   */
+  public function getFlattenKeys(){
+    //echo PHP_EOL.'flatten: '.$this->config->get('extraction_settings.flatten_keys').PHP_EOL;
+
+    return $this->config->get('extraction_settings.flatten_keys') ??  $this->DEFAULT_FLATTEN;
   }
 
   /**

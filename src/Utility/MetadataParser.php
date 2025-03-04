@@ -93,6 +93,8 @@ class MetadataParser extends MetadataHexCore
     if ($bundleType !== null) {
       $this->setBundleType($bundleType);
     }
+    $this->strictHandling = (bool) $this->settingsManager->getStrictHandling();
+    $this->flattenKeys = (bool) $this->settingsManager->getFlattenKeys();
   }
 
   /**
@@ -104,11 +106,6 @@ class MetadataParser extends MetadataHexCore
     if ($this->bundleType !== null) {
       $this->availableFields = $this->entityFieldManager->getFieldDefinitions('node', $this->bundleType->id());
     }
-
-    // init the settings manager
-    $this->settingsManager = new SettingsManager();
-
-    // TODO set flatten_keys in here
 
     // setup field mappings
     $this->fieldMapping = $this->getFieldMappings();
@@ -200,7 +197,7 @@ class MetadataParser extends MetadataHexCore
 
     // Sanitize the array.
     $sanitizedArray = $this->sanitizeArray($flattenedArray);
-
+   // echo (!$this->strictHandling?'':PHP_EOL.'yes strict HANDLE'.PHP_EOL); 
     $cleanedMetadata = [];
     foreach ($sanitizedArray as $key => $value) {
       if (empty($key) || empty($value)) {
@@ -210,8 +207,10 @@ class MetadataParser extends MetadataHexCore
       // if we arent strict handling, normalize all keys
       if (!$this->strictHandling) {
         $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '$0', $key));
-      }
+      } else {
+        // PHP_EOL.'key'.$key.PHP_EOL;
 
+      }
       $cleanedMetadata[$key] = is_array($value) ? array_map('trim', $value) : trim($value);
     }
 
@@ -242,11 +241,11 @@ class MetadataParser extends MetadataHexCore
 
     $lines = explode("\n", $fieldMappings);
     $result = [];
-    $sh = (bool) $this->settingsManager->getStrictHandling();
     foreach ($lines as $line) {
       if (strpos($line, '|') !== false) {
-        list($key, $value) = explode('|', $line);
-        $result[trim($value)] = $sh ? trim($key) : strtolower(trim($key));
+        list($key, $value) = explode('|', $line); // @todo this strict handling isnt working
+        // If we are strictly handling strings, dont mess with thier case
+        $result[trim($value)] = $this->strictHandling ? trim($key) : strtolower(trim($key));
       }
     }
 
@@ -295,10 +294,14 @@ class MetadataParser extends MetadataHexCore
       }
 
       if ($this->flattenKeys && strpos($cleanKey, ':') !== false) {
+        $x = $cleanKey;
         $cleanKey = substr(strrchr($cleanKey, ':'), 1);
       }
 
+      // don't overwrite keys
+      if (!array_key_exists($cleanKey, $sanitized)) {
       $sanitized[$cleanKey] = $cleanValue;
+      }
     }
 
     if (empty($sanitized)) {
