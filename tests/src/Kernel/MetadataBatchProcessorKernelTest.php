@@ -294,7 +294,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertEquals('', $ftype, 'FileType is blank');
     $this->assertNotEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
 
-    $this->assertEquals('', $ftop, 'Topic is blank');
+    $this->assertEquals([], $ftop, 'Topic is blank');
     $this->assertNotContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
     $this->assertNotContains('TCPDF', $term_names, "The expected taxonomy term name TCPDF is not present.");
     $this->assertNotContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
