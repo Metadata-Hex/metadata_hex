@@ -16,7 +16,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
   /**
    * Tests processing a node with a valid PDF file.
    */
-  public function testProcessNodeWithValidPdfWithMetadata() {
+  public function testBatchNodeIngest() {
 
     $files = [
       'metadoc.pdfx',
