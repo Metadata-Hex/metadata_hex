@@ -47,9 +47,9 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 
     // Ensure that each file is attached to a node and has extracted metadata
     foreach ($fids as $fid){
-      echo PHP_EOL.$fid.PHP_EOL;
+      echo PHP_EOL.'50 '.$fid.PHP_EOL;
 
-      $this->lookingForCorrectData($fid);
+      $this->lookingForCorrectData($fid); //
     }
 
     // Ensure that files already attached to nodes aren't messed with
@@ -73,7 +73,7 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 
 $nids = array_values($query); // Get node IDs
 $nid = reset($nids); // Get the first node ID (if any)
-echo print_r($nids, true);
+echo print_r($nid, true);
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
   
@@ -110,8 +110,17 @@ echo print_r($nids, true);
   public function lookingForCorrectData($nid){ 
 
     $this->assertNotEquals('', $nid, 'Nid is empty');
-    $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
-  
+
+    $query = \Drupal::entityQuery('node')
+    ->condition('field_attachment', $fid)
+    ->accessCheck(false)
+    ->execute();
+
+$nids = array_values($query); // Get node IDs
+$nid = reset($nids); // Get the first node ID (if any)
+echo print_r($nid, true);
+
+    $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);    
     // Capture the current details
     $fsubj = $node->get('field_subject')->getString();
     $fpages = $node->get('field_pages')->getString();
