@@ -93,7 +93,7 @@ class SettingsManager extends MetadataHexCore {
    *  The node types
    */
   public function getStrictHandling(){
-    echo PHP_EOL.$this->config->get('extraction_settings').PHP_EOL;
+    echo PHP_EOL.print_r($this->config->get('extraction_settings'), true).PHP_EOL;
     return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_STRICT;
   }
 
