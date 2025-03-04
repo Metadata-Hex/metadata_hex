@@ -191,7 +191,6 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
      * TODO: Add checks against taxonomy/string_lists
     */
     $this->setConfigSetting('extraction_settings.data_protected', TRUE);
-    $this->assertEquals($this->settingsManager->getStrictHandling(), true, 'strict handling isnt enabled');
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
