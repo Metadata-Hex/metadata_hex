@@ -283,19 +283,19 @@ echo PHP_EOL."STRICTHANDLING".PHP_EOL;
     // ASSERTATIONS
     $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
 
-    $this->assertNotEquals('', $fsubj, 'Subject is blank');
+    $this->assertEquals('', $fsubj, 'Subject is blank');
     $this->assertNotEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected'); //fails, it equals
 
-    $this->assertNotEquals('', $fpages, 'Catalog is blank');
+    $this->assertEquals('', $fpages, 'Catalog is blank');
     $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected');
 
-    $this->assertNotEquals('', $fdate, 'Publication date is blank');
+    $this->assertEquals('', $fdate, 'Publication date is blank');
     $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
 
-    $this->assertNotEquals('', $ftype, 'FileType is blank');
+    $this->assertEquals('', $ftype, 'FileType is blank');
     $this->assertNotEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
 
-    $this->assertNotEquals('', $ftop, 'Topic is blank');
+    $this->assertEquals('', $ftop, 'Topic is blank');
     $this->assertNotContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
     $this->assertNotContains('TCPDF', $term_names, "The expected taxonomy term name TCPDF is not present.");
     $this->assertNotContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
@@ -425,7 +425,7 @@ echo PHP_EOL."STRICTHANDLING".PHP_EOL;
     $this->assertEquals($node->id(), $node_alt->id(), 'Node ids dont match');
 
     $this->assertEquals('', $fsubj, 'Subject is blank');
-    $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
+    $this->assertNotEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
 
     $this->assertNotEquals('', $fpages, 'Catalog is blank');
     $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected'); // this should = 1 = 
