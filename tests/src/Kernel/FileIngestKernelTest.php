@@ -47,6 +47,8 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 
     // Ensure that each file is attached to a node and has extracted metadata
     foreach ($fids as $fid){
+      echo PHP_EOL.$fid.PHP_EOL;
+
       $this->lookingForCorrectData($fid);
     }
 
