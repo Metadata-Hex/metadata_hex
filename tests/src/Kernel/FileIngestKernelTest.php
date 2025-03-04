@@ -107,9 +107,9 @@ echo print_r($nid, true);
   /**
    * 
    */
-  public function lookingForCorrectData($nid){ 
+  public function lookingForCorrectData($fid){ 
 
-    $this->assertNotEquals('', $nid, 'Nid is empty');
+    $this->assertNotEquals('', $fid, 'Nid is empty');
 
     $query = \Drupal::entityQuery('node')
     ->condition('field_attachment', $fid)
@@ -118,7 +118,7 @@ echo print_r($nid, true);
 
 $nids = array_values($query); // Get node IDs
 $nid = reset($nids); // Get the first node ID (if any)
-echo 'NID '.$nid.PHP_EOL;
+// echo 'NID '.$nid.PHP_EOL;
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);    
     // Capture the current details
