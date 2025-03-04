@@ -417,7 +417,7 @@ echo PHP_EOL."STRICTHANDLING".PHP_EOL;
 
     // ASSERTATIONS
     $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
-    $this->assertEquals($node->id, $node_alt->id(), 'Node ids dont match');
+    $this->assertEquals($node->id(), $node_alt->id(), 'Node ids dont match');
 
     $this->assertEquals('', $fsubj, 'Subject is blank');
     $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
