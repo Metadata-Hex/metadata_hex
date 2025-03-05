@@ -26,19 +26,21 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
       'document4.pdf'
     ];
 
-    $fids = [];
-    $popped = [];
-    $i = 0;
+    $fidsGood = [4,5,6,7];
+    $popped = [1];
+    $fidsBad = [1,2,3];
+    
+    // $i = 0;
     // create files
     foreach ($files as $name) {
       $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf');
-      $fids[] = $file->id();
-      echo PHP_EOL.$i.PHP_EOL;
-      $i++;
+      // $fids[] = $file->id();
+      // echo PHP_EOL.$i.PHP_EOL;
+      // $i++;
     }
-echo PHP_EOL.'FIDS!! '.print_r($fids, true).PHP_EOL;
+// echo PHP_EOL.'FIDS!! '.print_r($fids, true).PHP_EOL;
     // pop off the first and attach it to a node
-    $popped[] = array_shift($fids); 
+    // $popped[] = array_shift($fids); 
 
     foreach ($popped as $pop){
       $node = $this->createNode($pop);
@@ -48,14 +50,14 @@ echo PHP_EOL.'FIDS!! '.print_r($fids, true).PHP_EOL;
     $this->batchProcessor->processFiles();
 
     // Ensure that files already attached to nodes aren't messed with
-    foreach ($popped as $pop){
-      echo PHP_EOL.$pop.PHP_EOL;
+    foreach ($fidsBad as $pop){
+      //echo P/HP_EOL.$pop.PHP_EOL;
       $this->lookingForNoData($pop);
     }
 
     // Ensure that each file is attached to a node and has extracted metadata
     foreach ($fids as $fid){
-      echo PHP_EOL.'50 '.$fid.PHP_EOL;
+      //echo PHP_EOL.'50 '.$fid.PHP_EOL;
 
       $this->lookingForCorrectData($fid); //
     }

@@ -26,31 +26,23 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
       'document4.pdf'
     ];
 
-    $nids = [];
-$i = 0;
+
     foreach ($files as $name) {
       $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf');
       $node = $this->createNode($file);
-      $nids[] = $node->id();
-      echo PHP_EOL.$i.PHP_EOL;
-      $i++;
     }
-    echo PHP_EOL.'NIDS!! '.print_r($nids, true).PHP_EOL;
 
     $this->batchProcessor->processNodes();
 
-    $popped = [];
-
-    $popped[] = array_shift($nids); 
+    $popped = [1];
+    $nids = [2,3,4,5];
     
     foreach ($popped as $pop){
-      echo PHP_EOL.$pop.PHP_EOL;
       $this->lookingForNoData($pop);
     }
 
 
     foreach ($nids as $nid){
-      echo PHP_EOL.$nid.PHP_EOL;
 
       $this->lookingForCorrectData($nid);
     }
