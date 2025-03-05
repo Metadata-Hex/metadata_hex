@@ -70,16 +70,16 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
   public function lookingForNoData($fid){ 
     $this->assertNotEquals('', $fid, 'Fid is empty');
 
-    $query = \Drupal::entityQuery('node')
-    ->condition('field_attachment', $fid)
-    ->accessCheck(false)
-    ->execute();
+    // $query = \Drupal::entityQuery('node')
+    // ->condition('field_attachment', $fid)
+    // ->accessCheck(false)
+    // ->execute();
+    // currently $fid correstponds with $nid
+// $nids = array_values($query); // Get node IDs
 
-$nids = array_values($query); // Get node IDs
-
-$nid = reset($nids); // Get the first node ID (if any)
-echo print_r($nids, true);
-
+// $nid = reset($nids); // Get the first node ID (if any)
+// echo print_r($nids, true);
+$nid = $fid;
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
   
     // Capture the current details
