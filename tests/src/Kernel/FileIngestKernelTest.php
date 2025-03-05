@@ -36,7 +36,7 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
       echo PHP_EOL.$i.PHP_EOL;
       $i++;
     }
-echo PHP_EOL.'FIDS!! '.print_r($fids, true).PHPEOL;
+echo PHP_EOL.'FIDS!! '.print_r($fids, true).PHP_EOL;
     // pop off the first and attach it to a node
     $popped[] = array_shift($fids); 
 

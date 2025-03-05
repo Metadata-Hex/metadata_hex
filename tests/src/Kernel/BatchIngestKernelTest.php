@@ -35,7 +35,7 @@ $i = 0;
       echo PHP_EOL.$i.PHP_EOL;
       $i++;
     }
-    echo PHP_EOL.'NIDS!! '.print_r($nids, true).PHPEOL;
+    echo PHP_EOL.'NIDS!! '.print_r($nids, true).PHP_EOL;
 
     $this->batchProcessor->processNodes();
 
