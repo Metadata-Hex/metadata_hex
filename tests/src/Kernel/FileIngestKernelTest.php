@@ -120,13 +120,14 @@ $nid = $fid;
 
     $this->assertNotEquals('', $fid, 'Nid is empty');
 
-    $query = \Drupal::entityQuery('node')
-    ->condition('field_attachment', $fid)
-    ->accessCheck(false)
-    ->execute();
+//     $query = \Drupal::entityQuery('node')
+//     ->condition('field_attachment', $fid)
+//     ->accessCheck(false)
+//     ->execute();
 
-$nids = array_values($query); // Get node IDs
-$nid = reset($nids); // Get the first node ID (if any)
+// $nids = array_values($query); // Get node IDs
+$nid = $fid; 
+// Get the first node ID (if any)
 // echo 'NID '.$nid.PHP_EOL;
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);    

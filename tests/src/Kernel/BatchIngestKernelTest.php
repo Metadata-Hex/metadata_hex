@@ -90,7 +90,7 @@ echo $index;
    */
   public function lookingForCorrectData($nid){ 
     $this->assertNotEquals('', $nid, 'Nid is empty');
-
+echo PHP_EOL.$nid.PHP_EOL;
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
   
     // Capture the current details
