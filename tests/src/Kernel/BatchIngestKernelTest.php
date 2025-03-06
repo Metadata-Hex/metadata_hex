@@ -11,7 +11,7 @@ use Drupal\Tests\metadata_hex\Kernel\BaseKernelTestHex;
  */
 class BatchIngestKernelTest extends BaseKernelTestHex {
 
-  
+
 
   /**
    * Tests processing a node with a valid PDF file.
@@ -45,17 +45,17 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
       $this->lookingForCorrectData($nid);
     }
 
-    
+
   }
 
   /**
-   * 
+   *
    */
-  public function lookingForNoData($nid){ 
+  public function lookingForNoData($nid){
     $this->assertNotEquals('', $nid, 'Nid is empty');
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
-  
+
     // Capture the current details
     $fsubj = $node->get('field_subject')->getString();
     $fpages = $node->get('field_pages')->getString();
@@ -66,7 +66,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
     foreach ($node->get('field_topics')->referencedEntities() as $term) {
         $term_names[] = $term->label();
     }
-  
+
     // ASSERTATIONS
 
     $this->assertEquals('', $fsubj, 'Subject is blank');
@@ -74,8 +74,8 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
 
     $this->assertEquals('', $fpages, 'Catalog is blank');
     $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected');
-
-    $this->assertEquals('', $fdate, 'Publication date is blank');
+echo 'fdate:'.$fdate;
+   $this->assertEquals('', $fdate, 'Publication date is blank');
 
     $this->assertEquals('', $ftype, 'FileType is blank');
     $this->assertNotEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
@@ -84,9 +84,9 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
   }
 
   /**
-   * 
+   *
    */
-  public function lookingForCorrectData($nid){ 
+  public function lookingForCorrectData($nid){
     $this->assertNotEquals('', $nid, 'Nid is empty');
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
@@ -101,7 +101,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
     foreach ($node->get('field_topics')->referencedEntities() as $term) {
         $term_names[] = $term->label();
     }
-  
+
     // ASSERTATIONS
     $this->assertNotEquals('', $fsubj, 'Subject is blank');
     $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
