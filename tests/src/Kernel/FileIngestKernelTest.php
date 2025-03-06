@@ -41,6 +41,14 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
       $this->createNode($pop);
     }
 
+    $directory = 'public://test-files'; // Change this to 'public://' for all public files.
+    $files = file_scan_directory($directory, '/.*/');
+    
+    foreach ($files as $file) {
+        print $file->uri . "\n"; // Prints the full URI like "public://subdir/file.jpg"
+    }
+
+
     // Process the files and ingest
     $this->batchProcessor->processFiles();
 
