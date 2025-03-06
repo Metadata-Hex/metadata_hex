@@ -58,6 +58,7 @@ echo 'NODE'.$node->id().PHP_EOL;
     }
     $nids = \Drupal::entityQuery('node')
     //->condition('nid', $nidx, 'NOT IN')
+    ->accessCheck(false)
     ->execute();
     echo PHP_EOL.'NIDS::'.print_r($nids, true).PHP_EOL;
     // Ensure that each file is attached to a node and has extracted metadata
