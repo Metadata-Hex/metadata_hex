@@ -53,7 +53,7 @@ echo 'NODE'.$node->id().PHP_EOL;
 
     // Ensure that files already attached to nodes aren't messed with
     foreach ($fidsBad as $pop){
-      //echo P/HP_EOL.$pop.PHP_EOL;
+      echo PHP_EOL.'pop'.$pop.PHP_EOL;
       $this->lookingForNoData($pop);
     }
     $nids = \Drupal::entityQuery('node')
