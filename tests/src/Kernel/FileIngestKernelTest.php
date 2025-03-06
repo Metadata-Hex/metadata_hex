@@ -16,6 +16,8 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
    */
   public function testBatchFileIngest() {
 
+    $this->setConfigSetting('file_ingest.ingest_directory', '');
+
     $files = [
       'attached.pdf',
       'metadoc.pdfx',
