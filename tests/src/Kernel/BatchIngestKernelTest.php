@@ -33,6 +33,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
     }
 
     $this->batchProcessor->processNodes();
+    sleep(1);
 
     $popped = [1];
     $nids = [2,3,4,5];
@@ -43,7 +44,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
 
 
     foreach ($nids as $nid => $index){
-echo $index;
+echo PHP_EOL.'index: '.$index.PHP_EOL;
       $this->lookingForCorrectData($nid);
     }
 
