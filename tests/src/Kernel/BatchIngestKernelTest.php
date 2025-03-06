@@ -37,7 +37,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
 
     $popped = [1];
     $nids = [2,3,4,5];
-    echo PHP_EOL.'nnnn '.print_r( \Drupal::entityQuery('node')->execute(), true).PHP_EOL;
+    echo PHP_EOL.'nnnn '.print_r( \Drupal::entityQuery('node')->accessCheck(false)->execute(), true).PHP_EOL;
     foreach ($popped as $pop){
       $this->lookingForNoData($pop);
     }
