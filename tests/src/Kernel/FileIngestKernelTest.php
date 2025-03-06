@@ -30,45 +30,27 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
     $popped = [1];
     $fidsBad = [1,2,3];
     
-    // $i = 0;
     // create files
     foreach ($files as $name) {
       $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf');
-      // $fids[] = $file->id();
-      // echo PHP_EOL.$i.PHP_EOL;
-      // $i++;
     }
-// echo PHP_EOL.'FIDS!! '.print_r($fids, true).PHP_EOL;
-    // pop off the first and attach it to a node
-    // $popped[] = array_shift($fids); 
-    $nidx = [];
+
     foreach ($popped as $pop){
-      $node = $this->createNode($pop);
-      $nidx[] = $node->id();
+      $this->createNode($pop);
     }
-echo 'NODE'.$node->id().PHP_EOL;
+
     // Process the files and ingest
     $this->batchProcessor->processFiles();
-    sleep(1);
 
     // Ensure that files already attached to nodes aren't messed with
     foreach ($fidsBad as $pop){
-      echo PHP_EOL.'pop'.$pop.PHP_EOL;
-      //$this->lookingForNoData($pop);
+      $this->lookingForNoData($pop);
     }
-    $nids = \Drupal::entityQuery('node')
-    //->condition('nid', $nidx, 'NOT IN')
-    ->accessCheck(false)
-    ->execute();
-    echo PHP_EOL.'NIDS::'.print_r($nids, true).PHP_EOL;
+    
+
     // Ensure that each file is attached to a node and has extracted metadata
-    $i = 1;
     foreach ($fidsGood as $fid){
-    echo PHP_EOL.'fidnid '.$i.PHP_EOL;
-
-      //$this->lookingForCorrectData($fid); //
-      $i++;
-
+      $this->lookingForCorrectData($fid); 
     }
 
   }
@@ -79,16 +61,7 @@ echo 'NODE'.$node->id().PHP_EOL;
   public function lookingForNoData($fid){ 
     $this->assertNotEquals('', $fid, 'Fid is empty');
 
-    // $query = \Drupal::entityQuery('node')
-    // ->condition('field_attachment', $fid)
-    // ->accessCheck(false)
-    // ->execute();
-    // currently $fid correstponds with $nid
-// $nids = array_values($query); // Get node IDs
-
-// $nid = reset($nids); // Get the first node ID (if any)
-// echo print_r($nids, true);
-$nid = $fid;
+    $nid = $fid;
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
   
     // Capture the current details
@@ -125,15 +98,7 @@ $nid = $fid;
 
     $this->assertNotEquals('', $fid, 'Nid is empty');
 
-//     $query = \Drupal::entityQuery('node')
-//     ->condition('field_attachment', $fid)
-//     ->accessCheck(false)
-//     ->execute();
-
-// $nids = array_values($query); // Get node IDs
-$nid = $fid; 
-// Get the first node ID (if any)
-// echo 'NID '.$nid.PHP_EOL;
+    $nid = $fid; 
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);    
     // Capture the current details

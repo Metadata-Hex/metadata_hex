@@ -197,7 +197,7 @@ class MetadataParser extends MetadataHexCore
 
     // Sanitize the array.
     $sanitizedArray = $this->sanitizeArray($flattenedArray);
-   // echo (!$this->strictHandling?'':PHP_EOL.'yes strict HANDLE'.PHP_EOL); 
+
     $cleanedMetadata = [];
     foreach ($sanitizedArray as $key => $value) {
       if (empty($key) || empty($value)) {

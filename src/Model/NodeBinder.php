@@ -186,7 +186,6 @@ public function getWasNodeJustProcessed(): bool
    */
   public function getNode(): ?Node
   {
-echo PHP_EOL."getnode".PHP_EOL;
     return $this->nid ? Node::load($this->nid) : null;
   }
 
@@ -263,7 +262,6 @@ echo PHP_EOL."getnode".PHP_EOL;
         }
       }
     }
-    //echo PHP_EOL.print_r($metadata, true);
     return $metadata;
   }
 

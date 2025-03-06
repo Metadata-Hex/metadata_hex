@@ -100,9 +100,6 @@ class MetadataEntity extends MetadataHexCore
 
     // setup the parser
     $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
-
-    echo PHP_EOL."endof ME init".PHP_EOL;
-
   }
 
   /**
@@ -275,7 +272,6 @@ $fid = \Drupal::entityQuery('file')
    */
   public function writeMetadata()
   {
-    echo PHP_EOL."writemetadata".PHP_EOL;
     // Some may think to default to processed metadata. Perhaps
     if (empty($this->metadataProcessed)) {
       return;
