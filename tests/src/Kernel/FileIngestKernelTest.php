@@ -3,6 +3,7 @@
 namespace Drupal\Tests\metadata_hex\Kernel;
 
 use Drupal\Tests\metadata_hex\Kernel\BaseKernelTestHex;
+use Drupal\Core\File\FileSystemInterface;
 
 /**
  * Kernel test for the MetadataBatchProcessor service.
@@ -42,8 +43,13 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
     }
 
     $directory = 'public://test-files'; // Change this to 'public://' for all public files.
-    $files = file_scan_directory($directory, '/.*/');
+    $real_path = $this->fileSystem->realpath($directory);
+        
+    $files = scandir($real_path);
     
+    // Filter out . and .. from scandir result.
+    $files = array_diff($files, ['.', '..']);
+
     foreach ($files as $file) {
         print $file->uri . "\n"; // Prints the full URI like "public://subdir/file.jpg"
     }
