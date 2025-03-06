@@ -42,8 +42,8 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
     }
 
 
-    foreach ($nids as $nid){
-
+    foreach ($nids as $nid => $index){
+echo $index;
       $this->lookingForCorrectData($nid);
     }
 

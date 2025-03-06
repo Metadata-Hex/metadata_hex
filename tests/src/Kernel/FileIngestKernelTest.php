@@ -41,11 +41,12 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 // echo PHP_EOL.'FIDS!! '.print_r($fids, true).PHP_EOL;
     // pop off the first and attach it to a node
     // $popped[] = array_shift($fids); 
-
+    $nidx = [];
     foreach ($popped as $pop){
       $node = $this->createNode($pop);
+      $nidx[] = $node->id();
     }
-
+echo 'NODE'.$node->id().PHP_EOL;
     // Process the files and ingest
     $this->batchProcessor->processFiles();
 
@@ -54,7 +55,10 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
       //echo P/HP_EOL.$pop.PHP_EOL;
       $this->lookingForNoData($pop);
     }
-
+    $nids = \Drupal::entityQuery('node')
+    ->condition('nid', $nidx, 'NOT IN')
+    ->execute();
+    echo PHP_EOL.print_r($nids, true).PHP_EOL;
     // Ensure that each file is attached to a node and has extracted metadata
     foreach ($fids as $fid){
       //echo PHP_EOL.'50 '.$fid.PHP_EOL;
