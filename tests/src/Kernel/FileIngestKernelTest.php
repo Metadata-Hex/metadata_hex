@@ -66,6 +66,8 @@ echo 'NODE'.$node->id().PHP_EOL;
     echo PHP_EOL.'fidnid '.$i.PHP_EOL;
 
       $this->lookingForCorrectData($fid); //
+      $i++;
+
     }
 
   }

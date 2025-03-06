@@ -42,10 +42,11 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
       $this->lookingForNoData($pop);
     }
 
-
-    foreach ($nids as $nid => $index){
-echo PHP_EOL.'index: '.$index.PHP_EOL;
+$i = 1
+    foreach ($nids as $nid){
+echo PHP_EOL.'index: '.$i.PHP_EOL;
       $this->lookingForCorrectData($nid);
+      $i++;
     }
 
     
