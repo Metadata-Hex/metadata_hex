@@ -101,6 +101,8 @@ class MetadataEntity extends MetadataHexCore
     // setup the parser
     $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
 
+    echo PHP_EOL."endof ME init".PHP_EOL;
+
   }
 
   /**
@@ -273,6 +275,7 @@ $fid = \Drupal::entityQuery('file')
    */
   public function writeMetadata()
   {
+    echo PHP_EOL."writemetadata".PHP_EOL;
     // Some may think to default to processed metadata. Perhaps
     if (empty($this->metadataProcessed)) {
       return;
@@ -312,7 +315,7 @@ $fid = \Drupal::entityQuery('file')
           $target_type = $field_definition->getSetting('target_type');
           $handler_settings = $field_definition->getSetting('handler_settings');
           $vid = !empty($handler_settings['target_bundles']) ? reset($handler_settings['target_bundles']) : NULL;
-          
+
           if ($target_type === 'taxonomy_term') {
             $term_ids = [];
             foreach (explode(',', $value) as $term_name) {

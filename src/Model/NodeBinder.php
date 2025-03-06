@@ -44,9 +44,9 @@ class NodeBinder extends MetadataHexCore
    */
   protected $fileHandlerManager;
 
-  /** 
+  /**
    * MetadataHex Settings Manager
-   * @var 
+   * @var
    */
   protected $settingsManager;
   /**
@@ -186,6 +186,7 @@ public function getWasNodeJustProcessed(): bool
    */
   public function getNode(): ?Node
   {
+echo PHP_EOL."getnode".PHP_EOL;
     return $this->nid ? Node::load($this->nid) : null;
   }
 
