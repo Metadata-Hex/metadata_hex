@@ -94,7 +94,7 @@ echo PHP_EOL.'index: '.$i.PHP_EOL;
     $this->assertNotEquals('', $nid, 'Nid is empty');
 echo PHP_EOL.$nid.PHP_EOL;
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
-  
+  echo PHP_EOL.print_r($node->toArray(), true).PHP_EOL;
     // Capture the current details
     $fsubj = $node->get('field_subject')->getString();
     $fpages = $node->get('field_pages')->getString();
