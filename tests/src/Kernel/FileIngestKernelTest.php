@@ -62,7 +62,7 @@ echo 'NODE'.$node->id().PHP_EOL;
     echo PHP_EOL.'NIDS::'.print_r($nids, true).PHP_EOL;
     // Ensure that each file is attached to a node and has extracted metadata
     $i = 1;
-    foreach ($fids as $fid){
+    foreach ($fidsGood as $fid){
     echo PHP_EOL.'fidnid '.$i.PHP_EOL;
 
       $this->lookingForCorrectData($fid); //
