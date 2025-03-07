@@ -83,7 +83,9 @@ class NodeBinder extends MetadataHexCore
    */
   public function init($input)
   {
+    
     echo PHP_EOL."nodebinder:86".PHP_EOL;
+    echo PHP_EOL.gettype($input).PHP_EOL;
     if (is_string($input)){
       echo PHP_EOL."nodebinder88".PHP_EOL;
       $input = $this->initNode($input, $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
