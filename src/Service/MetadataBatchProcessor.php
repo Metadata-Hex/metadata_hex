@@ -176,6 +176,7 @@ class MetadataBatchProcessor extends MetadataHexCore
     $this->ingestFiles('public://'.$ingestDir);
     $categorized = $this->categorizeFiles();
 echo PHP_EOL."cat".PHP_EOL;
+echo PHP_EOL.print_r($categorized, true).PHP_EOL;
     foreach ($categorized['referenced'] as $file_uri) {
       echo "ra";
       $metadataEntity = new MetadataEntity($this->logger);
