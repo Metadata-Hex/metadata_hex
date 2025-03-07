@@ -175,7 +175,7 @@ class MetadataBatchProcessor extends MetadataHexCore
     $ingestDir = $this->settingsManager->getIngestDirectory()??'';
     $this->ingestFiles('public://'.$ingestDir);
     $categorized = $this->categorizeFiles();
-
+echo PHP_EOL."cat".PHP_EOL;
     foreach ($categorized['referenced'] as $file_uri) {
       $metadataEntity = new MetadataEntity($this->logger);
       $metadataEntity->loadFromFile($file_uri);

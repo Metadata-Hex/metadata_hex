@@ -101,7 +101,7 @@ class MetadataEntity extends MetadataHexCore
     }
 
     // setup the parser
-    $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
+    $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder($input)->getBundleType());
   }
 
   /**
