@@ -74,7 +74,11 @@ foreach ($root_files as $rf){
     }
 
 $nids = [2,3,4,5];
-    // Ensure that each file is attached to a node and has extracted metadata
+
+
+$node =  \Drupal::entityTypeManager()->getStorage('node')->load(2);
+echo print_r($node->toArray(), true);
+// Ensure that each file is attached to a node and has extracted metadata
     foreach ($nids as $nid){
       $this->lookingForCorrectData($nid);
     }
