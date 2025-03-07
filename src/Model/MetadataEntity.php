@@ -224,7 +224,7 @@ $fid = \Drupal::entityQuery('file')
     if ($nodefile === null) {
       return $this->nodeBinder;
     }
-echo PHP_EOL."metadataentity:227".PHP_EOL;
+
     // if we DID pass a nodefile in, init the nodeBinder and pass it back
     $this->nodeBinder->init($nodefile);
     return $this->nodeBinder;

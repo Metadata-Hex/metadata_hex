@@ -153,15 +153,14 @@ class MetadataBatchProcessor extends MetadataHexCore
    *   Directory to scan.
    */
   protected function ingestFiles(string $dir_to_scan)
-  { echo PHP_EOL.'dir2scan '.$dir_to_scan.PHP_EOL;
+  {  
     if (!is_dir($dir_to_scan)) {
       $this->logger->warning("Invalid directory: $dir_to_scan");
-      echo 'fuck';
+      echo "INVALID DIR";
       return;
     }
     // todo this needs to pull compatible extentions automatically
     $files = scandir($dir_to_scan);
-    echo 'files'.print_r($files, true);
     foreach ($files as $file) {
       if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') { // @TODO dynamic
         $this->files[] = "$dir_to_scan$file";
@@ -177,23 +176,15 @@ class MetadataBatchProcessor extends MetadataHexCore
     $ingestDir = $this->settingsManager->getIngestDirectory()??'';
     $this->ingestFiles('public://'.$ingestDir);
     $categorized = $this->categorizeFiles();
-echo PHP_EOL.$ingestDir.PHP_EOL;
-echo PHP_EOL.print_r($categorized, true).PHP_EOL;
     foreach ($categorized['referenced'] as $file_uri) {
-      echo "ra";
       $metadataEntity = new MetadataEntity($this->logger);
-      echo "raf";
       $metadataEntity->init($file_uri);
-      echo "toaf";
       $metadataEntity->writeMetadata();
     }
 
     foreach ($categorized['unreferenced'] as $file_uri) {
-      echo "Taae";
       $metadataEntity = new MetadataEntity($this->logger);
-      echo "tat";
       $metadataEntity->init($file_uri);
-      echo "tit";
       $metadataEntity->writeMetadata();
     }
 
