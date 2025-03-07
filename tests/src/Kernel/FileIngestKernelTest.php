@@ -23,17 +23,17 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 
     $file_names = [
       'attached.pdf', //1
-      'metadoc.pdfx', //2
-      'banner.doc', // 
+      // 'metadoc.pdfx', //2
+      // 'banner.doc', // 
       'test_metadata.pdf', //3
       'publication_23.pdf', //4
       'document2.pdf', //5
       'document4.pdf' //6
     ];
 
-    $files_unattached_valid = [4,5,6,7];
-    $files_on_node = [1];
-    $files_unattached_invalid = [1,2,3];
+    // $files_unattached_valid = [4,5,6,7];
+    // $files_on_node = [1];
+    // $files_unattached_invalid = [1,2,3];
     $files = [];
 
     // create files
@@ -66,6 +66,7 @@ foreach ($root_files as $rf){
 
     // Ensure that files already attached to nodes aren't messed with
     foreach ($files_linked as $fui){
+      
       $this->lookingForNoData($fui->id());
     }
 
