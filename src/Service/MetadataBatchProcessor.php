@@ -185,7 +185,9 @@ echo PHP_EOL."cat".PHP_EOL;
 
     foreach ($categorized['unreferenced'] as $file_uri) {
       $metadataEntity = new MetadataEntity($this->logger);
+      echo "tat";
       $metadataEntity->init($file_uri);
+      echo "tit";
       $metadataEntity->writeMetadata();
     }
 
