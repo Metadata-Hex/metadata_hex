@@ -151,7 +151,7 @@ trait TestFileHelperTrait {
 
     return $file;
     }
-    return null;
+    return $file_path;
     }
 
 }

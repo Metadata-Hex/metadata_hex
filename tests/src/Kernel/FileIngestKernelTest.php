@@ -40,6 +40,8 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
     foreach ($file_names as $name) {
       $files[] = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', false);
     }
+
+    // My mistake here is in forgetting that im explicitly creating files in the system without File entries in Drupal
     // Step 1: Select a random key from the $files array
     $randomKey = array_rand($files);
 
@@ -65,15 +67,15 @@ foreach ($root_files as $rf){
     $this->batchProcessor->processFiles();
 
     // Ensure that files already attached to nodes aren't messed with
-    foreach ($files_linked as $fui){
+    foreach ($files_linked as $furi){
       
-      $this->lookingForNoData($fui->id());
+      $this->lookingForNoData($furi);
     }
 
 
     // Ensure that each file is attached to a node and has extracted metadata
-    foreach ($files as $file){
-      $this->lookingForCorrectData($file->id());
+    foreach ($files as $furi){
+      $this->lookingForCorrectData($furi);
     }
 
   }
@@ -81,13 +83,18 @@ foreach ($root_files as $rf){
   /**
    *
    */
-  public function lookingForNoData($fid){
-    $this->assertNotEquals('', $fid, 'Fid is empty');
-// I can no longer assume $fid is $nid - fix this
+  public function lookingForNoData($furi){
+    $this->assertNotEquals('', $furi, 'Furi is empty');
+    $files = \Drupal::entityTypeManager()
+    ->getStorage('file')
+    ->loadByProperties(['uri' => $file_uri]);
+
+  // Retrieve the first file entity from the result.
+  $file = reset($files);
 
 $storage = \Drupal::entityTypeManager()->getStorage('node');
 
-$nodes = $storage->loadByProperties(['field_attachment' => $fid]);
+$nodes = $storage->loadByProperties(['field_attachment' => $file->id()]);
 
     //$nid = $fid;
    // $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
@@ -123,11 +130,18 @@ foreach($nodes as $node){
   /**
    *
    */
-  public function lookingForCorrectData($fid){
+  public function lookingForCorrectData($furi){
 
-    $this->assertNotEquals('', $fid, 'Nid is empty');
+    $this->assertNotEquals('', $furi, 'Nid is empty');
 
-    $nid = $fid;
+    $files = \Drupal::entityTypeManager()
+    ->getStorage('file')
+    ->loadByProperties(['uri' => $file_uri]);
+
+  // Retrieve the first file entity from the result.
+  $file = reset($files);
+  $nodes = $storage->loadByProperties(['field_attachment' => $file->id()]);
+  foreach($nodes as $node){
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
     // Capture the current details
@@ -161,25 +175,7 @@ foreach($nodes as $node){
     $this->assertContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
     $this->assertContains('Metadata', $term_names, "The expected taxonomy term name Metadata is not present.");
 
-
   }
-public function deleteFileEntity($file_id){
-// Load the file entity.
-$file = File::load($file_id);
-
-if ($file) {
-    // Remove any references in file_usage.
-    \Drupal::service('file.usage')->delete($file, 'custom_module', 'entity_name', $entity_id);
-
-    // Manually delete the file entry from the database.
-    $connection = Database::getConnection();
-    $connection->delete('file_managed')
-        ->condition('fid', $file->id())
-        ->execute();
-
-    \Drupal::logger('custom_module')->notice('File entry deleted from database: @fid', ['@fid' => $file->id()]);
-} else {
-    \Drupal::logger('custom_module')->error('File not found.');
+  }
 }
-}
-}
+
