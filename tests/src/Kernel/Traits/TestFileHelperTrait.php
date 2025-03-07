@@ -126,7 +126,7 @@ trait TestFileHelperTrait {
    * @param string $pdf_content The PDF content as a string.
    * @param string $mime_type The file MIME type (default: 'application/pdf').
    *
-   * @return \Drupal\file\Entity\File|null The created file entity.
+   * @return \Drupal\file\Entity\File|string The created file entity.
    */
   public function createDrupalFile(string $filename, string $pdf_content, string $mime_type = 'application/pdf', bool $createNode = true): ?File {
     // Define Drupal's public file directory
