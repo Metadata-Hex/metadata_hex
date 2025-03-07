@@ -89,10 +89,8 @@ class MetadataEntity extends MetadataHexCore
    */
   protected function init($input)
   {
-    //echo 'init'.$input;
     // ingest the input depending on what it is
     if (is_string($input)) {
-      echo $nput.'input';
       $this->loadFromFile($input);
     } elseif ($input instanceof File) {
       $this->loadFromFile($input->getFileUri());

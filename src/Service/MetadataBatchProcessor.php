@@ -161,9 +161,7 @@ class MetadataBatchProcessor extends MetadataHexCore
     // todo this needs to pull compatible extentions automatically
     $files = scandir($dir_to_scan);
     foreach ($files as $file) {
-echo $file;
       if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') { // @TODO dynamic
-        //echo "$dir_to_scan/$file";
         $this->files[] = "$dir_to_scan$file";
       }
     }
@@ -175,11 +173,8 @@ echo $file;
   public function processFiles()
   { 
     $ingestDir = $this->settingsManager->getIngestDirectory()??'';
-    echo PHP_EOL.$ingestDir.PHP_EOL;
     $this->ingestFiles('public://'.$ingestDir);
-    echo PHP_EOL."178".PHP_EOL;
     $categorized = $this->categorizeFiles();
-    echo PHP_EOL.print_r($categorized, true).PHP_EOL;
 
     foreach ($categorized['referenced'] as $file_uri) {
       $metadataEntity = new MetadataEntity($this->logger);

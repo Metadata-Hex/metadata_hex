@@ -50,7 +50,7 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
     $root_files = scandir($real_path);
 
 foreach ($root_files as $rf){
-  $this->assertContains($rf, $root_files, "File $rf is missing from root files."); //echo $file->id().$file->getFileUri();
+  $this->assertContains($rf, $root_files, "File $rf is missing from root files."); // $file->id().$file->getFileUri();
 }
 
     // Process the files and ingest
@@ -74,10 +74,10 @@ foreach ($root_files as $rf){
    */
   public function lookingForNoData($fid){
     $this->assertNotEquals('', $fid, 'Fid is empty');
-
+// I can no longer assume $fid is $nid - fix this
     $nid = $fid;
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
-echo print_r($node->toArray(), true);
+
     // Capture the current details
     $fsubj = $node->get('field_subject')->getString();
     $fpages = $node->get('field_pages')->getString();

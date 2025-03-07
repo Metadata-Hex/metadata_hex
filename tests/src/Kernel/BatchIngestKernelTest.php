@@ -74,8 +74,8 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
 
     $this->assertEquals('', $fpages, 'Catalog is blank');
     $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected');
-echo 'fdate:'.$fdate;
-   $this->assertEquals('', $fdate, 'Publication date is blank');
+
+    $this->assertEquals('', $fdate, 'Publication date is blank');
 
     $this->assertEquals('', $ftype, 'FileType is blank');
     $this->assertNotEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
