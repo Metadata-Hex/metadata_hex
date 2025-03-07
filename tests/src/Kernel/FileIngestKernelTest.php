@@ -31,47 +31,39 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
       'document4.pdf'
     ];
 
-    $fidsGood = [4,5,6,7];
-    $popped = [1];
-    $fidsBad = [1,2,3];
+    $files_unattached_valid = [4,5,6,7];
+    $files_on_node = [1];
+    $files_unattached_invalid = [1,2,3];
 
     // create files
     foreach ($files as $name) {
       $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', false);
     }
 
-    foreach ($popped as $pop){
-      $this->createNode($pop);
+    foreach ($files_on_node as $oni){
+      $this->createNode($fon);
     }
 
     $directory = 'public://test-files'; // Change this to 'public://' for all public files.
     $real_path = $this->container->get('file_system')->realpath($directory);
 
-    $files = scandir($real_path);
-foreach ($files as $file){
-  echo $file->id().$file->getFileUri();
+    $root_files = scandir($real_path);
+
+foreach ($root_files as $rf){
+  $this->assertContains($rf, $root_files, "File $rf is missing from root files."); //echo $file->id().$file->getFileUri();
 }
-    // Filter out . and .. from scandir result.
-    //:$files = array_diff($files, ['.', '..']);
-
-
-    foreach ($fidsGood as $fid) {
-//     $this->deleteFileEntity($fid);
-      print File::load($fid)->uri . "\n"; // Prints the full URI like "public://subdir/file.jpg"
-    }
-
 
     // Process the files and ingest
     $this->batchProcessor->processFiles();
 
     // Ensure that files already attached to nodes aren't messed with
-    foreach ($fidsBad as $pop){
-      $this->lookingForNoData($pop);
+    foreach ($files_unattached_invalid as $fui){
+      $this->lookingForNoData($fui);
     }
 
 
     // Ensure that each file is attached to a node and has extracted metadata
-    foreach ($fidsGood as $fid){
+    foreach ($files_unattached_valid as $fid){
       $this->lookingForCorrectData($fid);
     }
 

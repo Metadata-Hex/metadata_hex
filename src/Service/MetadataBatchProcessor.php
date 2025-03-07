@@ -161,7 +161,9 @@ class MetadataBatchProcessor extends MetadataHexCore
     // todo this needs to pull compatible extentions automatically
     $files = scandir($dir_to_scan);
     foreach ($files as $file) {
-      if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') {
+echo $file;
+      if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') { // @TODO dynamic
+        echo "$dir_to_scan/$file";
         $this->files[] = "$dir_to_scan/$file";
       }
     }
