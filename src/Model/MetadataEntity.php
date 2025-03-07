@@ -180,15 +180,17 @@ $fid = \Drupal::entityQuery('file')
     ->condition('uri', $file_uri)
     ->accessCheck(false)
     ->execute();
-
+    
     // Ensure we get the first result (if any)
     $fid = reset($fid);
-    echo PHP_EOL.$file_uri.":".$fid.PHP_EOL;
 
     if ($fid) {
         $file = File::load($fid);
     } else {
-        $file = NULL; // Handle the case where no file was found
+      // MAKE A NEW FILE
+      $file = File::create(['uri' => $file_uri]);
+      $file->save();
+        //$file = NULL; // Handle the case where no file was found
     }
 
 
