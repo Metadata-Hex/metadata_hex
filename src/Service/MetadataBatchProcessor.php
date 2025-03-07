@@ -153,7 +153,7 @@ class MetadataBatchProcessor extends MetadataHexCore
    *   Directory to scan.
    */
   protected function ingestFiles(string $dir_to_scan)
-  {
+  { echo PHP_EOL.'dir2scan '.$dir_to_scan.PHP_EOL;
     if (!is_dir($dir_to_scan)) {
       $this->logger->warning("Invalid directory: $dir_to_scan");
       echo 'fuck';
