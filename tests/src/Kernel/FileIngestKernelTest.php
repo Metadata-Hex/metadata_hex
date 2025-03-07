@@ -19,7 +19,7 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
    */
   public function testBatchFileIngest() {
 
-    $this->setConfigSetting('file_ingest.ingest_directory', 'test-files/');
+    $this->setConfigSetting('file_ingest.ingest_directory', 'test-files');
 
     $file_names = [
       'attached.pdf', //1
