@@ -85,15 +85,20 @@ class NodeBinder extends MetadataHexCore
   {
     echo PHP_EOL."nodebinder:86".PHP_EOL;
     if (is_string($input)){
+      echo PHP_EOL."nodebinder88".PHP_EOL;
       $input = $this->initNode($input, $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
       echo "x";
     }
     elseif ($input instanceof File) {
+      echo PHP_EOL."nodebinder93".PHP_EOL;
+
       $this->fid = $input->id();
       $file = $input;
       $input = $this->initNode($file->getFileUri(), $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
     }
     if ($input instanceof Node) {
+      echo PHP_EOL."nodebinder100".PHP_EOL;
+
       $this->nid = $input->id();
     } else {
       throw new \InvalidArgumentException("Invalid input provided.");
