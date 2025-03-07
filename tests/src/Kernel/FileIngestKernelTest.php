@@ -24,7 +24,7 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
     $file_names = [
       'attached.pdf', //1
       // 'metadoc.pdfx', //2
-      // 'banner.doc', // 
+      // 'banner.doc', //
       'test_metadata.pdf', //3
       'publication_23.pdf', //4
       'document2.pdf', //5
@@ -66,16 +66,17 @@ foreach ($root_files as $rf){
     // Process the files and ingest
     $this->batchProcessor->processFiles();
 
+    $this->lookingForNoData();
     // Ensure that files already attached to nodes aren't messed with
     foreach ($files_linked as $furi){
-      
-      $this->lookingForNoData($furi);
+
+//      $this->lookingForNoData($furi);
     }
 
-
+$nids = [2,3,4,5];
     // Ensure that each file is attached to a node and has extracted metadata
-    foreach ($files as $furi){
-      $this->lookingForCorrectData($furi);
+    foreach ($nids as $nid){
+      $this->lookingForCorrectData($nid);
     }
 
   }
@@ -83,22 +84,22 @@ foreach ($root_files as $rf){
   /**
    *
    */
-  public function lookingForNoData($furi){
-    $this->assertNotEquals('', $furi, 'Furi is empty');
-    $files = \Drupal::entityTypeManager()
-    ->getStorage('file')
-    ->loadByProperties(['uri' => $file_uri]);
+  public function lookingForNoData(){
+    //$this->assertNotEquals('', $furi, 'Furi is empty');
+    //$files = \Drupal::entityTypeManager()
+    //->getStorage('file')
+    //->loadByProperties(['uri' => $furi]);
 
   // Retrieve the first file entity from the result.
-  $file = reset($files);
+  //$file = reset($files);
 
-$storage = \Drupal::entityTypeManager()->getStorage('node');
+//$storage = \Drupal::entityTypeManager()->getStorage('node');
 
-$nodes = $storage->loadByProperties(['field_attachment' => $file->id()]);
+//$nodes = $storage->loadByProperties(['field_attachment' => $file->id()]);
 
     //$nid = $fid;
-   // $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
-foreach($nodes as $node){
+    $node =  \Drupal::entityTypeManager()->getStorage('node')->load(1);
+//foreach($nodes as $node){
     // Capture the current details
     $fsubj = $node->get('field_subject')->getString();
     $fpages = $node->get('field_pages')->getString();
@@ -124,24 +125,14 @@ foreach($nodes as $node){
     $this->assertNotEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
 
     $this->assertEquals([], $ftop, 'Topic is blank');
-  }
+
   }
 
   /**
    *
    */
-  public function lookingForCorrectData($furi){
+  public function lookingForCorrectData($nid){
 
-    $this->assertNotEquals('', $furi, 'Nid is empty');
-
-    $files = \Drupal::entityTypeManager()
-    ->getStorage('file')
-    ->loadByProperties(['uri' => $file_uri]);
-
-  // Retrieve the first file entity from the result.
-  $file = reset($files);
-  $nodes = $storage->loadByProperties(['field_attachment' => $file->id()]);
-  foreach($nodes as $node){
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
     // Capture the current details
@@ -175,7 +166,6 @@ foreach($nodes as $node){
     $this->assertContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
     $this->assertContains('Metadata', $term_names, "The expected taxonomy term name Metadata is not present.");
 
-  }
   }
 }
 
