@@ -19,7 +19,7 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
    */
   public function testBatchFileIngest() {
 
-    $this->setConfigSetting('file_ingest.ingest_directory', 'test-files');
+    $this->setConfigSetting('file_ingest.ingest_directory', 'test-files/');
 
     $files = [
       'attached.pdf',
@@ -48,7 +48,9 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
     $real_path = $this->container->get('file_system')->realpath($directory);
 
     $files = scandir($real_path);
-
+foreach ($files as $file){
+  echo $file->id().$file->getFileUri();
+}
     // Filter out . and .. from scandir result.
     //:$files = array_diff($files, ['.', '..']);
 
