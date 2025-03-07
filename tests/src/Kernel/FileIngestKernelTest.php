@@ -21,27 +21,35 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 
     $this->setConfigSetting('file_ingest.ingest_directory', 'test-files/');
 
-    $files = [
-      'attached.pdf',
-      'metadoc.pdfx',
-      'banner.doc',
-      'test_metadata.pdf',
-      'publication_23.pdf',
-      'document2.pdf',
-      'document4.pdf'
+    $file_names = [
+      'attached.pdf', //1
+      'metadoc.pdfx', //2
+      'banner.doc', // 
+      'test_metadata.pdf', //3
+      'publication_23.pdf', //4
+      'document2.pdf', //5
+      'document4.pdf' //6
     ];
 
     $files_unattached_valid = [4,5,6,7];
     $files_on_node = [1];
     $files_unattached_invalid = [1,2,3];
+    $files = [];
 
     // create files
-    foreach ($files as $name) {
-      $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', false);
+    foreach ($file_names as $name) {
+      $files[] = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', false);
     }
+    // Step 1: Select a random key from the $files array
+    $randomKey = array_rand($files);
 
-    foreach ($files_on_node as $oni){
-      $this->createNode($fon);
+    // Step 2: Transfer the File object to $files_linked
+    $files_linked[] = $files[$randomKey];
+
+    // Step 3: Remove the File object from $files
+    unset($files[$randomKey]);
+    foreach ($files_linked as $file){
+      $this->createNode($file);
     }
 
     $directory = 'public://test-files'; // Change this to 'public://' for all public files.
@@ -57,14 +65,14 @@ foreach ($root_files as $rf){
     $this->batchProcessor->processFiles();
 
     // Ensure that files already attached to nodes aren't messed with
-    foreach ($files_unattached_invalid as $fui){
-      $this->lookingForNoData($fui);
+    foreach ($files_linked as $fui){
+      $this->lookingForNoData($fui->id());
     }
 
 
     // Ensure that each file is attached to a node and has extracted metadata
-    foreach ($files_unattached_valid as $fid){
-      $this->lookingForCorrectData($fid);
+    foreach ($files as $file){
+      $this->lookingForCorrectData($file->id());
     }
 
   }
