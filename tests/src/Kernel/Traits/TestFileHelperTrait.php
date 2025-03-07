@@ -135,7 +135,7 @@ trait TestFileHelperTrait {
 
     // Define the full path
     $file_path = $directory . '/' . $filename;
-
+echo PHP_EOL.$file_path.PHP_EOL;
     // Write content to the file
     file_put_contents(\Drupal::service('file_system')->realpath($file_path), $pdf_content);
     echo PHP_EOL.$file_path.PHP_EOL;
