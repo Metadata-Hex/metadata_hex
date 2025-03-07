@@ -179,6 +179,7 @@ $fid = \Drupal::entityQuery('file')
 
     // Ensure we get the first result (if any)
     $fid = reset($fid);
+    echo PHP_EOL.$file_uri.":".$fid.PHP_EOL;
 
     if ($fid) {
         $file = File::load($fid);
