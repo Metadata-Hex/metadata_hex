@@ -75,9 +75,14 @@ foreach ($root_files as $rf){
   public function lookingForNoData($fid){
     $this->assertNotEquals('', $fid, 'Fid is empty');
 // I can no longer assume $fid is $nid - fix this
-    $nid = $fid;
-    $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
 
+$storage = \Drupal::entityTypeManager()->getStorage('node');
+
+$nodes = $storage->loadByProperties(['field_attachment' => $fid]);
+
+    //$nid = $fid;
+   // $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
+foreach($nodes as $node){
     // Capture the current details
     $fsubj = $node->get('field_subject')->getString();
     $fpages = $node->get('field_pages')->getString();
@@ -103,6 +108,7 @@ foreach ($root_files as $rf){
     $this->assertNotEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
 
     $this->assertEquals([], $ftop, 'Topic is blank');
+  }
   }
 
   /**
