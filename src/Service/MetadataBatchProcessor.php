@@ -163,8 +163,8 @@ class MetadataBatchProcessor extends MetadataHexCore
     foreach ($files as $file) {
 echo $file;
       if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') { // @TODO dynamic
-        echo "$dir_to_scan/$file";
-        $this->files[] = "$dir_to_scan/$file";
+        //echo "$dir_to_scan/$file";
+        $this->files[] = "$dir_to_scan$file";
       }
     }
   }
