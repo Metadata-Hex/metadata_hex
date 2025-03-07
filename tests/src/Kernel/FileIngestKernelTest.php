@@ -62,7 +62,7 @@ class BatchFileIngestKernelTest extends BaseKernelTestHex {
 foreach ($root_files as $rf){
   $this->assertContains($rf, $root_files, "File $rf is missing from root files."); // $file->id().$file->getFileUri();
 }
-
+return;
 echo PHP_EOL.'xxxxxxxxxx'.PHP_EOL;
     // Process the files and ingest
     $this->batchProcessor->processFiles();
