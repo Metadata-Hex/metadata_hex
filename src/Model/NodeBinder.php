@@ -83,7 +83,12 @@ class NodeBinder extends MetadataHexCore
    */
   public function init($input)
   {
-    if ($input instanceof File) {
+    echo PHP_EOL."nodebinder:86".PHP_EOL;
+    if (is_string($input)){
+      $input = $this->initNode($input, $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
+      echo "x";
+    }
+    elseif ($input instanceof File) {
       $this->fid = $input->id();
       $file = $input;
       $input = $this->initNode($file->getFileUri(), $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
