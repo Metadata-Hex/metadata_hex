@@ -63,6 +63,7 @@ foreach ($root_files as $rf){
   $this->assertContains($rf, $root_files, "File $rf is missing from root files."); // $file->id().$file->getFileUri();
 }
 
+echo PHP_EOL.'xxxxxxxxxx'.PHP_EOL;
     // Process the files and ingest
     $this->batchProcessor->processFiles();
 
@@ -76,8 +77,8 @@ foreach ($root_files as $rf){
 $nids = [2,3,4,5];
 
 
-$node =  \Drupal::entityTypeManager()->getStorage('node')->load(2);
-echo print_r($node->toArray(), true);
+//$node =  \Drupal::entityTypeManager()->getStorage('node')->load(2);
+//echo print_r($node->toArray(), true);
 // Ensure that each file is attached to a node and has extracted metadata
     foreach ($nids as $nid){
       $this->lookingForCorrectData($nid);
