@@ -90,7 +90,9 @@ class MetadataEntity extends MetadataHexCore
   protected function init($input)
   {
     // ingest the input depending on what it is
-    if ($input instanceof File) {
+    if (is_string($input)) {
+      $this->loadFromFile($input);
+    } elseif ($input instanceof File) {
       $this->loadFromFile($input->getFileUri());
     } elseif ($input instanceof Node) {
       $this->loadFromNode($input->id());
@@ -99,8 +101,7 @@ class MetadataEntity extends MetadataHexCore
     }
 
     // setup the parser
-    $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder()->getBundleType());
-
+    $this->metadataParser = new MetadataParser($this->logger, $this->getNodeBinder($input)->getBundleType());
   }
 
   /**
@@ -177,14 +178,18 @@ $fid = \Drupal::entityQuery('file')
     ->condition('uri', $file_uri)
     ->accessCheck(false)
     ->execute();
-
+    
     // Ensure we get the first result (if any)
     $fid = reset($fid);
 
     if ($fid) {
         $file = File::load($fid);
     } else {
-        $file = NULL; // Handle the case where no file was found
+      // MAKE A NEW FILE
+  
+      $file = File::create(['uri' => $file_uri]);
+      $file->save();
+        //$file = NULL; // Handle the case where no file was found
     }
 
 
@@ -312,7 +317,7 @@ $fid = \Drupal::entityQuery('file')
           $target_type = $field_definition->getSetting('target_type');
           $handler_settings = $field_definition->getSetting('handler_settings');
           $vid = !empty($handler_settings['target_bundles']) ? reset($handler_settings['target_bundles']) : NULL;
-          
+
           if ($target_type === 'taxonomy_term') {
             $term_ids = [];
             foreach (explode(',', $value) as $term_name) {

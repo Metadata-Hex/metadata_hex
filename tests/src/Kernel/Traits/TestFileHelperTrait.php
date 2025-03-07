@@ -126,9 +126,9 @@ trait TestFileHelperTrait {
    * @param string $pdf_content The PDF content as a string.
    * @param string $mime_type The file MIME type (default: 'application/pdf').
    *
-   * @return \Drupal\file\Entity\File|null The created file entity.
+   * @return \Drupal\file\Entity\File|string The created file entity.
    */
-  public function createDrupalFile(string $filename, string $pdf_content, string $mime_type = 'application/pdf'): ?File {
+  public function createDrupalFile(string $filename, string $pdf_content, string $mime_type = 'application/pdf', bool $createNode = true) {
     // Define Drupal's public file directory
     $directory = 'public://test-files';
     \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
@@ -139,6 +139,7 @@ trait TestFileHelperTrait {
     // Write content to the file
     file_put_contents(\Drupal::service('file_system')->realpath($file_path), $pdf_content);
 
+    if ($createNode){
     // Create a file entity
     $file = File::create([
         'uri' => $file_path,
@@ -149,6 +150,8 @@ trait TestFileHelperTrait {
     $file->save();
 
     return $file;
-  }
+    }
+    return $file_path;
+    }
 
 }

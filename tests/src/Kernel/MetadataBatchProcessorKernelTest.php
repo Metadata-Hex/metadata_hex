@@ -250,7 +250,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    * Tests processing with strict handling
    */
   public function testProcessNodeWithStrictHandling() {
-//echo PHP_EOL."STRICTHANDLING".PHP_EOL;
+
     $this->setConfigSetting('extraction_settings.strict_handling', TRUE);
     $this->setConfigSetting('extraction_settings.field_mappings', 'keyWoRds|field_topics\ntiTlE|title\nsuBjEct|field_subject\nCReationDaTE|field_publication_date\nPAGES|field_pages\nDC:FormAt|field_file_type');
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');

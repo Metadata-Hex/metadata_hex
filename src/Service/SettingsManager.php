@@ -93,7 +93,6 @@ class SettingsManager extends MetadataHexCore {
    *  The node types
    */
   public function getStrictHandling(){
-   // echo PHP_EOL.print_r($this->config->get('extraction_settings'), true).PHP_EOL;
     return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_STRICT;
   }
 
@@ -125,8 +124,6 @@ class SettingsManager extends MetadataHexCore {
    *  The node types
    */
   public function getFlattenKeys(){
-    //echo PHP_EOL.'flatten: '.$this->config->get('extraction_settings.flatten_keys').PHP_EOL;
-
     return $this->config->get('extraction_settings.flatten_keys') ??  $this->DEFAULT_FLATTEN;
   }
 

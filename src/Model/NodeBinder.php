@@ -44,9 +44,9 @@ class NodeBinder extends MetadataHexCore
    */
   protected $fileHandlerManager;
 
-  /** 
+  /**
    * MetadataHex Settings Manager
-   * @var 
+   * @var
    */
   protected $settingsManager;
   /**
@@ -82,8 +82,11 @@ class NodeBinder extends MetadataHexCore
    *   If the input is invalid.
    */
   public function init($input)
-  {
-    if ($input instanceof File) {
+  {    
+    if (is_string($input)){
+      $input = $this->initNode($input, $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
+    }
+    elseif ($input instanceof File) {
       $this->fid = $input->id();
       $file = $input;
       $input = $this->initNode($file->getFileUri(), $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
@@ -262,7 +265,6 @@ public function getWasNodeJustProcessed(): bool
         }
       }
     }
-    //echo PHP_EOL.print_r($metadata, true);
     return $metadata;
   }
 

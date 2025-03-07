@@ -113,7 +113,7 @@ protected $settingsManager;
     $this->installSchema('metadata_hex', ['metadata_hex_processed']);
     $this->initMetadataHex();
 
-    // Create the "article" content type. 
+    // Create the "article" content type.
     NodeType::create([
         'type' => 'article',
         'name' => 'Article',
@@ -126,7 +126,7 @@ protected $settingsManager;
     $this->createField('field_subject', 'Subject', 'string');
     $this->createField('field_pages', 'Pages', 'integer');
     $this->createField('field_publication_date', 'Publication Date', 'timestamp',  ['datetime_type' => 'datetime']);
-  
+
     $this->createField('field_file_type', 'File Type', 'list_string',  [
       'allowed_values' => [
         'application/pdf' => 'pdf',
@@ -136,8 +136,8 @@ protected $settingsManager;
     ]);
 
     $this->createField('field_attachment', 'Attachment', 'entity_reference', ['target_type' => 'file'], ['handler' => 'default:file']);
-    
-    
+
+
     // $this->createField('field_topics', 'Topics', 'entity_reference', ['target_type' => 'taxonomy_term'], [
     //   'handler' => 'default:taxonomy_term',
     //   'handler_settings' => [
@@ -176,6 +176,7 @@ protected $settingsManager;
     // initialize the batch processor
     $mdex = new MetadataExtractor(\Drupal::service('logger.channel.default'));
     $this->batchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
+    $this->batchProcessor->init('article');
   }
 
   /**
@@ -293,14 +294,14 @@ protected $settingsManager;
 
 /**
  * Creates a drupal field for testing
- * 
+ *
  * @var string $field_name
  * @var string $label
  * @var string $type
  * @var array $fsc_settings
  * @var array $fc_settings
  * @var string $bundle
- * 
+ *
  * @return void
  */
   protected function createField($field_name, $label, $type, $fsc_settings=[], $fc_settings = [], $bundle = 'article'){
@@ -310,7 +311,7 @@ protected $settingsManager;
         'type' => $type,
         'settings' => $fsc_settings
       ])->save();
-  
+
       FieldConfig::create([
         'field_name' => $field_name,
         'entity_type' => 'node',

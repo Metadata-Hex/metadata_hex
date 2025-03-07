@@ -153,16 +153,17 @@ class MetadataBatchProcessor extends MetadataHexCore
    *   Directory to scan.
    */
   protected function ingestFiles(string $dir_to_scan)
-  {
+  {  
     if (!is_dir($dir_to_scan)) {
       $this->logger->warning("Invalid directory: $dir_to_scan");
+      echo "INVALID DIR";
       return;
     }
     // todo this needs to pull compatible extentions automatically
     $files = scandir($dir_to_scan);
     foreach ($files as $file) {
-      if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') {
-        $this->files[] = "$dir_to_scan/$file";
+      if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') { // @TODO dynamic
+        $this->files[] = "$dir_to_scan$file";
       }
     }
   }
@@ -170,21 +171,20 @@ class MetadataBatchProcessor extends MetadataHexCore
   /**
    * Processes files in a directory.
    */
-  protected function processFiles()
+  public function processFiles()
   { 
     $ingestDir = $this->settingsManager->getIngestDirectory()??'';
     $this->ingestFiles('public://'.$ingestDir);
     $categorized = $this->categorizeFiles();
-
     foreach ($categorized['referenced'] as $file_uri) {
       $metadataEntity = new MetadataEntity($this->logger);
-      $metadataEntity->loadFromFile($file_uri);
+      $metadataEntity->init($file_uri);
       $metadataEntity->writeMetadata();
     }
 
     foreach ($categorized['unreferenced'] as $file_uri) {
       $metadataEntity = new MetadataEntity($this->logger);
-      $metadataEntity->loadFromFile($file_uri);
+      $metadataEntity->init($file_uri);
       $metadataEntity->writeMetadata();
     }
 
