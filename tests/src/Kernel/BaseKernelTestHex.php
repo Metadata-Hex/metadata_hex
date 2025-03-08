@@ -138,14 +138,6 @@ protected $settingsManager;
 
     $this->createField('field_attachment', 'Attachment', 'entity_reference', ['target_type' => 'file'], ['handler' => 'default:file']);
 
-
-    // $this->createField('field_topics', 'Topics', 'entity_reference', ['target_type' => 'taxonomy_term'], [
-    //   'handler' => 'default:taxonomy_term',
-    //   'handler_settings' => [
-    //     'target_bundles' => ['topics'],
-    //   ],
-    // ], -1);
-
     // Create the field storage for the taxonomy reference field.
     FieldStorageConfig::create([
       'field_name' => 'field_topics',

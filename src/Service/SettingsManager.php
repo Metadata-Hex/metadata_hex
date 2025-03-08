@@ -63,16 +63,16 @@ class SettingsManager extends MetadataHexCore {
    return $this->config->get('extraction_settings.field_mappings') ?? '';
   }
  
-
+/** */
   public function getIngestField(): string {
     return $this->config->get('file_ingest.file_attachment_field')??'';
   }
 
-
+/** */
   public function getIngestDirectory(): string {
     return $this->config->get('file_ingest.ingest_directory')??'';
   }
-
+/** */
   public function getIngestBundleType(): string {
     return $this->config->get('file_ingest.bundle_type_for_generation')??'';
   }

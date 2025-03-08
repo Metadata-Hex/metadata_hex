@@ -24,13 +24,13 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     $this->file_system->prepareDirectory($directory, \Drupal\Core\File\FileSystemInterface::CREATE_DIRECTORY);
 
     $file_names = [
-      'attached.pdf', //1
-      // 'metadoc.pdfx', //2
-      // 'banner.doc', //
-      'test_metadata.pdf', //3
-      'publication_23.pdf', //4
-      'document2.pdf', //5
-      'document4.pdf' //6
+      'attached.pdf', 
+      // 'metadoc.pdfx', 
+      // 'banner.doc', 
+      'test_metadata.pdf', 
+      'publication_23.pdf', 
+      'document2.pdf', 
+      'document4.pdf' 
     ];
 
     $files = [];
@@ -39,44 +39,21 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     foreach ($file_names as $name) {
       $files[] = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', true);
     }
-//echo 'raw_files'.print_r($files, true);
-    // My mistake here is in forgetting that im explicitly creating files in the system without File entries in Drupal
-    // Step 1: Select a random key from the $files array
     $randomKey = array_rand($files);
-
-    // Step 2: Transfer the File object to $files_linked
     $files_linked[] = $files[$randomKey];
 
-    // Step 3: Remove the File object from $files
     unset($files[$randomKey]);
     foreach ($files_linked as $file){
       $node = $this->createNode($file);
-      echo PHP_EOL.'created node nid: '.$node->id().PHP_EOL;
     }
 
-    // ****** ALSO add a test that counts nodes before and after and makes sure extra nodes are not created
-    
-    // $directory = 'public://test-files/'; // Change this to 'public://' for all public files.
-    // $real_path = $this->container->get('file_system')->realpath($directory);
-    // echo PHP_EOL.'realpath: '.$real_path.PHP_EOL;
-    // $root_files = scandir($real_path);
-
-// foreach ($root_files as $rf){
-//   echo PHP_EOL."processing file $rf".PHP_EOL;
-//   if ($rf == '.' || $rf == '..') {
-//     continue;
-//   }
-$fids = [2,3,4,5];
-  //$this->assertContains($rf, $file_names, "File $rf is missing from root files."); // $file->id().$file->getFileUri();
+$fids = $nids = [2,3,4,5];
   $this->batchProcessor->processFiles($fids);
     sleep(1);
-//}
 
+// verify that files already attached to nodes are filtered out
     $this->lookingForNoData();
    
-$nids = [2,3,4,5];
-
-
     foreach ($nids as $nid){
       $this->lookingForCorrectData($nid);
     }

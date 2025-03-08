@@ -83,17 +83,13 @@ class NodeBinder extends MetadataHexCore
    */
   public function init($input)
   {    
-
     if (is_string($input)){
-      echo PHP_EOL.$input.PHP_EOL;
-      $input = $this->initNode($input); // TODO this needs to be dynamic
+      $input = $this->initNode($input); 
     }
     elseif ($input instanceof File) {
-      echo PHP_EOL.'file'.PHP_EOL;
-
       $this->fid = $input->id();
       $file = $input;
-      $input = $this->initNode($file->getFileUri()); // TODO this needs to be dynamic
+      $input = $this->initNode($file->getFileUri()); 
     }
     if ($input instanceof Node) {
       echo PHP_EOL.'nodebiner init with nid: '.$input->id().PHP_EOL;

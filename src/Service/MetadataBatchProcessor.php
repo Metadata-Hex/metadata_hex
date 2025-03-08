@@ -155,89 +155,65 @@ class MetadataBatchProcessor extends MetadataHexCore
 
   /**
    * Processes files in a directory.
+   * 
+   * @var File $file
+   * 
+   * @return void
    */
   public function processFile($file)
   { 
-    // if (!is_string($file)) {
-    //   echo "Invalid file_url: $filefile";
-    //   $this->logger->error("Invalid file_url: $file_uri");
-    // }
-
-    // $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
-    // if (!empty($file) && $batch) {
-    //   echo PHP_EOL.'return'.PHP_EOL;
-    //   return;
-    // }
-//echo PHP_EOL.'1'.PHP_EOL;
     $metadataEntity = new MetadataEntity($this->logger);
-  //  echo PHP_EOL.'2'.PHP_EOL;
     $metadataEntity->initialize($file);
-//echo PHP_EOL.'3'.PHP_EOL; 
     $metadataEntity->writeMetadata();
-//echo PHP_EOL.'4'.PHP_EOL;
   }
 
   /**
    * Processes files in a directory.
+   * 
+   * @var string $file_uri
+   * 
+   * @return void
    */
   public function processFileUri($file_uri)
   { 
     if (!is_string($file_uri)) {
-      echo "Invalid file_url: $file_uri";
       $this->logger->error("Invalid file_url: $file_uri");
     }
 
     $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
-    // if (!empty($file) && $batch) {
-    //   echo PHP_EOL.'return'.PHP_EOL;
-    //   return;
-    // }
-echo PHP_EOL.'1'.PHP_EOL;
     $metadataEntity = new MetadataEntity($this->logger);
-    echo PHP_EOL.'2'.PHP_EOL;
-    $metadataEntity->initialize($file_uri);
-echo PHP_EOL.'3'.PHP_EOL; 
+    $metadataEntity->initialize($file);
     $metadataEntity->writeMetadata();
-echo PHP_EOL.'4'.PHP_EOL;
   }
 
+  /**
+   * Process multiple files
+   * 
+   * @var array $fids
+   * 
+   * @return void
+   */
   public function processFiles(array $fids){
 
+    // Process the incoming array of fids
     foreach ($fids as $fid) { 
       $file = null;
 
+      // if the $fid is actuall a file, set file
       if ($fid instanceof File){
         $file = $fid;
-      } else if(is_string($fid) || is_int($fid)) { //check against integer
-      $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
+      } 
+      // treat it like a fid
+      else if(is_string($fid) || is_int($fid)) {
+        $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
       }
+
+      // if there's no file, then we dont proceed
       if (!empty($file)) {
-      $this->processFile($file);
+        $this->processFile($file);
       }
     }
   }
-
-  //   $ingestDir = $this->settingsManager->getIngestDirectory()??'';
-    
-  //   $this->ingestFiles('sites/default/files/'.$ingestDir);
-
-    
-  //   $categorized = $this->categorizeFiles();
-  //   echo PHP_EOL.''.print_r($categorized, true).PHP_EOL;
-  //   foreach ($categorized['referenced'] as $file_uri) {
-  //     $metadataEntity = new MetadataEntity($this->logger);
-  //     $metadataEntity->init($file_uri);
-  //     $metadataEntity->writeMetadata();
-  //   }
-
-  //   foreach ($categorized['unreferenced'] as $file_uri) {
-  //     $metadataEntity = new MetadataEntity($this->logger);
-  //     $metadataEntity->init($file_uri);
-  //     $metadataEntity->writeMetadata();
-  //   }
-
-  //   $this->logger->info('File processing completed.');
-  // }
 
   /**
    * Processes a node and updates its metadata.
