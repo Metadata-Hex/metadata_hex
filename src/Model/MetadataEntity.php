@@ -87,7 +87,7 @@ class MetadataEntity extends MetadataHexCore
    * @throws \InvalidArgumentException
    *   If the input is invalid.
    */
-  protected function init($input)
+  public function init($input)
   {
     // ingest the input depending on what it is
     if (is_string($input)) {
@@ -173,12 +173,13 @@ class MetadataEntity extends MetadataHexCore
    *   If the file is invalid.
    */
   public function loadFromFile(string $file_uri)
-  {
-$fid = \Drupal::entityQuery('file')
+  {      
+
+  $fid = \Drupal::entityQuery('file')
     ->condition('uri', $file_uri)
     ->accessCheck(false)
     ->execute();
-    
+
     // Ensure we get the first result (if any)
     $fid = reset($fid);
 
@@ -186,20 +187,16 @@ $fid = \Drupal::entityQuery('file')
         $file = File::load($fid);
     } else {
       // MAKE A NEW FILE
-  
       $file = File::create(['uri' => $file_uri]);
       $file->save();
-        //$file = NULL; // Handle the case where no file was found
     }
-
 
     if (!$file) {
       throw new Exception("File not found: $file_uri");
     }
 
     // Ingest and set the raw metadata
-    $tmd = $this->getNodeBinder($file)->ingestNodeFileMeta();
-
+    $tmd = $this->getNodeBinder($file)->ingestNodeFileMeta(); //
     $this->setLocalMetadata($tmd);
 
     // cleans up and parses the metadata and sets
@@ -391,7 +388,9 @@ $fid = \Drupal::entityQuery('file')
   }
 
   /**
-   *
+   * Returns the full extracted metadata
+   * 
+   * @return array
    */
   public function getMetadata(){
     return ['mapped' => $this->metadataMapped, 'processed' => $this->metadataProcessed, 'raw' => $this->metadataRaw];

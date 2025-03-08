@@ -52,12 +52,13 @@ protected $settingsManager;
    */
   protected $config;
 
+  protected $file_system;
   /**
    * Setup before running the test.
    */
   protected function setUp(): void {
     parent::setUp();
-
+    
     $this->enableModules(['metadata_hex']);
 
     // Install required entity schemas.
@@ -137,14 +138,6 @@ protected $settingsManager;
 
     $this->createField('field_attachment', 'Attachment', 'entity_reference', ['target_type' => 'file'], ['handler' => 'default:file']);
 
-
-    // $this->createField('field_topics', 'Topics', 'entity_reference', ['target_type' => 'taxonomy_term'], [
-    //   'handler' => 'default:taxonomy_term',
-    //   'handler_settings' => [
-    //     'target_bundles' => ['topics'],
-    //   ],
-    // ], -1);
-
     // Create the field storage for the taxonomy reference field.
     FieldStorageConfig::create([
       'field_name' => 'field_topics',
@@ -172,10 +165,11 @@ protected $settingsManager;
 
     // Create a user with necessary permissions.
     $this->createUser();
+    $this->file_system = $this->container->get('file_system');
 
     // initialize the batch processor
     $mdex = new MetadataExtractor(\Drupal::service('logger.channel.default'));
-    $this->batchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
+    $this->batchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex, $this->file_system);
     $this->batchProcessor->init('article');
   }
 

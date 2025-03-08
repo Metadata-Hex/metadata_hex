@@ -12,74 +12,48 @@ use Drupal\Core\File\FileSystemInterface;
  *
  * @group metadata_hex
  */
-class BatchFileIngestKernelTest extends BaseKernelTestHex {
-
+class FileIngestKernelTest extends BaseKernelTestHex {
+  protected $strictConfigSchema = FALSE;
+  protected $rollback = FALSE;
   /**
    * Tests processing a node with a valid PDF file.
    */
   public function testBatchFileIngest() {
-
-    $this->setConfigSetting('file_ingest.ingest_directory', 'test-files');
+    $directory = '';
+    $this->setConfigSetting('file_ingest.ingest_directory', value: $directory);
+    $this->file_system->prepareDirectory($directory, \Drupal\Core\File\FileSystemInterface::CREATE_DIRECTORY);
 
     $file_names = [
-      'attached.pdf', //1
-      // 'metadoc.pdfx', //2
-      // 'banner.doc', //
-      'test_metadata.pdf', //3
-      'publication_23.pdf', //4
-      'document2.pdf', //5
-      'document4.pdf' //6
+      'attached.pdf', 
+      // 'metadoc.pdfx', 
+      // 'banner.doc', 
+      'test_metadata.pdf', 
+      'publication_23.pdf', 
+      'document2.pdf', 
+      'document4.pdf' 
     ];
 
-    // $files_unattached_valid = [4,5,6,7];
-    // $files_on_node = [1];
-    // $files_unattached_invalid = [1,2,3];
     $files = [];
 
     // create files
     foreach ($file_names as $name) {
-      $files[] = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', false);
+      $files[] = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', true);
     }
-
-    // My mistake here is in forgetting that im explicitly creating files in the system without File entries in Drupal
-    // Step 1: Select a random key from the $files array
     $randomKey = array_rand($files);
-
-    // Step 2: Transfer the File object to $files_linked
     $files_linked[] = $files[$randomKey];
 
-    // Step 3: Remove the File object from $files
     unset($files[$randomKey]);
     foreach ($files_linked as $file){
-      $this->createNode($file);
+      $node = $this->createNode($file);
     }
 
-    $directory = 'public://test-files'; // Change this to 'public://' for all public files.
-    $real_path = $this->container->get('file_system')->realpath($directory);
+$fids = $nids = [2,3,4,5];
+  $this->batchProcessor->processFiles($fids);
+    sleep(1);
 
-    $root_files = scandir($real_path);
-
-foreach ($root_files as $rf){
-  $this->assertContains($rf, $root_files, "File $rf is missing from root files."); // $file->id().$file->getFileUri();
-}
-return;
-echo PHP_EOL.'xxxxxxxxxx'.PHP_EOL;
-    // Process the files and ingest
-    $this->batchProcessor->processFiles();
-
+// verify that files already attached to nodes are filtered out
     $this->lookingForNoData();
-    // Ensure that files already attached to nodes aren't messed with
-    foreach ($files_linked as $furi){
-
-//      $this->lookingForNoData($furi);
-    }
-
-$nids = [2,3,4,5];
-
-
-//$node =  \Drupal::entityTypeManager()->getStorage('node')->load(2);
-//echo print_r($node->toArray(), true);
-// Ensure that each file is attached to a node and has extracted metadata
+   
     foreach ($nids as $nid){
       $this->lookingForCorrectData($nid);
     }
@@ -89,22 +63,10 @@ $nids = [2,3,4,5];
   /**
    *
    */
-  public function lookingForNoData(){
-    //$this->assertNotEquals('', $furi, 'Furi is empty');
-    //$files = \Drupal::entityTypeManager()
-    //->getStorage('file')
-    //->loadByProperties(['uri' => $furi]);
+  public function lookingForNoData($nid = 1){
 
-  // Retrieve the first file entity from the result.
-  //$file = reset($files);
+    $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
 
-//$storage = \Drupal::entityTypeManager()->getStorage('node');
-
-//$nodes = $storage->loadByProperties(['field_attachment' => $file->id()]);
-
-    //$nid = $fid;
-    $node =  \Drupal::entityTypeManager()->getStorage('node')->load(1);
-//foreach($nodes as $node){
     // Capture the current details
     $fsubj = $node->get('field_subject')->getString();
     $fpages = $node->get('field_pages')->getString();
@@ -117,7 +79,6 @@ $nids = [2,3,4,5];
     }
 
     // ASSERTATIONS
-
     $this->assertEquals('', $fsubj, 'Subject is blank');
     $this->assertNotEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
 
@@ -130,14 +91,12 @@ $nids = [2,3,4,5];
     $this->assertNotEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
 
     $this->assertEquals([], $ftop, 'Topic is blank');
-
   }
 
   /**
    *
    */
   public function lookingForCorrectData($nid){
-
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
     // Capture the current details
@@ -152,7 +111,6 @@ $nids = [2,3,4,5];
     }
 
     // ASSERTATIONS
-
     $this->assertNotEquals('', $fsubj, 'Subject is blank');
     $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
 
@@ -170,7 +128,6 @@ $nids = [2,3,4,5];
     $this->assertContains('TCPDF', $term_names, "The expected taxonomy term name TCPDF is not present.");
     $this->assertContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
     $this->assertContains('Metadata', $term_names, "The expected taxonomy term name Metadata is not present.");
-
   }
 }
 

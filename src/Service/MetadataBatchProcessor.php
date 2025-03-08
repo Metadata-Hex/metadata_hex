@@ -47,6 +47,7 @@ class MetadataBatchProcessor extends MetadataHexCore
    */
   protected $extractor;
 
+  protected $file_system;
   /**
    * List of file URIs to process.
    *
@@ -66,11 +67,12 @@ class MetadataBatchProcessor extends MetadataHexCore
    * @param MetadataExtractor $extractor
    *   The metadata extraction service.
    */
-  public function __construct(LoggerInterface $logger, MetadataExtractor $extractor)
+  public function __construct(LoggerInterface $logger, MetadataExtractor $extractor, $file_system)
   {
     parent::__construct($logger);
     $this->extractor = $extractor;
     $this->settingsManager = new SettingsManager();
+    $this->file_system = $file_system; //\Drupal::service('file_system');
   }
 
   /**
@@ -146,49 +148,71 @@ class MetadataBatchProcessor extends MetadataHexCore
     return ['processed' => $processed, 'referenced' => $referenced, 'unreferenced' => $unreferenced];
   }
 
+  public function overrideStorage($fs){
+    $this->file_system = $fs;
+  }
+
+
   /**
-   * Scans a directory for files.
-   *
-   * @param string $dir_to_scan
-   *   Directory to scan.
+   * Processes files in a directory.
+   * 
+   * @var File $file
+   * 
+   * @return void
    */
-  protected function ingestFiles(string $dir_to_scan)
-  {  
-    if (!is_dir($dir_to_scan)) {
-      $this->logger->warning("Invalid directory: $dir_to_scan");
-      echo "INVALID DIR";
-      return;
-    }
-    // todo this needs to pull compatible extentions automatically
-    $files = scandir($dir_to_scan);
-    foreach ($files as $file) {
-      if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') { // @TODO dynamic
-        $this->files[] = "$dir_to_scan$file";
-      }
-    }
+  public function processFile($file)
+  { 
+    $metadataEntity = new MetadataEntity($this->logger);
+    $metadataEntity->initialize($file);
+    $metadataEntity->writeMetadata();
   }
 
   /**
    * Processes files in a directory.
+   * 
+   * @var string $file_uri
+   * 
+   * @return void
    */
-  public function processFiles()
+  public function processFileUri($file_uri)
   { 
-    $ingestDir = $this->settingsManager->getIngestDirectory()??'';
-    $this->ingestFiles('public://'.$ingestDir);
-    $categorized = $this->categorizeFiles();
-    foreach ($categorized['referenced'] as $file_uri) {
-      $metadataEntity = new MetadataEntity($this->logger);
-      $metadataEntity->init($file_uri);
-      $metadataEntity->writeMetadata();
+    if (!is_string($file_uri)) {
+      $this->logger->error("Invalid file_url: $file_uri");
     }
 
-    foreach ($categorized['unreferenced'] as $file_uri) {
-      $metadataEntity = new MetadataEntity($this->logger);
-      $metadataEntity->init($file_uri);
-      $metadataEntity->writeMetadata();
-    }
+    $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
+    $metadataEntity = new MetadataEntity($this->logger);
+    $metadataEntity->initialize($file);
+    $metadataEntity->writeMetadata();
+  }
 
-    $this->logger->info('File processing completed.');
+  /**
+   * Process multiple files
+   * 
+   * @var array $fids
+   * 
+   * @return void
+   */
+  public function processFiles(array $fids){
+
+    // Process the incoming array of fids
+    foreach ($fids as $fid) { 
+      $file = null;
+
+      // if the $fid is actuall a file, set file
+      if ($fid instanceof File){
+        $file = $fid;
+      } 
+      // treat it like a fid
+      else if(is_string($fid) || is_int($fid)) {
+        $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
+      }
+
+      // if there's no file, then we dont proceed
+      if (!empty($file)) {
+        $this->processFile($file);
+      }
+    }
   }
 
   /**

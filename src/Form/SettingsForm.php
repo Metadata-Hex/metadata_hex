@@ -88,20 +88,53 @@ class SettingsForm extends ConfigFormBase {
         $this->messenger->addWarning($this->t('No node types selected for processing.'));
     }
   }
+
+
+  /**
+   * Scans a directory for files.
+   *
+   * @param string $dir_to_scan
+   *   Directory to scan.
+   */
+  public function ingestFiles(string $dir_to_scan)
+  {  
+
+    $files = [];
+    $directory = "public://$dir_to_scan"; // Change this to 'public://' for all public files.
+    $real_path = $this->file_system->realpath($directory);
+
+    $root_files = scandir($real_path);
+
+    foreach ($root_files as $file) {
+      if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') { // @TODO dynamic
+        $files[] = "$dir_to_scan$file";
+      }
+    }
+    return $files;
+  }
+
+  
   /**
    * Submit handler for processing all selected node types.
    */
   public function processAllFiles(array &$form, FormStateInterface $form_state) {
+
+    $ingest_dir = $form_state->getValue('ingest_directory');
     $config = $this->configFactory->getEditable('metadata_hex.settings');
     $config->set('file_ingest.bundle_type_for_generation', $form_state->getValue('bundle_type_for_generation'));
     $config->set('file_ingest.file_attachment_field', $form_state->getValue('file_attachment_field'));
-    $config->set('file_ingest.ingest_directory', $form_state->getValue('ingest_directory'));
+    $config->set('file_ingest.ingest_directory', $ingest_dir);
     $config->save();
 
+    //   $ingestDir = $this->settingsManager->getIngestDirectory()??'';
+    $files = $this->ingestFiles($ingest_dir);
+
+ //   foreach ($files as $file){
     $operations[] = [
       ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'processFiles'],
+      [$files, true],
     ];
-
+//  }
     // Define batch
     $batch = [
       'title' => $this->t('Ingesting Files for metadata processing'),

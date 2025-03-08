@@ -84,12 +84,12 @@ class NodeBinder extends MetadataHexCore
   public function init($input)
   {    
     if (is_string($input)){
-      $input = $this->initNode($input, $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
+      $input = $this->initNode($input); 
     }
     elseif ($input instanceof File) {
       $this->fid = $input->id();
       $file = $input;
-      $input = $this->initNode($file->getFileUri(), $this->settingsManager->getIngestBundleType(), $this->settingsManager->getIngestField()); // TODO this needs to be dynamic
+      $input = $this->initNode($file->getFileUri()); 
     }
     if ($input instanceof Node) {
       $this->nid = $input->id();
@@ -271,29 +271,57 @@ public function getWasNodeJustProcessed(): bool
   /**
    * Initializes a blank node if no reference is found.
    *
-   * @param string $file_uri
+   * @param string| int $input
    *   The file URI.
-   * @param string $target_bundle
-   *   The target bundle type.
-   * @param string|null $field_name
-   *   Optional field name.
+
    *
    * @return Node
    *   The initialized node.
    */
-  public function initNode(string $file_uri, string $target_bundle, ?string $field_name = null): Node
+  public function initNode(string|int $input): Node
   {
-    // initiate a new node
+    $bundle_type = $this->settingsManager->getIngestBundleType();
+    $field_name = $this->settingsManager->getIngestField();
+    $file = null;
+
+    if (is_numeric($input)){
+      $file  = File::load($input);
+    } else if (is_string($input)){
+      $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $input]);
+      $file = reset($file);
+
+      if (empty($file)) {
+        $file = File::create(['uri' => $input]);
+        $file->save();
+      }
+    } else if ($input instanceof File){
+      $file = $input;
+    }
+
+    if (empty($file) && !($file instanceof File)) {
+      throw new \InvalidArgumentException("Invalid input provided.");
+    }
+
+    $query = \Drupal::entityQuery('node')
+    ->condition('type', $bundle_type)
+    ->condition($field_name, $file->id())
+    ->accessCheck(FALSE) // Skip access check in programmatic queries.
+    ->execute();
+    
+    if (!empty($query)) {
+      $nid = reset($query);
+      $node = Node::load($nid);
+      return $node;
+    }
+
     $node = Node::create([
-      'type' => $target_bundle,
+      'type' => $bundle_type,
       'status' => 0,
       'title' => 'Generated Node',
     ]);
 
     // attach the file to the specified field and save
-    if ($field_name) {
-      $file = File::create(['uri' => $file_uri]);
-      $file->save();
+    if ($field_name && $node->hasField($field_name)) { 
       $node->set($field_name, ['target_id' => $file->id()]);
     }
 
