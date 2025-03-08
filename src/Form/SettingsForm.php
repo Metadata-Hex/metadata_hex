@@ -11,6 +11,7 @@ use Drupal\metadata_hex\Batch\MetadataBatch;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\metadata_hex\Handler\FileHandlerInterface;
 
 class SettingsForm extends ConfigFormBase {
 
@@ -18,6 +19,34 @@ class SettingsForm extends ConfigFormBase {
   protected $metadataExtractor;
   protected $messenger;
 
+  /**
+   * Get all supported extensions from registered FileHandler plugins.
+   *
+   * @return array
+   *   A unique list of all supported file extensions.
+   */
+  function getAllSupportedExtensions(): array {
+      $extensions = [];
+  
+      // Get the FileHandler plugin manager.
+      $plugin_manager = \Drupal::service('plugin.manager.metadata_hex_file_handler');
+  
+      // Load all plugin definitions (registered handlers).
+      $definitions = $plugin_manager->getDefinitions();
+  
+      // Loop through each plugin, instantiate it, and get its supported extensions.
+      foreach ($definitions as $plugin_id => $definition) {
+          /** @var FileHandlerInterface $plugin */
+          $plugin = $plugin_manager->createInstance($plugin_id);
+  
+          // Merge extensions from this handler.
+          $extensions = array_merge($extensions, $plugin->getSupportedExtentions());
+      }
+  
+      // Ensure unique values.
+      return array_unique($extensions);
+  }
+  
   /**
    * {@inheritdoc}
    */
@@ -102,12 +131,14 @@ class SettingsForm extends ConfigFormBase {
     $files = [];
     $directory = "public://$dir_to_scan"; // Change this to 'public://' for all public files.
     $real_path = $this->file_system->realpath($directory);
-
     $root_files = scandir($real_path);
-
+    $extensions = $this->getAllSupportedExtensions();
+    
     foreach ($root_files as $file) {
-      if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') { // @TODO dynamic
-        $files[] = "$dir_to_scan$file";
+      $file_extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+
+      if (in_array($file_extension, $extensions, true)) {
+                $files[] = "$dir_to_scan$file";
       }
     }
     return $files;
