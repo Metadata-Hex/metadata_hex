@@ -92,7 +92,6 @@ class NodeBinder extends MetadataHexCore
       $input = $this->initNode($file->getFileUri()); 
     }
     if ($input instanceof Node) {
-      echo PHP_EOL.'nodebiner init with nid: '.$input->id().PHP_EOL;
       $this->nid = $input->id();
     } else {
       throw new \InvalidArgumentException("Invalid input provided.");
