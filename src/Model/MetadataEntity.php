@@ -87,7 +87,7 @@ class MetadataEntity extends MetadataHexCore
    * @throws \InvalidArgumentException
    *   If the input is invalid.
    */
-  protected function init($input)
+  public function init($input)
   {
     // ingest the input depending on what it is
     if (is_string($input)) {
@@ -173,22 +173,25 @@ class MetadataEntity extends MetadataHexCore
    *   If the file is invalid.
    */
   public function loadFromFile(string $file_uri)
-  {
+  {      
+    echo PHP_EOL.'177'.PHP_EOL;
+
 $fid = \Drupal::entityQuery('file')
     ->condition('uri', $file_uri)
     ->accessCheck(false)
     ->execute();
-    
+    echo PHP_EOL.'103'.PHP_EOL;
     // Ensure we get the first result (if any)
     $fid = reset($fid);
-
+    echo PHP_EOL.'106'.PHP_EOL;
     if ($fid) {
         $file = File::load($fid);
     } else {
       // MAKE A NEW FILE
-  
+      echo PHP_EOL.'191'.PHP_EOL; echo PHP_EOL.'177'.PHP_EOL;
       $file = File::create(['uri' => $file_uri]);
       $file->save();
+      echo PHP_EOL.'194'.PHP_EOL;
         //$file = NULL; // Handle the case where no file was found
     }
 
@@ -196,12 +199,12 @@ $fid = \Drupal::entityQuery('file')
     if (!$file) {
       throw new Exception("File not found: $file_uri");
     }
-
+    echo PHP_EOL.'202'.PHP_EOL;
     // Ingest and set the raw metadata
-    $tmd = $this->getNodeBinder($file)->ingestNodeFileMeta();
-
+    $tmd = $this->getNodeBinder($file_uri)->ingestNodeFileMeta(); //
+    echo PHP_EOL.'A7'.PHP_EOL;
     $this->setLocalMetadata($tmd);
-
+    echo PHP_EOL.'XX177'.PHP_EOL;
     // cleans up and parses the metadata and sets
     $mtdt = $this->getParser()->cleanMetadata($this->metadataRaw);
     $this->mapMetadata($mtdt);
@@ -215,6 +218,8 @@ $fid = \Drupal::entityQuery('file')
    */
   public function getNodeBinder($nodefile = null)
   {
+
+    
     // init if its not initalized
     if ($this->nodeBinder === null) {
       $this->nodeBinder = new NodeBinder($this->logger);
@@ -224,7 +229,7 @@ $fid = \Drupal::entityQuery('file')
     if ($nodefile === null) {
       return $this->nodeBinder;
     }
-
+//echo $nodefile;
     // if we DID pass a nodefile in, init the nodeBinder and pass it back
     $this->nodeBinder->init($nodefile);
     return $this->nodeBinder;

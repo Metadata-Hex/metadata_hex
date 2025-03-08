@@ -52,12 +52,13 @@ protected $settingsManager;
    */
   protected $config;
 
+  protected $file_system;
   /**
    * Setup before running the test.
    */
   protected function setUp(): void {
     parent::setUp();
-
+    
     $this->enableModules(['metadata_hex']);
 
     // Install required entity schemas.
@@ -172,10 +173,11 @@ protected $settingsManager;
 
     // Create a user with necessary permissions.
     $this->createUser();
+    $this->file_system = $this->container->get('file_system');
 
     // initialize the batch processor
     $mdex = new MetadataExtractor(\Drupal::service('logger.channel.default'));
-    $this->batchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
+    $this->batchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex, $this->file_system);
     $this->batchProcessor->init('article');
   }
 

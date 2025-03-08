@@ -47,6 +47,7 @@ class MetadataBatchProcessor extends MetadataHexCore
    */
   protected $extractor;
 
+  protected $file_system;
   /**
    * List of file URIs to process.
    *
@@ -66,11 +67,12 @@ class MetadataBatchProcessor extends MetadataHexCore
    * @param MetadataExtractor $extractor
    *   The metadata extraction service.
    */
-  public function __construct(LoggerInterface $logger, MetadataExtractor $extractor)
+  public function __construct(LoggerInterface $logger, MetadataExtractor $extractor, $file_system)
   {
     parent::__construct($logger);
     $this->extractor = $extractor;
     $this->settingsManager = new SettingsManager();
+    $this->file_system = $file_system; //\Drupal::service('file_system');
   }
 
   /**
@@ -146,50 +148,96 @@ class MetadataBatchProcessor extends MetadataHexCore
     return ['processed' => $processed, 'referenced' => $referenced, 'unreferenced' => $unreferenced];
   }
 
+  public function overrideStorage($fs){
+    $this->file_system = $fs;
+  }
+
+
   /**
-   * Scans a directory for files.
-   *
-   * @param string $dir_to_scan
-   *   Directory to scan.
+   * Processes files in a directory.
    */
-  protected function ingestFiles(string $dir_to_scan)
-  {  
-    if (!is_dir($dir_to_scan)) {
-      $this->logger->warning("Invalid directory: $dir_to_scan");
-      echo "INVALID DIR";
-      return;
-    }
-    // todo this needs to pull compatible extentions automatically
-    $files = scandir($dir_to_scan);
-    foreach ($files as $file) {
-      if (pathinfo($file, PATHINFO_EXTENSION) === 'pdf') { // @TODO dynamic
-        $this->files[] = "$dir_to_scan$file";
-      }
-    }
+  public function processFile($file)
+  { 
+    // if (!is_string($file)) {
+    //   echo "Invalid file_url: $filefile";
+    //   $this->logger->error("Invalid file_url: $file_uri");
+    // }
+
+    // $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
+    // if (!empty($file) && $batch) {
+    //   echo PHP_EOL.'return'.PHP_EOL;
+    //   return;
+    // }
+//echo PHP_EOL.'1'.PHP_EOL;
+    $metadataEntity = new MetadataEntity($this->logger);
+  //  echo PHP_EOL.'2'.PHP_EOL;
+    $metadataEntity->initialize($file);
+//echo PHP_EOL.'3'.PHP_EOL; 
+    $metadataEntity->writeMetadata();
+//echo PHP_EOL.'4'.PHP_EOL;
   }
 
   /**
    * Processes files in a directory.
    */
-  public function processFiles()
+  public function processFileUri($file_uri)
   { 
-    $ingestDir = $this->settingsManager->getIngestDirectory()??'';
-    $this->ingestFiles('public://'.$ingestDir);
-    $categorized = $this->categorizeFiles();
-    foreach ($categorized['referenced'] as $file_uri) {
-      $metadataEntity = new MetadataEntity($this->logger);
-      $metadataEntity->init($file_uri);
-      $metadataEntity->writeMetadata();
+    if (!is_string($file_uri)) {
+      echo "Invalid file_url: $file_uri";
+      $this->logger->error("Invalid file_url: $file_uri");
     }
 
-    foreach ($categorized['unreferenced'] as $file_uri) {
-      $metadataEntity = new MetadataEntity($this->logger);
-      $metadataEntity->init($file_uri);
-      $metadataEntity->writeMetadata();
-    }
-
-    $this->logger->info('File processing completed.');
+    $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
+    // if (!empty($file) && $batch) {
+    //   echo PHP_EOL.'return'.PHP_EOL;
+    //   return;
+    // }
+echo PHP_EOL.'1'.PHP_EOL;
+    $metadataEntity = new MetadataEntity($this->logger);
+    echo PHP_EOL.'2'.PHP_EOL;
+    $metadataEntity->initialize($file_uri);
+echo PHP_EOL.'3'.PHP_EOL; 
+    $metadataEntity->writeMetadata();
+echo PHP_EOL.'4'.PHP_EOL;
   }
+
+  public function processFiles(array $fids){
+
+    foreach ($fids as $fid) { 
+      $file = null;
+
+      if ($fid instanceof File){
+        $file = $fid;
+      } else if(is_string($fid) || is_int($fid)) { //check against integer
+      $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
+      }
+      if (!empty($file)) {
+      $this->processFile($file);
+      }
+    }
+  }
+
+  //   $ingestDir = $this->settingsManager->getIngestDirectory()??'';
+    
+  //   $this->ingestFiles('sites/default/files/'.$ingestDir);
+
+    
+  //   $categorized = $this->categorizeFiles();
+  //   echo PHP_EOL.''.print_r($categorized, true).PHP_EOL;
+  //   foreach ($categorized['referenced'] as $file_uri) {
+  //     $metadataEntity = new MetadataEntity($this->logger);
+  //     $metadataEntity->init($file_uri);
+  //     $metadataEntity->writeMetadata();
+  //   }
+
+  //   foreach ($categorized['unreferenced'] as $file_uri) {
+  //     $metadataEntity = new MetadataEntity($this->logger);
+  //     $metadataEntity->init($file_uri);
+  //     $metadataEntity->writeMetadata();
+  //   }
+
+  //   $this->logger->info('File processing completed.');
+  // }
 
   /**
    * Processes a node and updates its metadata.

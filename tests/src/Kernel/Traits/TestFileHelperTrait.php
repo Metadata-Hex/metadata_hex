@@ -128,18 +128,18 @@ trait TestFileHelperTrait {
    *
    * @return \Drupal\file\Entity\File|string The created file entity.
    */
-  public function createDrupalFile(string $filename, string $pdf_content, string $mime_type = 'application/pdf', bool $createNode = true) {
+  public function createDrupalFile(string $filename, string $pdf_content, string $mime_type = 'application/pdf', bool $createFileEntity = true) {
     // Define Drupal's public file directory
-    $directory = 'public://test-files';
+    $directory = 'public://';
     \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
 
     // Define the full path
-    $file_path = $directory . '/' . $filename;
+    $file_path = $directory . $filename;
 
     // Write content to the file
     file_put_contents(\Drupal::service('file_system')->realpath($file_path), $pdf_content);
 
-    if ($createNode){
+    if ($createFileEntity){
     // Create a file entity
     $file = File::create([
         'uri' => $file_path,
