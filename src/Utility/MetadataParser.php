@@ -294,7 +294,6 @@ class MetadataParser extends MetadataHexCore
       }
 
       if ($this->flattenKeys && strpos($cleanKey, ':') !== false) {
-        $x = $cleanKey;
         $cleanKey = substr(strrchr($cleanKey, ':'), 1);
       }
 
