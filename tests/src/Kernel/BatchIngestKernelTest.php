@@ -16,7 +16,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
   /**
    * Tests processing a node with a valid PDF file.
    */
-  public function testBatchNodeIngest() {
+  public function testBatchNodeIngestPdf() {
 
     $files = [
       'metadoc.pdfx',
@@ -29,6 +29,41 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
 
     foreach ($files as $name) {
       $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf');
+      $node = $this->createNode($file);
+    }
+
+    $this->batchProcessor->processNodes();
+
+    $popped = [1];
+    $nids = [2,3,4,5];
+
+    foreach ($popped as $pop){
+      $this->lookingForNoData($pop);
+    }
+
+    foreach ($nids as $nid){
+      $this->lookingForCorrectData($nid);
+    }
+
+
+  }
+
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testBatchNodeIngestDocx() {
+
+    $files = [
+      'metadoc.docx',
+      'test_metadata.docx',
+      'publication_23.docx',
+      'document2.docx',
+      'document4.docx'
+    ];
+
+
+    foreach ($files as $name) {
+      $file = $this->createDrupalFile($name, $this->generateDocxWithMetadata(), 'application/docx');
       $node = $this->createNode($file);
     }
 

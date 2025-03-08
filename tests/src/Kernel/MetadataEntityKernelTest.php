@@ -19,7 +19,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
   /**
    * Tests processing a node with a valid node.
    */
-  public function testMetadataEntityCanProcessNode() {
+  public function testMetadataEntityCanProcessPdfNode() {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
@@ -30,9 +30,22 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
   }
 
   /**
+   * Tests processing a node with a valid node.
+   */
+  public function testMetadataEntityCanProcessDocxNode() {
+
+    $file = $this->createDrupalFile('test_metadata.docx', $this->generateDocxWithMetadata(), 'application/docx');
+    $node = $this->createNode($file);
+
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromNode($node->id());
+    $this->runAssertions();
+  }
+
+  /**
    * Tests processing a node with a valid file.
    */
-  public function testMetadataEntityCanProcessFile() {
+  public function testMetadataEntityCanProcessPdfFile() {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
 
@@ -41,6 +54,18 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $this->runAssertions();
   }
 
+
+  /**
+   * Tests processing a node with a valid file.
+   */
+  public function testMetadataEntityCanProcessDocxFile() {
+
+    $file = $this->createDrupalFile('test_metadata.docx', $this->generateDocxWithMetadata(), 'application/docx');
+
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($file->getFileUri());
+    $this->runAssertions();
+  }
 
 
 

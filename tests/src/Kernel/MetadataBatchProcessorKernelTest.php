@@ -14,14 +14,30 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
   /**
    * Tests processing a node with a valid PDF file.
    */
-  public function testProcessNodeWithValidFileTypeNoMetadata() {
+  public function testProcessNodeWithValidPdfFileTypeNoMetadata() {
 
     $this->expectException(\Exception::class);
     $this->expectExceptionMessage("Invalid or unreadable file: vfs://root/test_document.pdf");
 
     // Setup a basic valid file and node
     $node = $this->createNode('/test_document.pdf');
+    $this->verifyNodeNotUpdated($node);
+  }
 
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testProcessNodeWithValidDocxFileTypeNoMetadata() {
+
+    $this->expectException(\Exception::class);
+    $this->expectExceptionMessage("Invalid or unreadable file: vfs://root/test_document.docx");
+
+    // Setup a basic valid file and node
+    $node = $this->createNode('/test_document.docx');
+    $this->verifyNodeNotUpdated($node);
+  }
+  
+    public function verifyNodeNotUpdated($node){
     // Capture the original details
     $created = $node->getCreatedTime();
     $modified = $node->getChangedTime();
@@ -49,24 +65,27 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     // Setup a basic valid file and node
     $node = $this->createNode('/test_document.txt');
 
-    // Capture the original details
-    $created = $node->getCreatedTime();
-    $modified = $node->getChangedTime();
-
-    // Process the node
-    $this->batchProcessor->processNode($node->id());
-
-    // Reload the node now that batch processes have occured
-    $node_alt = \Drupal::entityTypeManager()->getStorage('node')->load($node->id());
-
-    // Capture the current details
-    $created_alt = $node_alt->getCreatedTime();
-    $modified_alt = $node_alt->getChangedTime();
-
-    // Assertions
-    $this->assertEquals($created, $created_alt, 'Node creation date should match');
-    $this->assertEquals($modified, $modified_alt, 'Node modification date should match');
+    $this->verifyNodeNotUpdated($node);
   }
+
+  //   // Capture the original details
+  //   $created = $node->getCreatedTime();
+  //   $modified = $node->getChangedTime();
+
+  //   // Process the node
+  //   $this->batchProcessor->processNode($node->id());
+
+  //   // Reload the node now that batch processes have occured
+  //   $node_alt = \Drupal::entityTypeManager()->getStorage('node')->load($node->id());
+
+  //   // Capture the current details
+  //   $created_alt = $node_alt->getCreatedTime();
+  //   $modified_alt = $node_alt->getChangedTime();
+
+  //   // Assertions
+  //   $this->assertEquals($created, $created_alt, 'Node creation date should match');
+  //   $this->assertEquals($modified, $modified_alt, 'Node modification date should match');
+  // }
 
   /**
    * Tests processing a node with a valid PDF file.
@@ -75,13 +94,29 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $node = $this->createNode($file);
 
+    // Process the node
+    $this->batchProcessor->processNode($node->id());
+    $this->verifyNodeUpdatedWithMetadata($node);
+  }
 
-    // Capture the original details
-    $created = $node->getCreatedTime();
-    $modified = $node->getChangedTime();
+
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testProcessNodeWithValidDocxWithMetadata() {
+    $file = $this->createDrupalFile('test_metadata.docx', $this->generateDocxWithMetadata(), 'application/docx');
+    $node = $this->createNode($file);
 
     // Process the node
     $this->batchProcessor->processNode($node->id());
+    $this->verifyNodeUpdatedWithMetadata($node);
+  }
+
+  
+  public function verifyNodeUpdatedWithMetadata($node){
+        // Capture the original details
+        $created = $node->getCreatedTime();
+        $modified = $node->getChangedTime();
 
     // Reload the node now that batch processes have occured
     $node_alt = \Drupal::entityTypeManager()->getStorage('node')->load($node->id());
@@ -187,9 +222,6 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
   
    public function testProcessNodeWithDataProtected() {
 
-    /**
-     * TODO: Add checks against taxonomy/string_lists
-    */
     $this->setConfigSetting('extraction_settings.data_protected', TRUE);
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');

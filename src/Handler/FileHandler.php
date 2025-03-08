@@ -165,6 +165,32 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
   }
 
   /**
+ * Gets all supported file extensions from all registered FileHandlers.
+ *
+ * @return array
+ *   A merged list of all supported file extensions.
+ */
+public function getAllSupportedExtensions(): array {
+  $extensions = [];
+
+  // Get all registered file handler plugins.
+  $plugin_manager = \Drupal::service('plugin.manager.metadata_hex_file_handler');
+  $definitions = $plugin_manager->getDefinitions();
+
+  foreach ($definitions as $plugin_id => $definition) {
+      /** @var FileHandlerInterface $plugin */
+      $plugin = $plugin_manager->createInstance($plugin_id);
+      
+      // Merge the extensions from this handler.
+      $extensions = array_merge($extensions, $plugin->getSupportedExtentions());
+  }
+
+  // Ensure uniqueness.
+  return array_unique($extensions);
+}
+
+
+  /**
    * Determines if the file exists and is readable.
    *
    * @return bool

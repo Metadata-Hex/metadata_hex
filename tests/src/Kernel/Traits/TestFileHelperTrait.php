@@ -7,6 +7,8 @@ use Drupal\node\Entity\Node;
 use Drupal\user\Entity\User;
 use org\bovigo\vfs\vfsStream;
 use TCPDF;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\IOFactory;
 
 trait TestFileHelperTrait {
 
@@ -17,6 +19,44 @@ trait TestFileHelperTrait {
       // print_r($e->getMessage(), true);
     }
   }
+
+
+/**
+ * Generates a DOCX file with metadata using PHPWord.
+ *
+ * @return string The DOCX content as a string.
+ */
+public function generateDocxWithMetadata(): string {
+  $phpWord = new PhpWord();
+
+  // Set metadata properties
+  $phpWord->getDocumentProperties()->setCreator('Drupal Kernel Test');
+  $phpWord->getDocumentProperties()->setCompany('Automated Test Suite');
+  $phpWord->getDocumentProperties()->setTitle('Test DOCX Document');
+  $phpWord->getDocumentProperties()->setSubject('Testing Metadata in DOCX');
+  $phpWord->getDocumentProperties()->setKeywords('Drupal, PHPWord, Test, Metadata');
+  $phpWord->getDocumentProperties()->setCategory('Automated Testing');
+  $phpWord->getDocumentProperties()->setLastModifiedBy('Test Runner');
+  $phpWord->getDocumentProperties()->setCreated(time()); // Unix timestamp
+  $phpWord->getDocumentProperties()->setModified(time());
+
+  // Add content
+  $section = $phpWord->addSection();
+  $section->addText('This is a test DOCX with metadata.', ['name' => 'Arial', 'size' => 12]);
+
+  // Save to a temporary file and return content as string
+  $tempFile = tempnam(sys_get_temp_dir(), 'docx_test') . '.docx';
+  $writer = IOFactory::createWriter($phpWord, 'Word2007');
+  $writer->save($tempFile);
+
+  // Get file content
+  $docxContent = file_get_contents($tempFile);
+
+  // Clean up temp file
+  unlink($tempFile);
+
+  return $docxContent;
+}
 
   /**
    * Generates a PDF with metadata using TCPDF.
