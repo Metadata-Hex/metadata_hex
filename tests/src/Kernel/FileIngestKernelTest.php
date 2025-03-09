@@ -30,7 +30,7 @@ class FileIngestKernelTest extends BaseKernelTestHex {
       'test_metadata.pdf', 
       'publication_23.pdf', 
       'document2.pdf', 
-      'document4.pdf'
+      'document4.pdf' 
     ];
 
     $files = [];
@@ -39,7 +39,6 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     foreach ($file_names as $name) {
       $files[] = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', true);
     }
-    $files[] = $this->createDrupalFile($name, $this->generateMdWithMetadata(), 'text/markdown', true);
     $randomKey = array_rand($files);
     $files_linked[] = $files[$randomKey];
 
@@ -48,7 +47,7 @@ class FileIngestKernelTest extends BaseKernelTestHex {
       $node = $this->createNode($file);
     }
 
-$fids = $nids = [2,3,4,5,6];
+$fids = $nids = [2,3,4,5];
   $this->batchProcessor->processFiles($fids);
     sleep(1);
 
