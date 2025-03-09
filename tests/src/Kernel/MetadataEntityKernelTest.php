@@ -42,6 +42,32 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
   }
 
 
+  /**
+   * Tests processing a node with a valid node.
+   */
+  public function testMetadataEntityCanProcessMdNode() {
+
+    $file = $this->createDrupalFile('test_metadata.md', $this->generateMdWithMetadata(), 'text/markdown');
+    $node = $this->createNode($file);
+
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromNode($node->id());
+    $this->runAssertions();
+  }
+
+  /**
+   * Tests processing a node with a valid file.
+   */
+  public function testMetadataEntityCanProcessMdFile() {
+
+    $file = $this->createDrupalFile('test_metadata.md', $this->generateMdWithMetadata(), 'text/markdown');
+
+    $this->me = new MetadataEntity(\Drupal::logger('info'));
+    $this->me->loadFromFile($file->getFileUri());
+    $this->runAssertions();
+  }
+
+
 
 
   /**

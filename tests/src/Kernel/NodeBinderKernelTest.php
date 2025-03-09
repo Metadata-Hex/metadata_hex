@@ -18,7 +18,7 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
    * Tests processing a node with a valid PDF file.
    */
 
-  public function testNodeBinderWithNode() {
+   public function testNodeBinderWithPdfNode() {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $this->original = $this->createNode($file);
@@ -32,9 +32,32 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
   /**
    * Tests processing a node with a valid PDF file.
    */
-  public function testNodeBinderWithFile() {
+  public function testNodeBinderWithPdfFile() {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
+    $this->bind = new NodeBinder(\Drupal::logger('info'));
+    $this->bind->init($file);
+
+    $this->runAssertions();
+  }
+
+  public function testNodeBinderWithMdNode() {
+
+    $file = $this->createDrupalFile('test_metadata.md', $this->generatePdfWithMetadata(), 'text/markdown');
+    $this->original = $this->createNode($file);
+    $this->bind = new NodeBinder(\Drupal::logger('info'));
+    $this->bind->init($this->original);
+
+    $this->runAssertions();
+
+  }
+
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testNodeBinderWithMdFile() {
+
+    $file = $this->createDrupalFile('test_metadata.md', $this->generatePdfWithMetadata(), 'text/markdown');
     $this->bind = new NodeBinder(\Drupal::logger('info'));
     $this->bind->init($file);
 
