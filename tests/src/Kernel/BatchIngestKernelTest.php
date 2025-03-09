@@ -63,7 +63,7 @@ class BatchIngestKernelTest extends BaseKernelTestHex {
 
 
     foreach ($files as $name) {
-      $file = $this->createDrupalFile($name, $this->generateDocxWithMetadata(), 'application/docx');
+      $file = $this->createDrupalFile($name, $this->generateDocxWithMetadata(), 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
       $node = $this->createNode($file);
     }
 

@@ -39,10 +39,11 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     foreach ($file_names as $name) {
       $files[] = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', true);
     }
-    $randomKey = array_rand($files);
-    $files_linked[] = $files[$randomKey];
 
-    unset($files[$randomKey]);
+    //$randomKey = array_rand($files);
+    $files_linked[] = $files[0];
+
+    // unset($files[$randomKey]);
     foreach ($files_linked as $file){
       $node = $this->createNode($file);
     }

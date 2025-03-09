@@ -43,6 +43,28 @@ public function generateDocxWithMetadata(): string {
   // Add content
   $section = $phpWord->addSection();
   $section->addText('This is a test DOCX with metadata.', ['name' => 'Arial', 'size' => 12]);
+    $writer = IOFactory::createWriter($phpWord, 'Word2007');
+  ob_start();
+    $writer->save('php://output');
+
+$docxContent = ob_get_contents();
+ob_end_clean();
+
+
+    return $docxContent;
+      // Create the writer
+    $writer = IOFactory::createWriter($phpWord, 'Word2007');
+
+    // Save to a memory stream instead of a file
+    $tempMemory = fopen('php://memory', 'w+');
+    $writer->save($tempMemory);
+
+    // Rewind the stream to read its contents
+    rewind($tempMemory);
+    $docxContent = stream_get_contents($tempMemory);
+    fclose($tempMemory);
+
+    return $docxContent;
 
   // Save to a temporary file and return content as string
   $tempFile = tempnam(sys_get_temp_dir(), 'docx_test') . '.docx';
@@ -51,7 +73,6 @@ public function generateDocxWithMetadata(): string {
 
   // Get file content
   $docxContent = file_get_contents($tempFile);
-
   // Clean up temp file
   unlink($tempFile);
 
