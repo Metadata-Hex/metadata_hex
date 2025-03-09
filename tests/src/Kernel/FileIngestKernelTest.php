@@ -49,7 +49,8 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     //}
 //echo PHP_EOL.print_r($node->toArray(), true).PHP_EOL;
 $fids = $nids = [2,3,4,5];
-  $this->batchProcessor->processFiles($fids);
+echo print_r($fids, true);
+$this->batchProcessor->processFiles($fids);
     sleep(1);
 
 //:echo PHP_EOL.print_r($node->toArray(), true).PHP_EOL;
@@ -57,6 +58,8 @@ $fids = $nids = [2,3,4,5];
     $this->lookingForNoData($node);
 
     foreach ($nids as $nid){
+      echo PHP_EOL.$nid.PHP_EOL;
+
       $this->lookingForCorrectData($nid);
     }
 
