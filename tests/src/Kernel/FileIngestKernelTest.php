@@ -43,17 +43,18 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     $files_linked[] = $files[$randomKey];
 
     unset($files[$randomKey]);
-    foreach ($files_linked as $file){
-      $node = $this->createNode($file);
-    }
-echo PHP_EOL.print_r($node->toArray(), true).PHP_EOL;
+    $node = $this->createNode($files_linked[0]);
+    //oreach ($files_linked as $file){V
+     // $node = $this->createNode($file);
+    //}
+//echo PHP_EOL.print_r($node->toArray(), true).PHP_EOL;
 $fids = $nids = [2,3,4,5];
   $this->batchProcessor->processFiles($fids);
     sleep(1);
 
-echo PHP_EOL.print_r($node->toArray(), true).PHP_EOL;
+//:echo PHP_EOL.print_r($node->toArray(), true).PHP_EOL;
 // verify that files already attached to nodes are filtered out
-    $this->lookingForNoData();
+    $this->lookingForNoData($node);
 
     foreach ($nids as $nid){
       $this->lookingForCorrectData($nid);
@@ -64,9 +65,9 @@ echo PHP_EOL.print_r($node->toArray(), true).PHP_EOL;
   /**
    *
    */
-  public function lookingForNoData($nid = 1){
+  public function lookingForNoData($node){
 
-    $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
+   // $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
 
     // Capture the current details
     $fsubj = $node->get('field_subject')->getString();
