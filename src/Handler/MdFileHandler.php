@@ -3,8 +3,7 @@
 namespace Drupal\metadata_hex\Handler;
 
 use Exception;
-use PhpOffice\PhpWord\IOFactory;
-
+use Symfony\Component\Yaml\Yaml;
 /**
  * Class MdFileHandler
  *
@@ -40,7 +39,7 @@ class MdFileHandler extends FileHandler {
         $markdownBody = preg_replace('/^---\n.*?\n---\n/s', '', $content, 1);
 
         // Parse YAML into an array
-        $frontmatter = yaml_parse($yamlContent) ?: [];
+        $frontmatter = yaml::parse($yamlContent) ?: [];
     } else {
         // No frontmatter found, assume only Markdown content
         $frontmatter = [];
