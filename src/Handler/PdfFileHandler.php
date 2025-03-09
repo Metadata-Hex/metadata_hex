@@ -41,7 +41,6 @@ class PdfFileHandler extends FileHandler {
       $details = $pdf->getDetails();
       return $details;
     } catch (Exception $e) {
-      $this->logger->error("Error parsing PDF file: " . $e->getMessage());
       throw new Exception("Error parsing PDF file: " . $e->getMessage());
     }
   }

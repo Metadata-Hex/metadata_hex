@@ -18,7 +18,7 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
    * Tests processing a node with a valid PDF file.
    */
 
-  public function testNodeBinderWithNode() {
+   public function testNodeBinderWithPdfNode() {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $this->original = $this->createNode($file);
@@ -32,13 +32,36 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
   /**
    * Tests processing a node with a valid PDF file.
    */
-  public function testNodeBinderWithFile() {
+  public function testNodeBinderWithPdfFile() {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
     $this->bind = new NodeBinder(\Drupal::logger('info'));
     $this->bind->init($file);
 
     $this->runAssertions();
+  }
+
+  public function testNodeBinderWithMdNode() {
+
+    $file = $this->createDrupalFile('test_metadata.md', $this->generatePdfWithMetadata(), 'text/markdown');
+    $this->original = $this->createNode($file);
+    $this->bind = new NodeBinder(\Drupal::logger('info'));
+    $this->bind->init($this->original);
+
+    $this->runAssertions(1);
+
+  }
+
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testNodeBinderWithMdFile() {
+
+    $file = $this->createDrupalFile('test_metadata.md', $this->generatePdfWithMetadata(), 'text/markdown');
+    $this->bind = new NodeBinder(\Drupal::logger('info'));
+    $this->bind->init($file);
+
+    $this->runAssertions(1);
   }
 
   /** 
@@ -71,7 +94,7 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
   /**
    * Run Assertions
    */
-  public function runAssertions(){
+  public function runAssertions($matches = 5){
 
     $n = $this->bind->getNode();
     $meta = $this->bind->ingestNodeFileMeta();//();
@@ -89,7 +112,7 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
     $this->assertIsArray($meta, "Metadata should be an array.");
 
     // Assert that meta has more than 5 entries
-    $this->assertGreaterThan(5, count($meta_raw), "Metadata should contain more than 5 entries.");
+    $this->assertGreaterThan($matches, count($meta_raw), "Metadata should contain more than 5 entries.");
 
     // $files = $this->bind->getFileUris();
 

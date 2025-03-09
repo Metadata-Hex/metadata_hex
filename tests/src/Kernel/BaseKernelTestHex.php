@@ -58,7 +58,7 @@ protected $settingsManager;
    */
   protected function setUp(): void {
     parent::setUp();
-    
+
     $this->enableModules(['metadata_hex']);
 
     // Install required entity schemas.
@@ -132,7 +132,7 @@ protected $settingsManager;
       'allowed_values' => [
         'application/pdf' => 'pdf',
         'application/docx' => 'docx',
-        'application/txt' => 'txt'
+        'text/markdown' => 'md'
       ],
     ]);
 

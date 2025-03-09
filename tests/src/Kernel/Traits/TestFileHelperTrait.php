@@ -18,6 +18,31 @@ trait TestFileHelperTrait {
     }
   }
 
+  public function generateMdWithMetadata(): string {
+      $sampleContent = <<<EOT
+  ---
+  title: "Test Markdown File"
+  author: "John Doe"
+  date: "2025-03-08"
+  subject: "Testing Metadata in mds"
+  keywords:
+    - php
+    - markdown
+    - Test
+  ---
+  
+  # Hello World
+  
+  This is a test Markdown file.
+  
+  - Item 1
+  - Item 2
+  - Item 3
+  EOT;
+  
+return $sampleContent;
+  }
+
   /**
    * Generates a PDF with metadata using TCPDF.
    *

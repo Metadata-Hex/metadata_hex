@@ -122,7 +122,59 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
   }
 
- 
+
+  /**
+   * Tests processing a node with a valid PDF file.
+   */
+  public function testProcessNodeWithValidMdWithMetadata() {
+    $file = $this->createDrupalFile('test_metadata.md', $this->generateMdWithMetadata(), 'text/markdown');
+    $node = $this->createNode($file);
+
+
+    // Capture the original details
+    $created = $node->getCreatedTime();
+    $modified = $node->getChangedTime();
+
+    // Process the node
+    $this->batchProcessor->processNode($node->id());
+
+    // Reload the node now that batch processes have occured
+    $node_alt = \Drupal::entityTypeManager()->getStorage('node')->load($node->id());
+
+    // Capture the current details
+    $created_alt = $node_alt->getCreatedTime();
+    $modified_alt = $node_alt->getChangedTime();
+    $fsubj = $node_alt->get('field_subject')->getString();
+    $fpages = $node_alt->get('field_pages')->getString();
+    $fdate = $node_alt->get('field_publication_date')->getString();
+    $ftype = $node_alt->get('field_file_type')->value;
+    $ftop = $node_alt->get('field_topics')->getValue();
+    $term_names = [];
+    foreach ($node_alt->get('field_topics')->referencedEntities() as $term) {
+        $term_names[] = $term->label();
+    }
+
+    // ASSERTATIONS
+    $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
+
+    $this->assertNotEquals('', $fsubj, 'Subject is blank');
+    $this->assertEquals('Testing Metadata in mds', $fsubj, 'Extracted subject doesnt match expected');
+
+    $this->assertEquals('', $fpages, 'Pages isnt blank');
+
+    $this->assertEquals('', $fdate, 'Publication date is blank');
+    $this->assertFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
+
+    $this->assertEquals('', $ftype, 'FileType is blank');
+
+    $this->assertNotEquals('', $ftop, 'Topic is blank');
+    $this->assertNotContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
+    $this->assertNotContains('TCPDF', $term_names, "The expected taxonomy term name TCPDF is not present.");
+    $this->assertNotContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
+    $this->assertNotContains('Metadata', $term_names, "The expected taxonomy term name Metadata is not present.");
+
+  }
+
    /**
    * Tests processing node with title not protected
    */
@@ -184,7 +236,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
    /**
    * Tests processing Nodes with data protected
    */
-  
+
    public function testProcessNodeWithDataProtected() {
 
     /**
@@ -222,6 +274,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     foreach ($node_alt->get('field_topics')->referencedEntities() as $term) {
         $term_names[] = $term->label();
     }
+
 
     // ASSERTATIONS
     $this->assertEquals($created, $created_alt, 'Node creation dates dont match');
@@ -302,9 +355,9 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     }
 
   /**
-   * Tests processing with flatten keys 
+   * Tests processing with flatten keys
    */
-  public function testProcessNodeWithFlattenKeys() { 
+  public function testProcessNodeWithFlattenKeys() {
 
     $updatedMapping = "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nformat|field_file_type";
     $this->setConfigSetting('extraction_settings.flatten_keys', TRUE);
@@ -350,7 +403,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
 
     $this->assertNotEquals('', $ftype, 'FileType is blank');
-    $this->assertEquals('pdf', $ftype, 'Extracted file_type matches when it shouldnt'); // it shouldnt be pdf == pdf 
+    $this->assertEquals('pdf', $ftype, 'Extracted file_type matches when it shouldnt'); // it shouldnt be pdf == pdf
 
     $this->assertNotEquals([], $ftop, 'Topic is blank');
     $this->assertContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
@@ -384,9 +437,9 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
 
   /**
    * Tests processing with incorrect mappings
-   * 
+   *
    */
-  public function testProcessNodeWithFieldMapping() { 
+  public function testProcessNodeWithFieldMapping() {
     // PHP_EOL."FIELD".PHP_EOL;
     $updatedMapping = "keywords|field_topics\ntitle|title\ndx:subjcts|field_subject\nCreationDate|field_pub_date\nDC:Format|field_file_type";
     $this->setConfigSetting('extraction_settings.field_mappings', $updatedMapping);
@@ -426,7 +479,7 @@ class MetadataBatchProcessorKernelTest extends BaseKernelTestHex {
     $this->assertNotEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
 
     $this->assertEquals('', $fpages, 'Catalog is blank'.$fpages);
-    $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected'); // this should = 1 = 
+    $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected'); // this should = 1 =
 
     $this->assertEquals('', $fdate, 'Publication date is blank'.$fdate);
 
