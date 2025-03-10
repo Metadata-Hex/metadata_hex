@@ -6,8 +6,9 @@
 
 ## **Features**
 ✅ **Automated Metadata Extraction**  
-- Extracts metadata from PDFs using `Smalot\PdfParser`.  
-- Supports additional file types via plugin-based handlers.  
+- Extracts metadata from PDFs using `Smalot\PdfParser`.
+- Extracts metadata from markdown using `Symphony\Yaml `
+- Supports additional file types via plugin-based handlers (future enhancement).  
 
 ✅ **Node & File Processing**  
 - Processes newly inserted nodes automatically via `hook_node_insert()`.  
@@ -19,7 +20,7 @@
 
 ✅ **Batch Processing**  
 - Supports bulk metadata extraction and node updates.  
-- Processes entire directories of PDF files.  
+- Processes entire directories of files and attach them to nodes.  
 
 ✅ **Admin Configuration**  
 - Fully configurable via the Drupal admin panel.  
@@ -43,29 +44,31 @@
   - **`hook_node_insert()`** checks the node bundle.
   - If eligible, it **sends the node to the batch processor**.
 
-### **Manual File Processing**
+### ** File Ingest Processing**
 Run batch processing manually using:
-```php
-\Drupal\metadata_hex\Handler\MetadataBatchProcessor::processFiles();
-```
+- process entire folders using the file batch ingest
 
 ## **Core Components**
-### **1️⃣ Services**
+### ** Services**
 | Service Key | Class | Purpose |
 |------------|-------|---------|
 | `metadata_hex.file_handler_manager` | `FileHandlerManager` | Manages file handlers for different extensions |
 | `metadata_hex.metadata_extractor` | `MetadataExtractor` | Extracts metadata from PDF files |
-| `metadata_hex.metadata_parser` | `MetadataParser` | Cleans, validates, and structures metadata |
 | `metadata_hex.settings_manager` | `SettingsManager` | Retrieves and manages module settings |
 | `metadata_hex.metadata_batch_processor` | `MetadataBatchProcessor` | Handles batch metadata processing |
 
-### **2️⃣ Entity Classes**
+### ** Entity Classes**
 | Class | Purpose |
 |------------|---------|
 | `NodeBinder` | Associates files and metadata with Drupal nodes |
 | `MetadataEntity` | Encapsulates metadata processing for a given entity |
 
-### **3️⃣ Hooks**
+### ** Utilities**
+| Service Key | Class | Purpose |
+| `metadata_hex.metadata_parser` | `MetadataParser` | Cleans, validates, and structures metadata |
+
+
+### ** Hooks**
 | Hook | Description |
 |------|------------|
 | `hook_node_insert()` | Checks if a node should be processed and sends it to the `MetadataBatchProcessor` |
@@ -92,8 +95,8 @@ class CsvFileHandler extends FileHandler {
 ```
 ## **Development & Debugging**
 ### **Logging**
-This module logs to the `metadata_hex` channel:
-`\Drupal::logger('metadata_hex')->info('Processing started.');`
+This module logs to the `default` channel:
+`\Drupal::logger('default')->info('Processing started.');`
 
 Check logs via:
 `drush ws --severity=notice`
