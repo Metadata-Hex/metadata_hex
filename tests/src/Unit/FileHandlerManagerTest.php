@@ -13,7 +13,7 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\metadata_hex\Handler\PdfFileHandler;
-use Drupal\metadata_hex\Handler\DocxFileHandler;
+use Drupal\metadata_hex\HandlerMdFileHandler;
 
 class FileHandlerManagerTest extends TestCase {
 
@@ -102,15 +102,15 @@ class FileHandlerManagerTest extends TestCase {
   /** @test */
   public function test_it_returns_a_handler_for_doc_extension() {
       // Mock the handler object
-      $mockHandler = $this->createMock(DocxFileHandler::class);
+      $mockHandler = $this->createMock(MdFileHandler::class);
 
       // Assuming FileHandlerManager has a method getHandlerForExtension()
       $this->fhm = $this->createMock(FileHandlerManager::class);
-      $this->fhm->method('getHandlerForExtension')->with('docx')->willReturn($mockHandler);
+      $this->fhm->method('getHandlerForExtension')->with('md')->willReturn($mockHandler);
 
-      $result = $this->fhm->getHandlerForExtension('docx');
+      $result = $this->fhm->getHandlerForExtension('md');
 
-      $this->assertInstanceOf(DocxFileHandler::class, $result);
+      $this->assertInstanceOf(MdFileHandler::class, $result);
   }
 
   /** @test */
