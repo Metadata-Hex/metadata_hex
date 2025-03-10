@@ -13,7 +13,7 @@ use Drupal\Core\Config\Config;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\metadata_hex\Handler\PdfFileHandler;
-use Drupal\metadata_hex\HandlerMdFileHandler;
+use Drupal\metadata_hex\Handler\MdFileHandler;
 
 class FileHandlerManagerTest extends TestCase {
 
