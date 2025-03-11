@@ -79,10 +79,6 @@ class SettingsForm extends ConfigFormBase {
   /**
    * Submit handler for processing all selected node types.
    */
-
-  /**
-   * Submit handler for processing all selected node types.
-   */
   public function processAllNodes(array &$form, FormStateInterface $form_state) {
     $config = $this->configFactory->getEditable('metadata_hex.settings');
     $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
@@ -143,7 +139,36 @@ class SettingsForm extends ConfigFormBase {
     }
     return $files;
   }
+ /**
+   * Retrieve file IDs of orphaned files with specified extensions.
+   *
+   * @return array
+   *   Array of orphaned file IDs.
+   */
+  protected function getOrphanedFiles() {
+    $connection = Database::getConnection();
+    $query = $connection->select('file_managed', 'f')
+      ->fields('f', ['fid'])
+      ->leftJoin('file_usage', 'fu', 'f.fid = fu.fid')
+      ->isNull('fu.fid')
+      ->condition('f.filemime', $this->buildMimeTypeConditions(), 'IN');
 
+    return $query->execute()->fetchCol();
+  }
+
+  /**
+   * Build conditions for allowed file extensions.
+   *
+   * @return array
+   *   Array of MIME types corresponding to allowed file extensions.
+   */
+  protected function buildMimeTypeConditions() {
+    $mime_types = [];
+    foreach ($this->allowedExtensions as $ext) {
+      $mime_types[] = \Drupal::service('file.mime_type.guesser')->guess("file.$ext");
+    }
+    return $mime_types;
+  }
   
   /**
    * Submit handler for processing all selected node types.
@@ -159,11 +184,33 @@ class SettingsForm extends ConfigFormBase {
 
     //   $ingestDir = $this->settingsManager->getIngestDirectory()??'';
     $files = $this->ingestFiles($ingest_dir);
+    $fids = [];
 
+    // Iterate over file URIs and ensure a Drupal file entity exists.
+    foreach ($files as $uri) {
+      $file = $this->fileStorage->loadByProperties(['uri' => $uri]);
+      if ($file) {
+        $fids[] = reset($file)->id();
+      }
+      else {
+        $new_file = File::create([
+          'uri' => $uri,
+          'status' => FILE_STATUS_PERMANENT,
+        ]);
+        $new_file->save();
+        $fids[] = $new_file->id();
+      }
+    }
+
+    // Find orphaned files of allowed extensions.
+    $orphaned_fids = $this->getOrphanedFiles();
+
+    // Merge, deduplicate, and return unique file IDs.
+    $batch_fids = array_unique(array_merge($fids, $orphaned_fids));
  //   foreach ($files as $file){
     $operations[] = [
       ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'processFiles'],
-      [$files, true],
+      [$batch_fids, true],
     ];
 //  }
     // Define batch
