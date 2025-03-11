@@ -44,17 +44,13 @@ class FileIngestKernelTest extends BaseKernelTestHex {
 
     unset($files[$randomKey]);
     $node = $this->createNode($files_linked[0]);
-    //oreach ($files_linked as $file){V
-     // $node = $this->createNode($file);
-    //}
-//echo PHP_EOL.print_r($node->toArray(), true).PHP_EOL;
-$fids = $nids = [2,3,4,5];
-//echo print_r($fids, true);
-$this->batchProcessor->processFiles($fids);
-    sleep(1);
 
-//:echo PHP_EOL.print_r($node->toArray(), true).PHP_EOL;
-// verify that files already attached to nodes are filtered out
+    $fids = $nids = [2,3,4,5];
+
+    $this->batchProcessor->processFiles($fids);
+        sleep(1);
+
+    // verify that files already attached to nodes are filtered out
     $this->lookingForNoData($node);
 
     foreach ($nids as $nid){
