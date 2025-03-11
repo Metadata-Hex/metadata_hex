@@ -54,7 +54,7 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     $this->lookingForNoData($node);
 
     foreach ($nids as $nid){
-      echo PHP_EOL.$nid.PHP_EOL;
+      //echo PHP_EOL.$nid.PHP_EOL;
 
       $this->lookingForCorrectData($nid);
     }

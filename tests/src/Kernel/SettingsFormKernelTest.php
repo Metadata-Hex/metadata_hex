@@ -11,9 +11,9 @@ use Symfony\Component\HttpFoundation\Request;
  *
  * @group metadata_hex
  */
-class SettingsFormTest extends BaseKernelTestHex {
+class SettingsFormKernelTest extends BaseKernelTestHex {
 
-  
+
 
   /**
    * Tests that the save button correctly updates configuration.
@@ -21,6 +21,16 @@ class SettingsFormTest extends BaseKernelTestHex {
   public function testSaveButton() {
     // Load the form and submit a mock request.
     $form = new SettingsForm();
+
+/**
+    ConfigFactoryInterface $configFactory,
+    TypedConfigManagerInterface $typedConfigManager, // Required by parent
+    MetadataBatchProcessor $batchProcessor,
+    MetadataExtractor $metadataExtractor,
+    MessengerInterface $messenger
+    **/
+
+
     $form_state = $this->getMockFormState([
       'some_setting' => 'new_value', // Adjust based on your form fields
     ]);
