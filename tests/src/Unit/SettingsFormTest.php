@@ -144,7 +144,7 @@ class SettingsFormTest extends TestCase
   /** @test */
   public function testBuildFormContainsExpectedFields()
   {
-    $form = [];
+     $form = [];
     $formState = new FormState();
     $builtForm = $this->form->buildForm($form, $formState);
 
