@@ -179,4 +179,77 @@ return $sampleContent;
     return $file_path;
     }
 
+
+   /**
+    * Creates a set of mock entity files
+     * @var array $files
+     */
+    protected function setMockEntities($files = [
+      'pdf' => [ 'file.pdf',
+      'test_metadata.pdf',
+      'publication_23.pdf' ],
+      'md' => [
+      'document2.md',
+      'document4.md'
+      ]
+    ]){
+  
+  
+      foreach ($files['pdf'] as $name) {
+        $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf');
+        $node = $this->createNode($file);
+      }
+        
+      foreach ($files['md'] as $name) {
+        $file = $this->createDrupalFile($name, $this->generateMdWithMetadata(), 'text/markdown');
+        $node = $this->createNode($file);
+      }
+    }
+
+   /**
+    * Creates a set of mock entity orphaned files
+     * @var array $files
+     */
+    protected function setMockOrphansFiles($files = [
+      'pdf' => [ 'orph.pdf',
+      'orph_test_metadata.pdf',
+      'orph_tpublication_23.pdf' ],
+      'md' => [
+      'orph_tdocument2.md',
+      'orph_tdocument4.md'
+      ]
+    ]){
+      foreach ($files['pdf'] as $name) {
+        $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', false);
+      }
+  
+      foreach ($files['md'] as $name) {
+        $file = $this->createDrupalFile($name, $this->generateMdWithMetadata(), 'text/markdown', false);
+      }
+    }
+  
+
+   /**
+    * Creates a set of mock entity unattached files
+     * @var array $files
+     */
+    protected function setMockUnattachedFiles($files = [
+      'pdf' => [ 'unatt.pdf',
+      'unatt_test_metadata.pdf',
+      'unatt_tpublication_23.pdf' ],
+      'md' => [
+      'unatt_tdocument2.md',
+      'unatt_tdocument4.md'
+      ]
+    ]){
+  
+      foreach ($files['pdf'] as $name) {
+        $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', true);
+      }
+      foreach ($files['md'] as $name) {
+        $file = $this->createDrupalFile($name, $this->generateMdWithMetadata(), 'text/markdown', true);
+      }
+    }
+    
+
 }

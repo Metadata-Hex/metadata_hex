@@ -45,17 +45,21 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
     /**
      * The messenger service.
      *
-     * @var \Drupal\Core\Messenger\MessengerInterface
+     * @var \Drupal\metadata_hex\Service\MetadataExtractor
      */
     protected $metadataExtractor;
   
     /**
      * The messenger service.
      *
-     * @var \Drupal\Core\Messenger\MessengerInterface
+     * @var \Drupal\metadata_hex\Service\MetadataBatchProcessor
      */
     protected $metadataBatchProcessor;
   
+    protected $form;
+    /**
+     * 
+     */
     protected $file_system;
     /**
      * Constructs a new SettingsForm.
@@ -87,111 +91,18 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
         $container->get('messenger')
       );
     }
+    protected function setUp(): void {
+      parent::setUp();
+      $this->installConfig(['metadata_hex']);
   
-    /**
-     * {@inheritdoc}
-     */
-    // public function getFormId() {
-    //   return 'metadata_hex_settings_form';
-    // }
-  
-    /**
-     * {@inheritdoc}
-     */
-  //   public function buildForm(array $form, FormStateInterface $form_state) {
-  //     $config = $this->configFactory->get('metadata_hex.settings');
-  
-  //     $form['example_setting'] = [
-  //       '#type' => 'textfield',
-  //       '#title' => $this->t('Example Setting'),
-  //       '#default_value' => $config->get('example_setting') ?? '',
-  //     ];
-  
-  //     $form['actions']['submit'] = [
-  //       '#type' => 'submit',
-  //       '#value' => $this->t('Save'),
-  //     ];
-  
-  //     return $form;
-  //   }
-  
-  //   /**
-  //    * {@inheritdoc}
-  //    */
-  //   public function submitForm(array &$form, FormStateInterface $form_state) {
-  //     $this->configFactory->getEditable('metadata_hex.settings')
-  //       ->set('example_setting', $form_state->getValue('example_setting'))
-  //       ->save();
-  
-  //     $this->messenger->addStatus($this->t('Settings saved successfully.'));
-  //   }
-  // }
-
-  protected function setMockEntities(){
-    $files = [
-      'metadoc.pdfx',
-      'test_metadata.pdf',
-      'publication_23.pdf',
-      'document2.pdf',
-      'document4.pdf'
-    ];
-
-
-    foreach ($files as $name) {
-      $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf');
-      $node = $this->createNode($file);
-    }
+      // Manually instantiate the form with required dependencies.
+      $this->form = new SettingsForm($this->configFactory,
+      $this->typedConfigManager, // Required by parent
+      $this->metadataBatchProcessor,
+      $this->metadataExtractor,
+      $this->messenger);
   }
-
-  protected function setMockOrphansFiles(){
-    $files = [
-      'orphan1.pdf',
-      'orphan_test_metadata.pdf',
-      'orphan_tpublication_23.pdf',
-      'orphan_tdocument2.pdf',
-      'orphan_tdocument4.pdf'
-    ];
-
-
-    foreach ($files as $name) {
-      $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', false);
-    }
-  }
-
-
-  protected function setMockUnattachedFiles(){
-    $files = [
-      'unatt.pdf',
-      'unatt_test_metadata.pdf',
-      'unatt_tpublication_23.pdf',
-      'unatt_tdocument2.pdf',
-      'unatt_tdocument4.pdf'
-    ];
-
-
-    foreach ($files as $name) {
-      $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', true);
-    }
-  }
-  /**
-   * Helper function to create a mock FormState object.
-   *
-   * @param array $values
-   *   Form field values.
-   * @param string $triggering_element
-   *   Name of the button being clicked.
-   *
-   * @return \Drupal\Core\Form\FormState
-   *   The mocked form state.
-   */
-  protected function getMockFormState(array $values, $triggering_element) {
-    $form_state = new FormState();
-    $form_state->setValues($values);
-    $form_state->setTriggeringElement(['#name' => $triggering_element]);
-
-    return $form_state;
-  }
-
+ 
   /**
    * Tests that the save button correctly updates configuration.
    */
@@ -217,8 +128,7 @@ $settings = [
 $nids = [1, 2, 3, 4, 5];
 
     $formState = new FormState();
-    $builtForm = $this->form->buildForm($form, $formState);
-    $formState->setValues();
+     $this->form->buildForm($form, $formState);
     $form_state = $this->getMockFormState($settings, 'process_cron_nodes');
     // Submit the form.
     $form->submitForm($settings, $form_state);
@@ -305,60 +215,24 @@ $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
   }
 
+    /**
+     * Helper function to create a mock FormState object.
+     *
+     * @param array $values
+     *   Form field values.
+     * @param string $triggering_element
+     *   Name of the button being clicked.
+     *
+     * @return \Drupal\Core\Form\FormState
+     *   The mocked form state.
+     */
+    protected function getMockFormState(array $values, $triggering_element) {
+      $form_state = new FormState();
+      $form_state->setValues($values);
+      $form_state->setTriggeringElement(['#name' => $triggering_element]);
+  
+      return $form_state;
+    }
+  
 
-/**     $form['file_ingest']['process_cron_nodes'] = [
-  '#type' => 'submit',
-  '#value' => $this->t('Ingest files'),
-  '#submit' => ['::processAllFiles'], 
-]; */
-
-/**
- *     $form['node_process']['process_nodes'] = [
-      '#type' => 'submit',
-      '#value' => $this->t('Manually process all selected node types'),
-      '#submit' => ['::processAllNodes'],
-    ];
- */
-    // Assert that the configuration was saved correctly.
-    // $config = $this->config('metadata_hex.settings');
-    // $this->assertEquals('new_value', $config->get('some_setting'), 'The setting was updated.');
   }
-
-  // /**
-  //  * Tests the reset button functionality.
-  //  */
-  // public function testResetButton() {
-  //   // Set initial configuration.
-  //   $this->config('metadata_hex.settings')->set('some_setting', 'old_value')->save();
-
-  //   // Load the form and simulate clicking the reset button.
-  //   $form = new SettingsForm();
-  //   $form_state = $this->getMockFormState([], 'reset'); // Simulating reset button click
-
-  //   $form->submitForm([], $form_state);
-
-  //   // Assert that the configuration was reset (modify expected value as needed).
-  //   $config = $this->config('metadata_hex.settings');
-  //   $this->assertEquals('default_value', $config->get('some_setting'), 'The setting was reset.');
-  // }
-
-  // /**
-  //  * Helper function to mock form state.
-  //  *
-  //  * @param array $values
-  //  *   The values to simulate in the form submission.
-  //  * @param string $triggering_element
-  //  *   The name of the button being clicked (optional).
-  //  *
-  //  * @return \Drupal\Core\Form\FormState
-  //  *   The mocked form state.
-  //  */
-  // protected function getMockFormState(array $values, $triggering_element = 'save') {
-  //   $form_state = $this->createMock(\Drupal\Core\Form\FormStateInterface::class);
-
-  //   $form_state->method('getValues')->willReturn($values);
-  //   $form_state->method('getTriggeringElement')->willReturn(['#name' => $triggering_element]);
-
-  //   return $form_state;
-  // }
-
