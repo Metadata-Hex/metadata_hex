@@ -123,7 +123,7 @@ class SettingsForm extends ConfigFormBase {
    */
   public function ingestFiles(string $dir_to_scan)
   {  
-    $file_system = $this->container->get('file_system');
+    $file_system = \Drupal::service('file_system');
     $files = [];
     $directory = "public://$dir_to_scan"; // Change this to 'public://' for all public files.
     $real_path = $file_system->realpath($directory);
