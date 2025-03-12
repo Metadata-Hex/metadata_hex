@@ -64,9 +64,9 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
       'hook_node_types' => ['article', 'page'],
       'field_mappings' => "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nDC:Format|field_file_type",
       'bundle_types' => ['article'],
-      'node_process.allow_reprocess' => TRUE,
+      'allow_reprocess' => TRUE,
       'bundle_type_for_generation' => 'article',
-      'extraction_settings.available_extensions' => "pdf\npdfx",
+      'available_extensions' => "pdf\npdfx",
       'file_attachment_field' => 'field_file_attachment',
       'ingest_directory' => '/',
     ];

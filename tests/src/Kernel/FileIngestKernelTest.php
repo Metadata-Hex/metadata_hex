@@ -101,6 +101,7 @@ class FileIngestKernelTest extends BaseKernelTestHex {
 
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
     // Capture the current details
+    $this->assertNotEquals(null, $node, "Node $nid is blank for some reason");
     $fsubj = $node->get('field_subject')->getString();
     $fpages = $node->get('field_pages')->getString();
     $fdate = $node->get('field_publication_date')->getString();
