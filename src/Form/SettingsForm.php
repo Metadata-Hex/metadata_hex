@@ -439,7 +439,6 @@ public function submitForm(array &$form, FormStateInterface $formState) {
     $config->set('extraction_settings.flatten_keys', $formState->getValue('flatten_keys', FALSE));
     $config->set('extraction_settings.data_protected', $formState->getValue('data_protected', FALSE));
     $config->set('extraction_settings.title_protected', $formState->getValue('title_protected', FALSE));
-    $config->set('extraction_settings.available_extensions', $formState->getValue('available_extensions', ''));
 
     $config->set('node_process.bundle_types', $formState->getValue('bundle_types', []));
     $config->set('node_process.allow_reprocess', $formState->getValue('allow_reprocess', FALSE));
