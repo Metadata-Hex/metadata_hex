@@ -188,7 +188,7 @@ $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
     //$formState->setValues();
     $form_state = $this->getMockFormState($this->settings, 'process_cron_nodes');
     // Submit the form.
-    $form->submitForm($settings, $form_state);
+    $form->submitForm($this->settings, $form_state);
 
     foreach ($nids as $nid){
       $this->lookingForCorrectData($nid);
