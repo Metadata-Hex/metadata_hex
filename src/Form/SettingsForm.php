@@ -123,10 +123,10 @@ class SettingsForm extends ConfigFormBase {
    */
   public function ingestFiles(string $dir_to_scan)
   {  
-
+    $file_system = $this->container->get('file_system');
     $files = [];
     $directory = "public://$dir_to_scan"; // Change this to 'public://' for all public files.
-    $real_path = $this->file_system->realpath($directory);
+    $real_path = $file_system->realpath($directory);
     $root_files = scandir($real_path);
     $extensions = $this->getAllSupportedExtensions();
     
