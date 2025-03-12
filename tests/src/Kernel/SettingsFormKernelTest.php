@@ -154,7 +154,7 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
 $nids = [1, 2, 3, 4, 5];
 
     $formState = new FormState();
-    $buildForm = $this->form->buildForm($this->settings, $formState);
+    $builtForm = $this->form->buildForm($this->settings, $formState);
     $form_state = $this->getMockFormState($this->settings, 'node_process[process_nodes]');
     // Submit the form.
    // $this->form->submitForm($this->settings, $form_state);
