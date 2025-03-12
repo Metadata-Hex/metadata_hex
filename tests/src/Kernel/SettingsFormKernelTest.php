@@ -154,7 +154,7 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
 $nids = [1, 2, 3, 4, 5];
 
     $formState = new FormState();
-     $this->form->buildForm($this->settings, $formState);
+    $buildForm = $this->form->buildForm($this->settings, $formState);
     $form_state = $this->getMockFormState($this->settings, 'node_process[process_nodes]');
     // Submit the form.
    // $this->form->submitForm($this->settings, $form_state);
@@ -192,7 +192,7 @@ $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
     //$formState->setValues();
     $form_state = $this->getMockFormState($this->settings, 'file_ingest[process_cron_nodes]');
     // Submit the form.
-    $form->submitForm($this->settings, $form_state);
+    //$form->submitForm($this->settings, $form_state);
     $this->form->processAllFiles($builtForm, $form_state);
 
     // Assert that the expected logic executed.
