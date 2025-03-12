@@ -11,7 +11,7 @@ use Drupal\metadata_hex\Form\SettingsForm;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
-
+use \Drupal\Core\Form\FormState;
 /**
  * Tests backend logic triggered by settings form buttons.
  *
