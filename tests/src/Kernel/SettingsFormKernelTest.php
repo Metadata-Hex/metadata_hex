@@ -5,7 +5,7 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Messenger\MessengerInterface;
 use Drupal\Core\Form\FormBase;
-use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Form\FormState;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\metadata_hex\Form\SettingsForm;
 use Symfony\Component\HttpFoundation\Request;
@@ -153,7 +153,7 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
 
 $nids = [1, 2, 3, 4, 5];
 
-    $formState = new FormStateInterface();
+    $formState = new FormState();
      $this->form->buildForm($this->settings, $formState);
     $form_state = $this->getMockFormState($this->settings, 'process_cron_nodes');
     // Submit the form.
@@ -255,7 +255,7 @@ $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
      *   The mocked form state.
      */
     protected function getMockFormState(array $values, $triggering_element) {
-      $form_state = new \Drupal\Core\Form\FormState();
+      $form_state = new FormState();
       $form_state->setValues($values);
       $form_state->setTriggeringElement(['#name' => $triggering_element]);
   
