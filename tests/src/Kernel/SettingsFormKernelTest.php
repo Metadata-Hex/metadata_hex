@@ -66,7 +66,6 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
       'bundle_types' => ['article'],
       'allow_reprocess' => TRUE,
       'bundle_type_for_generation' => 'article',
-      'available_extensions' => "pdf\npdfx",
       'file_attachment_field' => 'field_file_attachment',
       'ingest_directory' => '/',
     ];

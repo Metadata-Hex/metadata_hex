@@ -43,7 +43,6 @@ class SettingsFormTest extends TestCase
       'extraction_settings.strict_handling' => FALSE,
       'extraction_settings.data_protected' => TRUE,
       'extraction_settings.title_protected' => TRUE,
-      'extraction_settings.available_extensions' => "pdf\npdfx",
       'node_process.bundle_types' => ['article'],
       'node_process.allow_reprocess' => TRUE,
       'file_ingest.bundle_type_for_generation' => 'article',
