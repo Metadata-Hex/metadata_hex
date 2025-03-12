@@ -66,6 +66,7 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
       'bundle_types' => ['article'],
       'node_process.allow_reprocess' => TRUE,
       'bundle_type_for_generation' => 'article',
+      'extraction_settings.available_extensions' => "pdf\npdfx",
       'file_attachment_field' => 'field_file_attachment',
       'ingest_directory' => '/',
     ];
@@ -180,21 +181,13 @@ $nids = [1, 2, 3, 4, 5];
     $this->metadataExtractor,
     $this->messenger);
 
-$settings = [
-  'hook_node_types' => ['article', 'page'],
-  'field_mappings' => "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nDC:Format|field_file_type",
-  'bundle_types' => ['article'],
-  'node_process.allow_reprocess' => TRUE,
-  'bundle_type_for_generation' => 'article',
-  'file_attachment_field' => 'field_file_attachment',
-  'ingest_directory' => '/',
-];
+
 $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
     $formState = new FormState();
     $builtForm = $this->form->buildForm($this->settings, $formState);
-    $formState->setValues();
-    $form_state = $this->getMockFormState($settings, 'process_cron_nodes');
+    //$formState->setValues();
+    $form_state = $this->getMockFormState($this->settings, 'process_cron_nodes');
     // Submit the form.
     $form->submitForm($settings, $form_state);
 
