@@ -201,9 +201,9 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
     // Load the form and submit a mock request.
     $form = new SettingsForm($this->configFactory,
     $this->typedConfigManager, // Required by parent
-    $this->$metadataBatchProcessor,
-    $this->$metadataExtractor,
-    $this->$messenger);
+    $this->metadataBatchProcessor,
+    $this->metadataExtractor,
+    $this->messenger);
 
 $settings = [
   'hook_node_types' => ['article', 'page'],
