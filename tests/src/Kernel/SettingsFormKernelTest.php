@@ -57,10 +57,38 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
     protected $metadataBatchProcessor;
   
     protected $form;
+
+    protected $settings = [
+      'hook_node_types' => ['article', 'page'],
+      'field_mappings' => "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nDC:Format|field_file_type",
+      'bundle_types' => ['article'],
+      'node_process.allow_reprocess' => TRUE,
+      'bundle_type_for_generation' => 'article',
+      'file_attachment_field' => 'field_file_attachment',
+      'ingest_directory' => '/',
+    ];
     /**
      * 
      */
     protected $file_system;
+
+
+    private function initSettingsFormTest(){
+      $this->configFactory = $this->container->get('config.factory');
+      $this->typedConfigManager = $this->container->get('config.typed');
+      $this->messenger = $this->container->get('messenger');
+      $this->file_system = $this->container->get('file_system');
+      $this->metadataExtractor = new MetadataExtractor(\Drupal::service('logger.channel.default'));
+      $this->metadataBatchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $this->metadataExtractor, $this->file_system);
+
+        // Manually instantiate the form with required dependencies.
+        $this->form = new SettingsForm($this->configFactory,
+        $this->typedConfigManager, // Required by parent
+        $this->metadataBatchProcessor,
+        $this->metadataExtractor,
+        $this->messenger);
+    }
+
     /**
      * Constructs a new SettingsForm.
      *
@@ -71,67 +99,63 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
      * @param MessengerInterface $messenger
      *   The messenger service.
      */
-    public function __construct(ConfigFactoryInterface $configFactory, TypedConfigManagerInterface $typedConfigManager, MessengerInterface $messenger, FileSystemInterface $fileSystem) {
-      $this->configFactory = $configFactory;
-      $this->typedConfigManager = $typedConfigManager;
-      $this->messenger = $messenger;
-      $this->file_system = $fileSystem;
-      $this->metadataExtractor = new MetadataExtractor(\Drupal::service('logger.channel.default'));
-      $this->metadataBatchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $this->metadataExtractor, $this->file_system);
+    // public function __construct(ConfigFactoryInterface $configFactory, TypedConfigManagerInterface $typedConfigManager, MessengerInterface $messenger, FileSystemInterface $fileSystem) {
+    //   $this->configFactory = $configFactory;
+    //   $this->typedConfigManager = $typedConfigManager;
+    //   $this->messenger = $messenger;
+    //   $this->file_system = $fileSystem;
+    //   $this->metadataExtractor = new MetadataExtractor(\Drupal::service('logger.channel.default'));
+    //   $this->metadataBatchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $this->metadataExtractor, $this->file_system);
   
-    }
+    // }
   
-    /**
-     * {@inheritdoc}
-     */
-    public static function create(ContainerInterface $container) {
-      return new static(
-        $container->get('config.factory'),
-        $container->get('config.typed'),
-        $container->get('messenger')
-      );
-    }
-    protected function setUp(): void {
-      parent::setUp();
-      $this->installConfig(['metadata_hex']);
-  
-      // Manually instantiate the form with required dependencies.
-      $this->form = new SettingsForm($this->configFactory,
-      $this->typedConfigManager, // Required by parent
-      $this->metadataBatchProcessor,
-      $this->metadataExtractor,
-      $this->messenger);
-  }
+    // /**
+    //  * {@inheritdoc}
+    //  */
+    // public static function create(ContainerInterface $container) {
+    //   return new static(
+    //     $container->get('config.factory'),
+    //     $container->get('config.typed'),
+    //     $container->get('messenger')
+    //   );
+    // }
+    // protected function setUp(): void {
+    //  parent::setUp();
+      //$this->installConfig(['metadata_hex']);
+    //   $this->configFactory = $this->container->get('config.factory');
+    // $this->typedConfigManager = $this->container->get('config.typed');
+    // $this->messenger = $this->container->get('messenger');
+    // $this->file_system = $this->container->get('file_system');
+    //   // Manually instantiate the form with required dependencies.
+    //   $this->form = new SettingsForm($this->configFactory,
+    //   $this->typedConfigManager, // Required by parent
+    //   $this->metadataBatchProcessor,
+    //   $this->metadataExtractor,
+    //   $this->messenger);
+  // }
  
   /**
    * Tests that the save button correctly updates configuration.
    */
   public function testBatchIngestButton() {
 
+    $this->initSettingsformTest();
     $this->setMockEntities();
-    // Load the form and submit a mock request.
-    $form = new SettingsForm($this->configFactory,
-    $this->typedConfigManager, // Required by parent
-    $this->metadataBatchProcessor,
-    $this->metadataExtractor,
-    $this->messenger);
+    // // Load the form and submit a mock request.
+    // $form = new SettingsForm($this->configFactory,
+    // $this->typedConfigManager, // Required by parent
+    // $this->metadataBatchProcessor,
+    // $this->metadataExtractor,
+    // $this->messenger);
 
-$settings = [
-  'hook_node_types' => ['article', 'page'],
-  'field_mappings' => "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nDC:Format|field_file_type",
-  'bundle_types' => ['article'],
-  'node_process.allow_reprocess' => TRUE,
-  'bundle_type_for_generation' => 'article',
-  'file_attachment_field' => 'field_file_attachment',
-  'ingest_directory' => '/',
-];
+
 $nids = [1, 2, 3, 4, 5];
 
     $formState = new FormState();
-     $this->form->buildForm($form, $formState);
-    $form_state = $this->getMockFormState($settings, 'process_cron_nodes');
+     $this->form->buildForm($this->settings, $formState);
+    $form_state = $this->getMockFormState($this->settings, 'process_cron_nodes');
     // Submit the form.
-    $form->submitForm($settings, $form_state);
+    $this->form->submitForm($this->settings, $form_state);
 
     foreach ($nids as $nid){
       $this->lookingForCorrectData($nid);
@@ -143,15 +167,16 @@ $nids = [1, 2, 3, 4, 5];
    */
   public function testFileIngestButton() {
 
+    $this->initSettingsformTest();
     $this->setMockEntities();
     $this->setMockOrphansFiles();
     $this->setMockUnattachedFiles();
     // Load the form and submit a mock request.
     $form = new SettingsForm($this->configFactory,
     $this->typedConfigManager, // Required by parent
-    $this->$metadataBatchProcessor,
-    $this->$metadataExtractor,
-    $this->$messenger);
+    $this->metadataBatchProcessor,
+    $this->metadataExtractor,
+    $this->messenger);
 
 $settings = [
   'hook_node_types' => ['article', 'page'],
@@ -175,6 +200,7 @@ $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
       $this->lookingForCorrectData($nid);
     }
 }
+
 /**
    *
    */
@@ -227,7 +253,7 @@ $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
      *   The mocked form state.
      */
     protected function getMockFormState(array $values, $triggering_element) {
-      $form_state = new FormState();
+      $form_state = new \Drupal\Core\Form\FormState();
       $form_state->setValues($values);
       $form_state->setTriggeringElement(['#name' => $triggering_element]);
   
