@@ -11,7 +11,7 @@ use Drupal\metadata_hex\Form\SettingsForm;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
-use \Drupal\Core\Form\FormState;
+
 /**
  * Tests backend logic triggered by settings form buttons.
  *
@@ -153,7 +153,7 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
 
 $nids = [1, 2, 3, 4, 5];
 
-    $formState = new FormState();
+    $formState = new FormStateInterface();
      $this->form->buildForm($this->settings, $formState);
     $form_state = $this->getMockFormState($this->settings, 'process_cron_nodes');
     // Submit the form.
@@ -192,7 +192,7 @@ $settings = [
 $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
     $formState = new FormState();
-    $builtForm = $this->form->buildForm($form, $formState);
+    $builtForm = $this->form->buildForm($this->settings, $formState);
     $formState->setValues();
     $form_state = $this->getMockFormState($settings, 'process_cron_nodes');
     // Submit the form.
