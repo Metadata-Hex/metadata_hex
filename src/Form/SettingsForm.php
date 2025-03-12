@@ -29,7 +29,7 @@ class SettingsForm extends ConfigFormBase {
       $extensions = [];
   
       // Get the FileHandler plugin manager.
-      $plugin_manager = \Drupal::service('plugin.manager.metadata_hex_file_handler');
+      $plugin_manager = \Drupal::service('metadata_hex.file_handler_manager');
   
       // Load all plugin definitions (registered handlers).
       $definitions = $plugin_manager->getDefinitions();
