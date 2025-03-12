@@ -200,7 +200,7 @@ $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
    */
   public function lookingForCorrectData($nid){
     $this->assertNotEquals('', $nid, 'Nid is empty');
-
+    echo PHP_EOL.$nid.PHP_EOL;
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
 
     // Capture the current details
