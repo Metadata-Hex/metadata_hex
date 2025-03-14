@@ -91,12 +91,20 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    */
   abstract public function extractMetadata(): array;
 
-  /**
-   * Returns the extensions supported.
-   * Must be implemented in child classes.
+  
+/**
+   * Returns an array of supported file extensions.
    *
    * @return array
-   *   The supported extensions.
+   *   The supported file extensions.
+   */
+  abstract public function getSupportedMimeTypes(): array;
+
+  /**
+   * Returns an array of supported file extensions.
+   *
+   * @return array
+   *   The supported file extensions.
    */
   abstract public function getSupportedExtentions(): array;
 

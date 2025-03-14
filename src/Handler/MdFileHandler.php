@@ -15,6 +15,16 @@ use Symfony\Component\Yaml\Yaml;
  */
 class MdFileHandler extends FileHandler {
 
+
+
+  public function getSupportedExtentions(): array {
+    return ['md'];
+  }
+
+  public function getSupportedMimeTypes(): array {
+    return ['text/markdown'];
+  }
+
   /**
    * Extracts metadata from a DOCX file.
    *
@@ -51,14 +61,6 @@ class MdFileHandler extends FileHandler {
         'markdown' => trim($markdownBody),
     ];
   }
+  
 
-  /**
-   * Returns an array of supported file extensions.
-   *
-   * @return array
-   *   The supported file extensions.
-   */
-  public function getSupportedExtentions(): array {
-    return ['md'];
-  }
 }

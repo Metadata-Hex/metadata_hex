@@ -2,6 +2,8 @@
 
 namespace Drupal\metadata_hex\Form;
 
+use Drupal\Core\Database\Database;
+use Drupal\file\Entity\File;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
 use Drupal\Core\Form\ConfigFormBase;
@@ -19,17 +21,19 @@ class SettingsForm extends ConfigFormBase {
   protected $metadataExtractor;
   protected $messenger;
 
+
   /**
    * Get all supported extensions from registered FileHandler plugins.
    *
    * @return array
    *   A unique list of all supported file extensions.
    */
-  function getAllSupportedExtensions(): array {
+  private function getAllSupportedExtensions(): array {
       $extensions = [];
+      $mime_types = [];
   
       // Get the FileHandler plugin manager.
-      $plugin_manager = \Drupal::service('metadata_hex.file_handler_manager');
+      $plugin_manager = \Drupal::service('plugin.manager.metadata_hex');
   
       // Load all plugin definitions (registered handlers).
       $definitions = $plugin_manager->getDefinitions();
@@ -41,10 +45,13 @@ class SettingsForm extends ConfigFormBase {
   
           // Merge extensions from this handler.
           $extensions = array_merge($extensions, $plugin->getSupportedExtentions());
+          $mime_types = array_merge($mime_types, $plugin->getSupportedMimeTypes());
+
       }
   
+      return ['extensions'=> array_unique($extensions),'mime_types'=> array_unique($mime_types)];
       // Ensure unique values.
-      return array_unique($extensions);
+      //return array_unique($extensions);
   }
   
   /**
@@ -93,7 +100,7 @@ class SettingsForm extends ConfigFormBase {
         $operations = [];
         foreach ($selectedNodeTypes as $bundleType) {
             $operations[] = [
-                ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'processNodes'],
+                ['MetadataBatchProcessor', 'processNodes'],
                 [$bundleType, $willReprocess],
             ];
         }
@@ -128,7 +135,7 @@ class SettingsForm extends ConfigFormBase {
     $directory = "public://$dir_to_scan"; // Change this to 'public://' for all public files.
     $real_path = $file_system->realpath($directory);
     $root_files = scandir($real_path);
-    $extensions = $this->getAllSupportedExtensions();
+    $extensions = $this->getAllSupportedExtensions()['extensions'] ?? [];
     
     foreach ($root_files as $file) {
       $file_extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
@@ -147,13 +154,27 @@ class SettingsForm extends ConfigFormBase {
    */
   protected function getOrphanedFiles() {
     $connection = Database::getConnection();
-    $query = $connection->select('file_managed', 'f')
-      ->fields('f', ['fid'])
-      ->leftJoin('file_usage', 'fu', 'f.fid = fu.fid')
-      ->isNull('fu.fid')
-      ->condition('f.filemime', $this->buildMimeTypeConditions(), 'IN');
+    $mime_types = $this->getAllSupportedExtensions()['mime_types'] ?? [];
 
-    return $query->execute()->fetchCol();
+    // Subquery to get all used file IDs
+$subquery = $connection->select('file_usage', 'fu')
+    ->fields('fu', ['fid']); // This retrieves all file IDs that are referenced
+
+// Main query to get orphaned files
+$query = $connection->select('file_managed', 'f')
+    ->fields('f', ['fid'])
+    ->condition('f.fid', $subquery, 'NOT IN')  // Exclude files that are in use
+    ->condition('f.filemime', $mime_types, 'IN'); // Filter by MIME type
+
+return $query->execute()->fetchCol();
+
+    // $query = $connection->select('file_managed', 'f')
+    // ->fields('f', ['fid'])
+    // ->leftJoin('file_usage', 'fu', 'f.fid = fu.fid')
+    // ->condition('fu.fid', NULL, 'IS')  // Fix: Correctly check for NULL
+    // ->condition('f.filemime', $this->buildMimeTypeConditions(), 'IN');  // Additional condition for mime types
+  
+    // return $query->execute()->fetchCol();
   }
 
   /**
@@ -162,18 +183,20 @@ class SettingsForm extends ConfigFormBase {
    * @return array
    *   Array of MIME types corresponding to allowed file extensions.
    */
-  protected function buildMimeTypeConditions() {
-    $mime_types = [];
-    foreach ($this->allowedExtensions as $ext) {
-      $mime_types[] = \Drupal::service('file.mime_type.guesser')->guess("file.$ext");
-    }
-    return $mime_types;
-  }
+  // protected function buildMimeTypeConditions() {
+  //   $mime_types = [];
+  //   $m
+  //   foreach ($this->getAllSupportedExtensions() as $ext => $mime_type) {
+  //     $mime_types[] = $mime_type;
+  //   }
+  //   return $mime_types;
+  // }
   
   /**
    * Submit handler for processing all selected node types.
    */
   public function processAllFiles(array &$form, FormStateInterface $form_state) {
+   // $file_system = \Drupal::service('file_system');
 
     $ingest_dir = $form_state->getValue('ingest_directory');
     $config = $this->configFactory->getEditable('metadata_hex.settings');
@@ -188,14 +211,19 @@ class SettingsForm extends ConfigFormBase {
 
     // Iterate over file URIs and ensure a Drupal file entity exists.
     foreach ($files as $uri) {
-      $file = $this->fileStorage->loadByProperties(['uri' => $uri]);
-      if ($file) {
-        $fids[] = reset($file)->id();
+      //$TargetFile = File::loadByUri($uri);
+      //$file= reset($TargetFile);
+      //$file = File::loadByUri($uri);
+      //$file = File::loadByUri($uri);
+      $fid = $this->getFidFromUri($uri);
+
+      if ($fid) {
+        $fids[] = $fid;
       }
       else {
         $new_file = File::create([
           'uri' => $uri,
-          'status' => FILE_STATUS_PERMANENT,
+          'status' => 1,
         ]);
         $new_file->save();
         $fids[] = $new_file->id();
@@ -220,11 +248,22 @@ class SettingsForm extends ConfigFormBase {
       'init_message' => $this->t('Starting file ingestion...'),
       'progress_message' => $this->t('Processing...'),
       'error_message' => $this->t('File ingest or Metadata processing encountered an error.'),
-      'finished' => ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'batchFinished'],
+      'finished' => ['MetadataBatchProcessor', 'batchFinished'],
     ];
 
     batch_set($batch);
   } 
+
+  public function getFidFromUri($uri) {
+    $connection = Database::getConnection();
+    $query = $connection->select('file_managed', 'fm')
+      ->fields('fm', ['fid'])
+      ->condition('uri', $uri)
+      ->execute()
+      ->fetchField();
+  
+    return $query ? (int) $query : NULL;
+  }
 
   /**
   * {@inheritdoc}

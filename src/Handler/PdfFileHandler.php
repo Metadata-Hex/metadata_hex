@@ -21,6 +21,14 @@ use Smalot\PdfParser\Parser;
  */
 class PdfFileHandler extends FileHandler {
 
+
+public function getSupportedExtentions(): array {
+  return ['pdf', 'pdfx'];
+}
+
+public function getSupportedMimeTypes(): array {
+  return ['application/pdf', 'application/pdfx'];
+}
   /**
    * Extracts metadata from a PDF file.
    *
@@ -44,15 +52,7 @@ class PdfFileHandler extends FileHandler {
       throw new Exception("Error parsing PDF file: " . $e->getMessage());
     }
   }
-
-  /**
-   * Returns an array of supported file extensions.
-   *
-   * @return array
-   *   The supported file extensions.
-   */
-  public function getSupportedExtentions(): array {
-    return ['pdf', 'pdfx'];
-  }
+  // $this->extensions = ['pdf', 'pdfx'];
+  // $this->mimeTypes = ['application/pdf', 'application/pdfx'];
 
 }
