@@ -1,11 +1,7 @@
 <?php
-
 namespace Drupal\Tests\metadata_hex\Kernel;
-use Drupal\file\Entity\File;
-use Drupal\Core\Database\Database;
 
 use Drupal\Tests\metadata_hex\Kernel\BaseKernelTestHex;
-use Drupal\Core\File\FileSystemInterface;
 
 /**
  * Kernel test for the MetadataBatchProcessor service.
@@ -13,10 +9,16 @@ use Drupal\Core\File\FileSystemInterface;
  * @group metadata_hex
  */
 class FileIngestKernelTest extends BaseKernelTestHex {
+
+  // Ensuring that the config schema is not strict to allow for dynamic changes.
+  // This is necessary for the test to run without strict schema validation errors.
   protected $strictConfigSchema = FALSE;
   protected $rollback = FALSE;
+  
   /**
    * Tests processing a node with a valid PDF file.
+   * 
+   * @return void
    */
   public function testBatchFileIngest() {
     $directory = '';
@@ -25,8 +27,6 @@ class FileIngestKernelTest extends BaseKernelTestHex {
 
     $file_names = [
       'attached.pdf',
-      // 'metadoc.pdfx',
-      // 'banner.doc',
       'test_metadata.pdf',
       'publication_23.pdf',
       'document2.pdf',
@@ -39,6 +39,8 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     foreach ($file_names as $name) {
       $files[] = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', true);
     }
+
+    // I want some of the files to be attached to nodes randomly
     $randomKey = array_rand($files);
     $files_linked[] = $files[$randomKey];
 
@@ -53,20 +55,21 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     // verify that files already attached to nodes are filtered out
     $this->lookingForNoData($node);
 
+    // verify that files not attached to nodes are processed
     foreach ($nids as $nid){
-      //echo PHP_EOL.$nid.PHP_EOL;
-
       $this->lookingForCorrectData($nid);
     }
-
   }
 
   /**
-   *
+   * Verifies that no extracted data exists on the node
+   * 
+   * @param \Drupal\node\NodeInterface $node
+   *  The node to check for extracted data.
+   * 
+   * @return void
    */
   public function lookingForNoData($node){
-
-   // $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
 
     // Capture the current details
     $fsubj = $node->get('field_subject')->getString();
@@ -82,20 +85,21 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     // ASSERTATIONS
     $this->assertEquals('', $fsubj, 'Subject is blank');
     $this->assertNotEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
-
     $this->assertEquals('', $fpages, 'Catalog is blank');
     $this->assertNotEquals(1, $fpages, 'Extracted catalog doesnt match expected');
-
     $this->assertEquals('', $fdate, 'Publication date is blank');
-
     $this->assertEquals('', $ftype, 'FileType is blank');
     $this->assertNotEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
-
     $this->assertEquals([], $ftop, 'Topic is blank');
   }
 
   /**
-   *
+   * Verifies that extracted data exists on the node
+   * 
+   * @param $nid
+   *  The node to check for extracted data.
+   * 
+   * @return void
    */
   public function lookingForCorrectData($nid){
 
@@ -105,6 +109,7 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     if ($nid == 5 && $node == null){
       return;
     }
+
     // Capture the current details
     $this->assertNotEquals(null, $node, "Node $nid is blank for some reason");
     $fsubj = $node->get('field_subject')->getString();
@@ -118,18 +123,12 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     }
 
     // ASSERTATIONS
-  //  $this->assertNotEquals('', $fsubj, 'Subject is blank');
-//    $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
-
     $this->assertNotEquals('', $fpages, 'Catalog is blank');
     $this->assertEquals(1, $fpages, 'Extracted catalog doesnt match expected');
-
     $this->assertNotEquals('', $fdate, 'Publication date is blank');
     $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
-
     $this->assertNotEquals('', $ftype, 'FileType is blank');
     $this->assertEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
-
     $this->assertNotEquals('', $ftop, 'Topic is blank');
     $this->assertContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
     $this->assertContains('TCPDF', $term_names, "The expected taxonomy term name TCPDF is not present.");

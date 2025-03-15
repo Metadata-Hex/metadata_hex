@@ -8,18 +8,25 @@ use Drupal\user\Entity\User;
 use org\bovigo\vfs\vfsStream;
 use TCPDF;
 
-trait TestFileHelperTrait {
+trait TestFileHelperTrait
+{
 
-  public function setConfigSetting($field, $value){
+  public function setConfigSetting($field, $value)
+  {
     try {
       $this->config->set($field, $value)->save();
-    } catch (\Exception $e){
-      // print_r($e->getMessage(), true);
+    } catch (\Exception $e) {
     }
   }
 
-  public function generateMdWithMetadata(): string {
-      $sampleContent = <<<EOT
+  /**
+   * Generates a Markdown with metadata .
+   *
+   * @return string The markdown content as a string.
+   */
+  public function generateMdWithMetadata(): string
+  {
+    $sampleContent = <<<EOT
   ---
   title: "Test Markdown File"
   author: "John Doe"
@@ -39,8 +46,8 @@ trait TestFileHelperTrait {
   - Item 2
   - Item 3
   EOT;
-  
-return $sampleContent;
+
+    return $sampleContent;
   }
 
   /**
@@ -48,22 +55,23 @@ return $sampleContent;
    *
    * @return string The PDF content as a string.
    */
-  public function generatePdfWithMetadata(): string {
-      $pdf = new TCPDF();
+  public function generatePdfWithMetadata(): string
+  {
+    $pdf = new TCPDF();
 
-      // Set standard metadata
-      $pdf->SetCreator('Drupal Kernel Test');
-      $pdf->SetAuthor('Automated Test Suite');
-      $pdf->SetTitle('Test PDF Document');
-      $pdf->SetSubject('Testing Metadata in PDFs');
-      $pdf->SetKeywords('Drupal, TCPDF, Test, Metadata');
+    // Set standard metadata
+    $pdf->SetCreator('Drupal Kernel Test');
+    $pdf->SetAuthor('Automated Test Suite');
+    $pdf->SetTitle('Test PDF Document');
+    $pdf->SetSubject('Testing Metadata in PDFs');
+    $pdf->SetKeywords('Drupal, TCPDF, Test, Metadata');
 
-      $pdf->AddPage();
-      $pdf->SetFont('helvetica', '', 12);
-      $pdf->Cell(0, 10, 'This is a test PDF with metadata.', 0, 1, 'C');
+    $pdf->AddPage();
+    $pdf->SetFont('helvetica', '', 12);
+    $pdf->Cell(0, 10, 'This is a test PDF with metadata.', 0, 1, 'C');
 
-      // Set XMP metadata for advanced metadata storage
-      $xmp_metadata = '<?xpacket begin="..." id="W5M0MpCehiHzreSzNTczkc9d"?>
+    // Set XMP metadata for advanced metadata storage
+    $xmp_metadata = '<?xpacket begin="..." id="W5M0MpCehiHzreSzNTczkc9d"?>
           <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
               xmlns:pdf="http://ns.adobe.com/pdf/1.3/"
               xmlns:xmp="http://ns.adobe.com/xap/1.0/"
@@ -79,10 +87,10 @@ return $sampleContent;
               </rdf:Description>
           </rdf:RDF>
           <?xpacket end="w"?>';
-      $pdf->setExtraXMP($xmp_metadata);
+    $pdf->setExtraXMP($xmp_metadata);
 
-      // Output PDF as a string for saving in Drupal
-      return $pdf->Output('', 'S'); // Return as string
+    // Output PDF as a string for saving in Drupal
+    return $pdf->Output('', 'S'); // Return as string
   }
 
   /**
@@ -94,7 +102,8 @@ return $sampleContent;
    * @return \Drupal\file\Entity\File
    *   The created file entity.
    */
-  protected function createFile(string $uri) {
+  protected function createFile(string $uri)
+  {
     $root = vfsStream::setup('root');
 
     $file = File::create([
@@ -114,8 +123,9 @@ return $sampleContent;
    * @return \Drupal\node\Entity\Node
    *   The created node entity.
    */
-  protected function createNode(File|string $file = null) {
-    if ($file !== null && is_string($file)){
+  protected function createNode(File|string $file = null)
+  {
+    if ($file !== null && is_string($file)) {
       $file = $this->createFile($file);
     }
     $node = Node::create([
@@ -124,7 +134,7 @@ return $sampleContent;
       'field_subject' => '',
       'uid' => 1, // Assign to test user.
       'field_attachment' => [  // Adjust field name based on actual setup.
-        'target_id' => $file?->id()??null,
+        'target_id' => $file?->id() ?? null,
       ],
       'revision' => FALSE,
     ]);
@@ -135,14 +145,14 @@ return $sampleContent;
   /**
    * Helter function to create a user for node ownership.
    */
-  protected function createUser() {
+  protected function createUser()
+  {
     $user = User::create([
       'name' => 'test_user',
     ]);
     $user->save();
     $this->container->get('current_user')->setAccount($user);
   }
-
 
   /**
    * Creates a File entity from the generated PDF.
@@ -153,7 +163,8 @@ return $sampleContent;
    *
    * @return \Drupal\file\Entity\File|string The created file entity.
    */
-  public function createDrupalFile(string $filename, string $file_content, string $mime_type = 'application/pdf', bool $createFileEntity = true) {
+  public function createDrupalFile(string $filename, string $file_content, string $mime_type = 'application/pdf', bool $createFileEntity = true)
+  {
     // Define Drupal's public file directory
     $directory = 'public://';
     \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
@@ -164,93 +175,100 @@ return $sampleContent;
     // Write content to the file
     file_put_contents(\Drupal::service('file_system')->realpath($file_path), $file_content);
 
-    if ($createFileEntity){
-    // Create a file entity
-    $file = File::create([
+    if ($createFileEntity) {
+      // Create a file entity
+      $file = File::create([
         'uri' => $file_path,
         'filename' => $filename,
         'filemime' => $mime_type,
         'status' => 1,
-    ]);
-    $file->save();
-    
-    return $file;
+      ]);
+      $file->save();
+
+      return $file;
     }
 
     return $file_path;
-    }
+  }
 
 
-   /**
-    * Creates a set of mock entity files
-     * @var array $files
-     */
-    protected function setMockEntities($files = [
-      'pdf' => [ 'file.pdf',
-      'test_metadata.pdf',
-      'publication_23.pdf' ],
+  /**
+   * Creates a set of mock entity files
+   * @var array $files
+   */
+  protected function setMockEntities(
+    $files = [
+      'pdf' => [
+        'file.pdf',
+        'test_metadata.pdf',
+        'publication_23.pdf'
+      ],
       'md' => [
-      'document2.md',
-      'document4.md'
+        'document2.md',
+        'document4.md'
       ]
-    ]){
-  
-  
-      foreach ($files['pdf'] as $name) {
-        $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf');
-        $node = $this->createNode($file);
-      }
-        
-      foreach ($files['md'] as $name) {
-        $file = $this->createDrupalFile($name, $this->generateMdWithMetadata(), 'text/markdown');
-        $node = $this->createNode($file);
-      }
+    ]
+  ) {
+    foreach ($files['pdf'] as $name) {
+      $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf');
+      $node = $this->createNode($file);
     }
 
-   /**
-    * Creates a set of mock entity orphaned files
-     * @var array $files
-     */
-    protected function setMockOrphansFiles($files = [
-      'pdf' => [ 'orph.pdf',
-      'orph_test_metadata.pdf',
-      'orph_tpublication_23.pdf' ],
+    foreach ($files['md'] as $name) {
+      $file = $this->createDrupalFile($name, $this->generateMdWithMetadata(), 'text/markdown');
+      $node = $this->createNode($file);
+    }
+  }
+
+  /**
+   * Creates a set of mock entity orphaned files
+   * @var array $files
+   */
+  protected function setMockOrphansFiles(
+    $files = [
+      'pdf' => [
+        'orph.pdf',
+        'orph_test_metadata.pdf',
+        'orph_tpublication_23.pdf'
+      ],
       'md' => [
-      'orph_tdocument2.md',
-      'orph_tdocument4.md'
+        'orph_tdocument2.md',
+        'orph_tdocument4.md'
       ]
-    ]){
-      foreach ($files['pdf'] as $name) {
-        $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', false);
-      }
-  
-      foreach ($files['md'] as $name) {
-        $file = $this->createDrupalFile($name, $this->generateMdWithMetadata(), 'text/markdown', false);
-      }
+    ]
+  ) {
+    foreach ($files['pdf'] as $name) {
+      $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', false);
     }
-  
 
-   /**
-    * Creates a set of mock entity unattached files
-     * @var array $files
-     */
-    protected function setMockUnattachedFiles($files = [
-      'pdf' => [ 'unatt.pdf',
-      'unatt_test_metadata.pdf',
-      'unatt_tpublication_23.pdf' ],
+    foreach ($files['md'] as $name) {
+      $file = $this->createDrupalFile($name, $this->generateMdWithMetadata(), 'text/markdown', false);
+    }
+  }
+
+
+  /**
+   * Creates a set of mock entity unattached files
+   * @var array $files
+   */
+  protected function setMockUnattachedFiles(
+    $files = [
+      'pdf' => [
+        'unatt.pdf',
+        'unatt_test_metadata.pdf',
+        'unatt_tpublication_23.pdf'
+      ],
       'md' => [
-      'unatt_tdocument2.md',
-      'unatt_tdocument4.md'
+        'unatt_tdocument2.md',
+        'unatt_tdocument4.md'
       ]
-    ]){
-  
-      foreach ($files['pdf'] as $name) {
-        $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', true);
-      }
-      foreach ($files['md'] as $name) {
-        $file = $this->createDrupalFile($name, $this->generateMdWithMetadata(), 'text/markdown', true);
-      }
+    ]
+  ) {
+    foreach ($files['pdf'] as $name) {
+      $file = $this->createDrupalFile($name, $this->generatePdfWithMetadata(), 'application/pdf', true);
     }
-    
-
+    foreach ($files['md'] as $name) {
+      $file = $this->createDrupalFile($name, $this->generateMdWithMetadata(), 'text/markdown', true);
+    }
+  }
 }

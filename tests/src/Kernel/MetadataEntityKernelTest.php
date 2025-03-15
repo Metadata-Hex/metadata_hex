@@ -12,8 +12,16 @@ use Drupal\Tests\metadata_hex\Kernel\BaseKernelTestHex;
  */
 class MetadataEntityKernelTest extends BaseKernelTestHex {
 
+  /**
+   * Metadata Extractor
+   * @var 
+   */
   private $me;
 
+  /**
+   * Node Binder
+   * 
+   */
   private $nb;
 
   /**
@@ -67,9 +75,6 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $this->runAssertions();
   }
 
-
-
-
   /**
    * Run Assertions
    */
@@ -77,8 +82,9 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $n = $this->me->getNodeBinder();
 
     $this->assertEquals($n->getBundleType(), 'article', 'Bundle type doesnt match');
+
     if (!empty($n->getNode())){
-    $this->assertEquals($n->getNode()->id(), 1, 'Nodes arent the same');
+      $this->assertEquals($n->getNode()->id(), 1, 'Nodes arent the same');
     }
 
     $meta = $this->me->getMetadata();
