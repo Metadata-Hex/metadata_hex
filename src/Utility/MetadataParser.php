@@ -111,23 +111,40 @@ class MetadataParser extends MetadataHexCore
     $this->fieldMapping = $this->getFieldMappings();
   }
 
+  /**
+   * Returns the available fields for the current bundle type.
+   * @return array
+   */
   public function getAvailableFields()
   {
     return $this->availableFields;
   }
+
   /**
-   * 
+   * Sets the strict handling mode for string comparisons.
+   * @param bool $bool
+   * @return void
    */
   public function setStrictHandling(bool $bool)
   {
     $this->strictHandling = $bool;
   }
 
+  /**
+   * Sets the flatten key mode.
+   * @param bool $bool
+   * @return void
+   */
   public function setFlattenKeys(bool $bool)
   {
     $this->flattenKeys = $bool;
   }
 
+  /**
+   * Sets the available fields.
+   * @param array $data
+   * @return void
+   */
   public function setAvailableFields(array $data)
   {
     $this->availableFields = array_fill_keys($data, true);//array_flip(array_map('strval', $data));
@@ -207,9 +224,6 @@ class MetadataParser extends MetadataHexCore
       // if we arent strict handling, normalize all keys
       if (!$this->strictHandling) {
         $key = strtolower(preg_replace('/(?<!^)[A-Z]/', '$0', $key));
-      } else {
-        // PHP_EOL.'key'.$key.PHP_EOL;
-
       }
       $cleanedMetadata[$key] = is_array($value) ? array_map('trim', $value) : trim($value);
     }
@@ -243,7 +257,8 @@ class MetadataParser extends MetadataHexCore
     $result = [];
     foreach ($lines as $line) {
       if (strpos($line, '|') !== false) {
-        list($key, $value) = explode('|', $line); // @todo this strict handling isnt working
+        list($key, $value) = explode('|', $line);
+
         // If we are strictly handling strings, dont mess with thier case
         $result[trim($value)] = $this->strictHandling ? trim($key) : strtolower(trim($key));
       }
@@ -299,7 +314,7 @@ class MetadataParser extends MetadataHexCore
 
       // don't overwrite keys
       if (!array_key_exists($cleanKey, $sanitized)) {
-      $sanitized[$cleanKey] = $cleanValue;
+        $sanitized[$cleanKey] = $cleanValue;
       }
     }
 

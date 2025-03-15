@@ -13,14 +13,17 @@ use Smalot\PdfParser\Parser;
  *   extensions = {"pdf"}
  * )
  *
- * Handles parsing operations for extracted metadata from PDF files.
- * Responsible for:
- * - Validating field mappings
- * - Extracting and cleaning data
- * - Ensuring compatibility with Drupal field structures
  */
 class PdfFileHandler extends FileHandler {
 
+
+public function getSupportedExtentions(): array {
+  return ['pdf', 'pdfx'];
+}
+
+public function getSupportedMimeTypes(): array {
+  return ['application/pdf', 'application/pdfx'];
+}
   /**
    * Extracts metadata from a PDF file.
    *
@@ -44,15 +47,4 @@ class PdfFileHandler extends FileHandler {
       throw new Exception("Error parsing PDF file: " . $e->getMessage());
     }
   }
-
-  /**
-   * Returns an array of supported file extensions.
-   *
-   * @return array
-   *   The supported file extensions.
-   */
-  public function getSupportedExtentions(): array {
-    return ['pdf', 'pdfx'];
-  }
-
 }

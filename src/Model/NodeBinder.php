@@ -82,14 +82,13 @@ class NodeBinder extends MetadataHexCore
    *   If the input is invalid.
    */
   public function init($input)
-  {    
-    if (is_string($input)){
-      $input = $this->initNode($input); 
-    }
-    elseif ($input instanceof File) {
+  {
+    if (is_string($input)) {
+      $input = $this->initNode($input);
+    } elseif ($input instanceof File) {
       $this->fid = $input->id();
       $file = $input;
-      $input = $this->initNode($file->getFileUri()); 
+      $input = $this->initNode($file->getFileUri());
     }
     if ($input instanceof Node) {
       $this->nid = $input->id();
@@ -151,35 +150,36 @@ class NodeBinder extends MetadataHexCore
 
     return $query;
   }
- /**
- * Checks whether the node has been processed in the last 3 minutes.
- *
- * @return bool
- *   TRUE if the node's last_modified timestamp is less than 3 minutes old, FALSE otherwise.
- */
-public function getWasNodeJustProcessed(): bool
-{
-  if (!$this->nid) {
-    return false;
-  }
-  try {
-    $query = \Drupal::database()->select('metadata_hex_processed', 'mhp')
-      ->fields('mhp', ['last_modified'])
-      ->condition('entity_id', $this->nid)
-      ->execute()
-       ->fetchField();
+
+  /**
+   * Checks whether the node has been processed in the last 3 minutes.
+   *
+   * @return bool
+   *   TRUE if the node's last_modified timestamp is less than 3 minutes old, FALSE otherwise.
+   */
+  public function getWasNodeJustProcessed(): bool
+  {
+    if (!$this->nid) {
+      return false;
+    }
+    try {
+      $query = \Drupal::database()->select('metadata_hex_processed', 'mhp')
+        ->fields('mhp', ['last_modified'])
+        ->condition('entity_id', $this->nid)
+        ->execute()
+        ->fetchField();
     } catch (\Exception $e) {
       return false;
     }
 
-  if ($query) {
-    $lastModifiedTime = strtotime($query);
-    $currentTime = time();
-    return ($currentTime - $lastModifiedTime) <= 180;
-  } else {
-    return true; // if query is null, dont let it reprocess
+    if ($query) {
+      $lastModifiedTime = strtotime($query);
+      $currentTime = time();
+      return ($currentTime - $lastModifiedTime) <= 180;
+    } else {
+      return true; // if query is null, dont let it reprocess
+    }
   }
-}
 
   /**
    * Retrieves the node from a given NID.
@@ -231,37 +231,37 @@ public function getWasNodeJustProcessed(): bool
       if ($field_type === 'file' || ($field_type === 'entity_reference' && $target_type === 'file')) {
         foreach ($field->getValue() as $file_item) {
           if (!empty($file_item['target_id'])) {
-          // loads the file into a drupal model
-          $file = File::load($file_item['target_id']);
+            // loads the file into a drupal model
+            $file = File::load($file_item['target_id']);
 
-          // assuming it exists, retrieve information
-          if ($file) {
-            $file_uri = $file->getFileUri();
-            $file_extension = pathinfo($file_uri, PATHINFO_EXTENSION);
-            $handler = $this->fileHandlerManager->getHandlerForExtension($file_extension);
+            // assuming it exists, retrieve information
+            if ($file) {
+              $file_uri = $file->getFileUri();
+              $file_extension = pathinfo($file_uri, PATHINFO_EXTENSION);
+              $handler = $this->fileHandlerManager->getHandlerForExtension($file_extension);
 
-            // setup the handler and extract the metadata
-            if ($handler !== null) {
-              $handler->setFileUri($file_uri);
-              $exmd = $handler->extractMetadata();
+              // setup the handler and extract the metadata
+              if ($handler !== null) {
+                $handler->setFileUri($file_uri);
+                $exmd = $handler->extractMetadata();
 
-              $data = [
-                'uri' => $file->getFileUri(),
-                'metadata' => $exmd,
-              ];
+                $data = [
+                  'uri' => $file->getFileUri(),
+                  'metadata' => $exmd,
+                ];
 
-              // appends the data in a non-destructive way
-              if (!isset($metadata[$file->id()])) {
-                $metadata[$file->id()] = $data;
+                // appends the data in a non-destructive way
+                if (!isset($metadata[$file->id()])) {
+                  $metadata[$file->id()] = $data;
+                } else {
+                  $metadata[$file->id()] = array_merge($metadata[$file->id()], $data);
+                }
               } else {
-                $metadata[$file->id()] = array_merge($metadata[$file->id()], $data);
+                $this->logger->error("No extraction handler found for $file_uri");
               }
-            } else {
-              $this->logger->error("No extraction handler found for $file_uri");
-            }
 
+            }
           }
-        }
         }
       }
     }
@@ -284,9 +284,9 @@ public function getWasNodeJustProcessed(): bool
     $field_name = $this->settingsManager->getIngestField();
     $file = null;
 
-    if (is_numeric($input)){
-      $file  = File::load($input);
-    } else if (is_string($input)){
+    if (is_numeric($input)) {
+      $file = File::load($input);
+    } else if (is_string($input)) {
       $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $input]);
       $file = reset($file);
 
@@ -294,7 +294,7 @@ public function getWasNodeJustProcessed(): bool
         $file = File::create(['uri' => $input]);
         $file->save();
       }
-    } else if ($input instanceof File){
+    } else if ($input instanceof File) {
       $file = $input;
     }
 
@@ -303,11 +303,11 @@ public function getWasNodeJustProcessed(): bool
     }
 
     $query = \Drupal::entityQuery('node')
-    ->condition('type', $bundle_type)
-    ->condition($field_name, $file->id())
-    ->accessCheck(FALSE) // Skip access check in programmatic queries.
-    ->execute();
-    
+      ->condition('type', $bundle_type)
+      ->condition($field_name, $file->id())
+      ->accessCheck(FALSE) // Skip access check in programmatic queries.
+      ->execute();
+
     if (!empty($query)) {
       $nid = reset($query);
       $node = Node::load($nid);
@@ -321,7 +321,7 @@ public function getWasNodeJustProcessed(): bool
     ]);
 
     // attach the file to the specified field and save
-    if ($field_name && $node->hasField($field_name)) { 
+    if ($field_name && $node->hasField($field_name)) {
       $node->set($field_name, ['target_id' => $file->id()]);
     }
 
@@ -392,48 +392,48 @@ public function getWasNodeJustProcessed(): bool
    * @return void
    *
    */
-public function setProcessed()
-{
-  if (!$this->nid) {
-    return;
-  }
-  $entity_id = (int) $this->nid;
-  $entity_type = (string) $this->getBundleType();
-  $processed = 1;
-  $ts = (string) date('Y-m-d H:i:s');
-
-  try {
-    $db = Database::getConnection();
-    $query = $db->select('metadata_hex_processed', 'mhp')
-      ->fields('mhp', ['entity_id'])
-      ->condition('entity_id', $entity_id)
-      ->execute()
-      ->fetchField();
-
-    if ($query) {
-      // Update the existing record
-      $db->update('metadata_hex_processed')
-        ->fields([
-          'last_modified' => $ts,
-          'processed' => $processed,
-        ])
-    // Assert that all mapped keys exist in processed metadata
-        ->condition('entity_id', $entity_id)
-        ->execute();
-    } else {
-      // Insert a new record
-      $db->insert('metadata_hex_processed')
-        ->fields([
-          'entity_id' => $entity_id,
-          'last_modified' => $ts,
-          'processed' => $processed,
-        ])
-        ->execute();
+  public function setProcessed()
+  {
+    if (!$this->nid) {
+      return;
     }
-  } catch (\Exception $e) {
-    // Handle the exception as needed
+    $entity_id = (int) $this->nid;
+    $entity_type = (string) $this->getBundleType();
+    $processed = 1;
+    $ts = (string) date('Y-m-d H:i:s');
+
+    try {
+      $db = Database::getConnection();
+      $query = $db->select('metadata_hex_processed', 'mhp')
+        ->fields('mhp', ['entity_id'])
+        ->condition('entity_id', $entity_id)
+        ->execute()
+        ->fetchField();
+
+      if ($query) {
+        // Update the existing record
+        $db->update('metadata_hex_processed')
+          ->fields([
+              'last_modified' => $ts,
+              'processed' => $processed,
+            ])
+          // Assert that all mapped keys exist in processed metadata
+          ->condition('entity_id', $entity_id)
+          ->execute();
+      } else {
+        // Insert a new record
+        $db->insert('metadata_hex_processed')
+          ->fields([
+              'entity_id' => $entity_id,
+              'last_modified' => $ts,
+              'processed' => $processed,
+            ])
+          ->execute();
+      }
+    } catch (\Exception $e) {
+      // Handle the exception as needed
+    }
   }
-}
 
   /**
    * Sets a revision message when updating a node.

@@ -12,8 +12,16 @@ use Drupal\Tests\metadata_hex\Kernel\BaseKernelTestHex;
  */
 class MetadataEntityKernelTest extends BaseKernelTestHex {
 
+  /**
+   * Metadata Extractor
+   * @var 
+   */
   private $me;
 
+  /**
+   * Node Binder
+   * 
+   */
   private $nb;
 
   /**
@@ -67,9 +75,6 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $this->runAssertions();
   }
 
-
-
-
   /**
    * Run Assertions
    */
@@ -77,8 +82,9 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $n = $this->me->getNodeBinder();
 
     $this->assertEquals($n->getBundleType(), 'article', 'Bundle type doesnt match');
+
     if (!empty($n->getNode())){
-    $this->assertEquals($n->getNode()->id(), 1, 'Nodes arent the same');
+      $this->assertEquals($n->getNode()->id(), 1, 'Nodes arent the same');
     }
 
     $meta = $this->me->getMetadata();
@@ -112,7 +118,6 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     );
   }
 
-
   /**
    * Tests processing a node with an invalid file.
    */
@@ -122,9 +127,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = $this->createFile($file);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
     $this->me->loadFromFile($file);
-
   }
-
 
   /**
    * Tests processing a file with an invalid class type.
@@ -136,8 +139,6 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = \Drupal\user\Entity\User::load(1);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
     $this->me->loadFromFile($file);
-
-
   }
 
   /**
@@ -149,9 +150,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = $this->createFile($file);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
     $this->me->loadFromNode($file);
-
   }
-
 
   /**
    * Tests processing a node with an invalid class type.
@@ -163,9 +162,8 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = \Drupal\user\Entity\User::load(1);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
     $this->me->loadFromNode($file);
-
-
   }
+
     /**
    * Tests processing terms with invalid variable types.
    */
@@ -190,6 +188,4 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $this->me->loadFromFile($file->getFileUri());
     $this->me->writeMetadata();
   }
-
-
 }

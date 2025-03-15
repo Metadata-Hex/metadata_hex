@@ -2,22 +2,20 @@
 
 require_once __DIR__ . '/Mocks/NodeTypeStub.php';
 
-use Drupal\node\Entity\NodeTypeStub as NodeType;
-use Drupal\Tests\metadata_hex\Unit\Mocks\MockSettingsForm;
-use Drupal\metadata_hex\Service\MetadataBatchProcessor;
-use Drupal\metadata_hex\Service\MetadataExtractor;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Config;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
-use Drupal\Core\Form\FormState;
-use Drupal\Core\StringTranslation\TranslationInterface;
-use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Entity\EntityTypeRepositoryInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Form\FormState;
+use Drupal\Core\Messenger\MessengerInterface;
+use Drupal\Core\StringTranslation\TranslationInterface;
+use Drupal\metadata_hex\Service\MetadataBatchProcessor;
+use Drupal\metadata_hex\Service\MetadataExtractor;
+use Drupal\Tests\metadata_hex\Unit\Mocks\MockSettingsForm;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\DependencyInjection\ContainerBuilder;
 
 class SettingsFormTest extends TestCase
 {
@@ -43,7 +41,6 @@ class SettingsFormTest extends TestCase
       'extraction_settings.strict_handling' => FALSE,
       'extraction_settings.data_protected' => TRUE,
       'extraction_settings.title_protected' => TRUE,
-      'extraction_settings.available_extensions' => "pdf\npdfx",
       'node_process.bundle_types' => ['article'],
       'node_process.allow_reprocess' => TRUE,
       'file_ingest.bundle_type_for_generation' => 'article',
@@ -144,7 +141,7 @@ class SettingsFormTest extends TestCase
   /** @test */
   public function testBuildFormContainsExpectedFields()
   {
-    $form = [];
+     $form = [];
     $formState = new FormState();
     $builtForm = $this->form->buildForm($form, $formState);
 

@@ -2,18 +2,18 @@
 
 namespace Drupal\Tests\metadata_hex\Unit;
 
+use Drupal\Core\Config\Config;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\metadata_hex\Handler\MdFileHandler;
+use Drupal\metadata_hex\Handler\PdfFileHandler;
 use Drupal\metadata_hex\Service\FileHandlerManager;
 use Drupal\metadata_hex\Service\SettingsManager;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Config\ConfigFactoryInterface;
-use Drupal\Core\Config\Config;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\metadata_hex\Handler\PdfFileHandler;
-use Drupal\metadata_hex\Handler\MdFileHandler;
 
 class FileHandlerManagerTest extends TestCase {
 
@@ -100,7 +100,7 @@ class FileHandlerManagerTest extends TestCase {
   }
 
   /** @test */
-  public function test_it_returns_a_handler_for_doc_extension() {
+  public function test_it_returns_a_handler_for_md_extension() {
       // Mock the handler object
       $mockHandler = $this->createMock(MdFileHandler::class);
 
@@ -124,9 +124,3 @@ class FileHandlerManagerTest extends TestCase {
       $this->assertNull($result);
   } 
 }
-  /*
-setup filehandlerManager
-get available extentions, recieve an array
-get handler for extention('pdf'), handler::typeOF = 
-get handler for extention('doc'), handler::tyopOF = 
-".    " for a bad ext, verify is null */

@@ -1,23 +1,21 @@
 <?php
 namespace Drupal\Tests\metadata_hex\Kernel;
 
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
-use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\metadata_hex\Kernel\Traits\TestFileHelperTrait;
-use stdClass;
 
 /**
-  * @abstract
+ * @abstract
  */
-abstract class BaseKernelTestHex extends KernelTestBase {
+abstract class BaseKernelTestHex extends KernelTestBase
+{
 
   use TestFileHelperTrait;
   /**
@@ -46,7 +44,7 @@ abstract class BaseKernelTestHex extends KernelTestBase {
    * @var \Drupal\metadata_hex\Service\MetadataBatchProcessor
    */
   protected $batchProcessor;
-protected $settingsManager;
+  protected $settingsManager;
   /**
    *
    */
@@ -56,28 +54,31 @@ protected $settingsManager;
   /**
    * Setup before running the test.
    */
-  protected function setUp(): void {
+  protected function setUp(): void
+  {
     parent::setUp();
 
     $this->enableModules(['metadata_hex']);
-
+    $this->enableModules(['system']);
     // Install required entity schemas.
     $this->installEntitySchema('node');
     $this->installEntitySchema('file');
+
+    $this->installSchema('file', ['file_usage']);
     $this->installEntitySchema('user');
     $this->installConfig(['taxonomy']);
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('taxonomy_vocabulary');
     $this->installConfig(['text', 'filter', 'field', 'node']);
 
-   Vocabulary::create([
-        'vid' => 'tags',
-        'name' => 'Tags',
+    Vocabulary::create([
+      'vid' => 'tags',
+      'name' => 'Tags',
     ])->save();
 
     Vocabulary::create([
-        'vid' => 'topics',
-        'name' => 'Topics',
+      'vid' => 'topics',
+      'name' => 'Topics',
     ])->save();
 
     // Ensure the "Topics" vocabulary exists.
@@ -102,11 +103,7 @@ protected $settingsManager;
             'vid' => 'topics',
           ])->save();
         }
-        else {
-        }
       }
-    }
-    else {
     }
 
     $this->installSchema('node', ['node_access']);
@@ -116,9 +113,9 @@ protected $settingsManager;
 
     // Create the "article" content type.
     NodeType::create([
-        'type' => 'article',
-        'name' => 'Article',
-        'revision' => FALSE,
+      'type' => 'article',
+      'name' => 'Article',
+      'revision' => FALSE,
     ])->save();
 
     $this->disableRevisionsForContentType();
@@ -126,9 +123,9 @@ protected $settingsManager;
 
     $this->createField('field_subject', 'Subject', 'string');
     $this->createField('field_pages', 'Pages', 'integer');
-    $this->createField('field_publication_date', 'Publication Date', 'timestamp',  ['datetime_type' => 'datetime']);
+    $this->createField('field_publication_date', 'Publication Date', 'timestamp', ['datetime_type' => 'datetime']);
 
-    $this->createField('field_file_type', 'File Type', 'list_string',  [
+    $this->createField('field_file_type', 'File Type', 'list_string', [
       'allowed_values' => [
         'application/pdf' => 'pdf',
         'application/docx' => 'docx',
@@ -143,7 +140,7 @@ protected $settingsManager;
       'field_name' => 'field_topics',
       'entity_type' => 'node',
       'type' => 'entity_reference',
-    'cardinality' => -1, // -1 means unlimited
+      'cardinality' => -1, // -1 means unlimited
       'settings' => [
         'target_type' => 'taxonomy_term',
       ],
@@ -176,7 +173,8 @@ protected $settingsManager;
   /**
    * Initialize the metadata tables
    */
-  public function initMetadataHex(){
+  public function initMetadataHex()
+  {
     $database = \Drupal::database();
     $schema = $database->schema();
     $this->enableModules(['metadata_hex']);
@@ -190,17 +188,17 @@ protected $settingsManager;
 
     // Default settings
     $settings = [
-        'extraction_settings.hook_node_types' => ['article', 'page'],
-        'extraction_settings.field_mappings' => "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nDC:Format|field_file_type",
-        'extraction_settings.flatten_keys' => FALSE,
-        'extraction_settings.strict_handling' => FALSE,
-        'extraction_settings.data_protected' => FALSE,
-        'extraction_settings.title_protected' => TRUE,
-        'node_process.bundle_types' => ['article'],
-        'node_process.allow_reprocess' => TRUE,
-        'file_ingest.bundle_type_for_generation' => 'article',
-        'file_ingest.file_attachment_field' => 'field_attachment',
-        'file_ingest.ingest_directory' => 'pdfs/',
+      'extraction_settings.hook_node_types' => ['article', 'page'],
+      'extraction_settings.field_mappings' => "keywords|field_topics\ntitle|title\nsubject|field_subject\nCreationDate|field_publication_date\nPages|field_pages\nDC:Format|field_file_type",
+      'extraction_settings.flatten_keys' => FALSE,
+      'extraction_settings.strict_handling' => FALSE,
+      'extraction_settings.data_protected' => FALSE,
+      'extraction_settings.title_protected' => TRUE,
+      'node_process.bundle_types' => ['article'],
+      'node_process.allow_reprocess' => TRUE,
+      'file_ingest.bundle_type_for_generation' => 'article',
+      'file_ingest.file_attachment_field' => 'field_attachment',
+      'file_ingest.ingest_directory' => 'pdfs/',
     ];
 
     // Dynamically set
@@ -224,9 +222,10 @@ protected $settingsManager;
    * Custom override to allow sqlite to bypass cleanup (and those pesky executedDdlStatement errors)
    * @return void
    */
-  protected function tearDown(): void {
+  protected function tearDown(): void
+  {
     if (\Drupal::database()->driver() === 'sqlite') {
-        return;
+      return;
     }
 
     // Let the default cleanup run for MySQL/PostgreSQL.
@@ -236,7 +235,8 @@ protected $settingsManager;
   /**
    * Checks to see if the required table exists
    */
-  public function hasMetadataProcessedTable() {
+  public function hasMetadataProcessedTable()
+  {
 
     $table_exists = \Drupal::database()->schema()->tableExists('metadata_hex_processed');
     if ($table_exists) {
@@ -260,7 +260,8 @@ protected $settingsManager;
    * @var string $content_type_id
    * @return void
    */
-  protected function disableRevisionsForContentType($content_type_id = 'article') {
+  protected function disableRevisionsForContentType($content_type_id = 'article')
+  {
     $content_type = \Drupal::entityTypeManager()
       ->getStorage('node_type')
       ->load($content_type_id);
@@ -278,7 +279,8 @@ protected $settingsManager;
    * @var string $content_type
    * @return void
    */
-  protected function cleanContentTypeConfig(string $content_type) {
+  protected function cleanContentTypeConfig(string $content_type)
+  {
     $config = \Drupal::configFactory()->getEditable("node.type.$content_type");
 
     if ($config->get('third_party_settings.node.default_revision') !== NULL) {
@@ -286,33 +288,33 @@ protected $settingsManager;
     }
   }
 
-/**
- * Creates a drupal field for testing
- *
- * @var string $field_name
- * @var string $label
- * @var string $type
- * @var array $fsc_settings
- * @var array $fc_settings
- * @var string $bundle
- *
- * @return void
- */
-  protected function createField($field_name, $label, $type, $fsc_settings=[], $fc_settings = [], $bundle = 'article'){
-       FieldStorageConfig::create([
-        'field_name' => $field_name,
-        'entity_type' => 'node',
-        'type' => $type,
-        'settings' => $fsc_settings
-      ])->save();
+  /**
+   * Creates a drupal field for testing
+   *
+   * @var string $field_name
+   * @var string $label
+   * @var string $type
+   * @var array $fsc_settings
+   * @var array $fc_settings
+   * @var string $bundle
+   *
+   * @return void
+   */
+  protected function createField($field_name, $label, $type, $fsc_settings = [], $fc_settings = [], $bundle = 'article')
+  {
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'node',
+      'type' => $type,
+      'settings' => $fsc_settings
+    ])->save();
 
-      FieldConfig::create([
-        'field_name' => $field_name,
-        'entity_type' => 'node',
-        'bundle' => $bundle,
-        'label' => $label,
-        'settings' => $fc_settings,
-      ])->save();
+    FieldConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => 'node',
+      'bundle' => $bundle,
+      'label' => $label,
+      'settings' => $fc_settings,
+    ])->save();
   }
 }
-

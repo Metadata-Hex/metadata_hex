@@ -48,7 +48,8 @@
         "tecnickcom/tcpdf": "dev-main"
     },
 "scripts": {
-    "phpunit": "PHPUNIT_DISABLE_DEPRECATIONS=1 ./vendor/bin/phpunit --configuration phpunit.unit.xml.dist",
-    "phpkern": "PHPUNIT_DISABLE_DEPRECATIONS=1 ./vendor/bin/phpunit --configuration phpunit.kernel.xml.dist"
+  "phpunit": "PHPUNIT_DISABLE_DEPRECATIONS=1 ./vendor/bin/phpunit --configuration phpunit.unit.xml.dist",
+  "phpkern": "PHPUNIT_DISABLE_DEPRECATIONS=1 ./vendor/bin/phpunit --configuration phpunit.kernel.xml.dist",
+  "test:all": "composer phpunit && composer phpkern"
 }
 }

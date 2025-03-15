@@ -4,6 +4,7 @@ namespace Drupal\metadata_hex\Service;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\metadata_hex\Base\MetadataHexCore;
+
 /**
  * Class SettingsManager
  *
@@ -63,24 +64,33 @@ class SettingsManager extends MetadataHexCore {
    return $this->config->get('extraction_settings.field_mappings') ?? '';
   }
  
-/** */
+/** 
+ * Retrieves the file attachment field
+ * @return array
+*/
   public function getIngestField(): string {
     return $this->config->get('file_ingest.file_attachment_field')??'';
   }
 
-/** */
+/** 
+ * Retrieves the file ingest directory
+ * @return array
+*/
   public function getIngestDirectory(): string {
     return $this->config->get('file_ingest.ingest_directory')??'';
   }
-/** */
+
+  /** 
+ * Retrieves the ingest bundle type
+ * @return array
+*/
   public function getIngestBundleType(): string {
     return $this->config->get('file_ingest.bundle_type_for_generation')??'';
   }
+
   /**
    * Retrieves file ingestion settings.
-   *
    * @return array
-   *   The file ingestion settings.
    */
   protected function getFileIngestSettings(): array {
     return $this->config->get('file_ingest') ?? [];
@@ -88,32 +98,26 @@ class SettingsManager extends MetadataHexCore {
 
   /**
    * Retrieves if we are strict handling
-   * 
    * @return bool
-   *  The node types
    */
   public function getStrictHandling(){
-    return $this->config->get('extraction_settings.strict_handling') ?? $this->DEFAULT_STRICT;
+    return $this->config->get('extraction_settings.strict_handling') ?? self::DEFAULT_STRICT; 
   }
 
   /**
    * Retrieves if we are strict handling
-   * 
    * @return bool
-   *  The node types
    */
   public function getProtectedData(){
-    return $this->config->get('extraction_settings.data_protected') ?? $this->DEFAULT_PROTECT_DATA;
+    return $this->config->get('extraction_settings.data_protected') ?? self::DEFAULT_PROTECT_DATA;
   }
 
   /**
    * Retrieves if we are strict handling
-   * 
    * @return bool
-   *  The node types
    */
   public function getProtectedTitle(){
-    return $this->config->get('extraction_settings.title_protected') ?? $this->DEFAULT_PROTECT_TITLE;
+    return $this->config->get('extraction_settings.title_protected') ?? self::DEFAULT_PROTECT_TITLE;
   }
 
 
@@ -124,7 +128,7 @@ class SettingsManager extends MetadataHexCore {
    *  The node types
    */
   public function getFlattenKeys(){
-    return $this->config->get('extraction_settings.flatten_keys') ??  $this->DEFAULT_FLATTEN;
+    return $this->config->get('extraction_settings.flatten_keys') ??  self::DEFAULT_FLATTEN;
   }
 
   /**

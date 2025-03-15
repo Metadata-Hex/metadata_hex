@@ -2,16 +2,15 @@
 
 namespace Drupal\Tests\metadata_hex\Unit;
 
-use Drupal\metadata_hex\Service\MetadataExtractor;
-use Drupal\metadata_hex\Service\SettingsManager;
-use Drupal\Core\Entity\EntityFieldManagerInterface;
-use Psr\Log\LoggerInterface;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\Config;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\metadata_hex\Service\SettingsManager;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 class MetadataExtractorTest extends TestCase {
 

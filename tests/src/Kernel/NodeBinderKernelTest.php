@@ -14,10 +14,10 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
 
   private $bind;
   private $original;
+
   /**
    * Tests processing a node with a valid PDF file.
    */
-
    public function testNodeBinderWithPdfNode() {
 
     $file = $this->createDrupalFile('test_metadata.pdf', $this->generatePdfWithMetadata(), 'application/pdf');
@@ -49,7 +49,6 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
     $this->bind->init($this->original);
 
     $this->runAssertions(1);
-
   }
 
   /**
@@ -73,7 +72,6 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
     $file = $this->createFile($file);
     $this->bind = new NodeBinder(\Drupal::logger('info'));
     $this->bind->init($file);
-
   }
 
 
@@ -87,10 +85,8 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
     $file = \Drupal\user\Entity\User::load(1);
     $this->bind = new NodeBinder(\Drupal::logger('info'));
     $this->bind->init($file);
-
   }
 
-// maybe set settings incorrectly and confirm etc?
   /**
    * Run Assertions
    */
@@ -99,26 +95,23 @@ class NodeBinderKernelTest extends BaseKernelTestHex {
     $n = $this->bind->getNode();
     $meta = $this->bind->ingestNodeFileMeta();//();
     $meta_raw = [];
+
     array_walk_recursive($meta, function($value, $key) use (&$meta_raw) {
         $meta_raw[$key] = $value;
     });
 
     $this->assertEquals($n->bundle(), 'article', 'Bundle type doesnt match');
+    
     if (!empty($this->original)){
-    $this->assertEquals($n->id(), $this->original->id(), 'Nodes arent the same');
+      $this->assertEquals($n->id(), $this->original->id(), 'Nodes arent the same');
     }
-    $meta = $this->bind->ingestNodeFileMeta();//();
+
+    $meta = $this->bind->ingestNodeFileMeta();
+
     // Assert that meta is an array
     $this->assertIsArray($meta, "Metadata should be an array.");
 
     // Assert that meta has more than 5 entries
     $this->assertGreaterThan($matches, count($meta_raw), "Metadata should contain more than 5 entries.");
-
-    // $files = $this->bind->getFileUris();
-
-    // $this->assertTrue(
-    //     (bool) array_filter($filesuris, fn($uri) => str_contains($uri, 'test_metadata.pdf')),
-    //     "The array does not contain 'test_metadata.pdf' in any form."
-    // );
   }
 }

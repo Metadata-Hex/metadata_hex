@@ -4,19 +4,34 @@ namespace Drupal\metadata_hex\Form;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Config\TypedConfigManagerInterface;
+use Drupal\Core\Database\Database;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Messenger\MessengerInterface;
-use Drupal\metadata_hex\Batch\MetadataBatch;
+use Drupal\file\Entity\File;
+use Drupal\metadata_hex\Handler\FileHandlerInterface;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\metadata_hex\Handler\FileHandlerInterface;
 
 class SettingsForm extends ConfigFormBase {
 
+  /**
+   * Metadata Batch PRocessor
+   * @var MetadataBatchProcessor
+   */
   protected $batchProcessor;
+
+  /**
+   * Metadata Extractor
+   * @var MetadataExtractor
+   */
   protected $metadataExtractor;
+
+  /**
+   * Messenger interface
+   * @var MessengerInterface
+   */
   protected $messenger;
 
   /**
@@ -25,11 +40,12 @@ class SettingsForm extends ConfigFormBase {
    * @return array
    *   A unique list of all supported file extensions.
    */
-  function getAllSupportedExtensions(): array {
+  private function getAllSupportedExtensions(): array {
       $extensions = [];
+      $mime_types = [];
   
       // Get the FileHandler plugin manager.
-      $plugin_manager = \Drupal::service('plugin.manager.metadata_hex_file_handler');
+      $plugin_manager = \Drupal::service('plugin.manager.metadata_hex');
   
       // Load all plugin definitions (registered handlers).
       $definitions = $plugin_manager->getDefinitions();
@@ -41,10 +57,10 @@ class SettingsForm extends ConfigFormBase {
   
           // Merge extensions from this handler.
           $extensions = array_merge($extensions, $plugin->getSupportedExtentions());
+          $mime_types = array_merge($mime_types, $plugin->getSupportedMimeTypes());
       }
   
-      // Ensure unique values.
-      return array_unique($extensions);
+      return ['extensions'=> array_unique($extensions),'mime_types'=> array_unique($mime_types)];
   }
   
   /**
@@ -79,10 +95,6 @@ class SettingsForm extends ConfigFormBase {
   /**
    * Submit handler for processing all selected node types.
    */
-
-  /**
-   * Submit handler for processing all selected node types.
-   */
   public function processAllNodes(array &$form, FormStateInterface $form_state) {
     $config = $this->configFactory->getEditable('metadata_hex.settings');
     $config->set('node_process.bundle_types', $form_state->getValue('bundle_types'));
@@ -109,15 +121,18 @@ class SettingsForm extends ConfigFormBase {
             'init_message' => $this->t('Starting metadata processing...'),
             'progress_message' => $this->t('Processing...'),
             'error_message' => $this->t('Metadata processing encountered an error.'),
-            'finished' => ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'batchFinished'],
-        ];
+            'finished' => ['MetadataBatch', 'batchFinished'],
+          ];
 
         batch_set($batch);
     } else {
         $this->messenger->addWarning($this->t('No node types selected for processing.'));
     }
-  }
 
+    batch_process();
+
+    return $batch;
+  }
 
   /**
    * Scans a directory for files.
@@ -127,12 +142,12 @@ class SettingsForm extends ConfigFormBase {
    */
   public function ingestFiles(string $dir_to_scan)
   {  
-
+    $file_system = \Drupal::service('file_system');
     $files = [];
-    $directory = "public://$dir_to_scan"; // Change this to 'public://' for all public files.
-    $real_path = $this->file_system->realpath($directory);
+    $directory = "public://$dir_to_scan"; 
+    $real_path = $file_system->realpath($directory);
     $root_files = scandir($real_path);
-    $extensions = $this->getAllSupportedExtensions();
+    $extensions = $this->getAllSupportedExtensions()['extensions'] ?? [];
     
     foreach ($root_files as $file) {
       $file_extension = strtolower(pathinfo($file, PATHINFO_EXTENSION));
@@ -144,7 +159,29 @@ class SettingsForm extends ConfigFormBase {
     return $files;
   }
 
-  
+ /**
+   * Retrieve file IDs of orphaned files with specified extensions.
+   *
+   * @return array
+   *   Array of orphaned file IDs.
+   */
+  protected function getOrphanedFiles() {
+    $connection = Database::getConnection();
+    $mime_types = $this->getAllSupportedExtensions()['mime_types'] ?? [];
+
+    // Subquery to get all used file IDs
+$subquery = $connection->select('file_usage', 'fu')
+    ->fields('fu', ['fid']); // This retrieves all file IDs that are referenced
+
+// Main query to get orphaned files
+$query = $connection->select('file_managed', 'f')
+    ->fields('f', ['fid'])
+    ->condition('f.fid', $subquery, 'NOT IN')  // Exclude files that are in use
+    ->condition('f.filemime', $mime_types, 'IN'); // Filter by MIME type
+
+return $query->execute()->fetchCol();
+  }
+
   /**
    * Submit handler for processing all selected node types.
    */
@@ -157,15 +194,37 @@ class SettingsForm extends ConfigFormBase {
     $config->set('file_ingest.ingest_directory', $ingest_dir);
     $config->save();
 
-    //   $ingestDir = $this->settingsManager->getIngestDirectory()??'';
     $files = $this->ingestFiles($ingest_dir);
+    $fids = [];
 
- //   foreach ($files as $file){
+    // Iterate over file URIs and ensure a Drupal file entity exists.
+    foreach ($files as $uri) {
+      $fid = $this->getFidFromUri($uri);
+
+      if ($fid) {
+        $fids[] = $fid;
+      }
+      else {
+        $new_file = File::create([
+          'uri' => $uri,
+          'status' => 1,
+        ]);
+        $new_file->save();
+        $fids[] = $new_file->id();
+      }
+    }
+
+    // Find orphaned files of allowed extensions.
+    $orphaned_fids = $this->getOrphanedFiles();
+
+    // Merge, deduplicate, and return unique file IDs.
+    $batch_fids = array_unique(array_merge($fids, $orphaned_fids));
+
     $operations[] = [
       ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'processFiles'],
-      [$files, true],
+      [$batch_fids, true],
     ];
-//  }
+
     // Define batch
     $batch = [
       'title' => $this->t('Ingesting Files for metadata processing'),
@@ -173,11 +232,31 @@ class SettingsForm extends ConfigFormBase {
       'init_message' => $this->t('Starting file ingestion...'),
       'progress_message' => $this->t('Processing...'),
       'error_message' => $this->t('File ingest or Metadata processing encountered an error.'),
-      'finished' => ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'batchFinished'],
-    ];
+      'finished' => ['MetadataBatch', 'batchFinished'],
+    ]; 
 
     batch_set($batch);
+    batch_process();
+
+    return $batch;
   } 
+
+  /**
+   * Get the fid from a file uri
+   * 
+   * @param mixed $uri
+   * @return int|null
+   */
+  public function getFidFromUri($uri) {
+    $connection = Database::getConnection();
+    $query = $connection->select('file_managed', 'fm')
+      ->fields('fm', ['fid'])
+      ->condition('uri', $uri)
+      ->execute()
+      ->fetchField();
+  
+    return $query ? (int) $query : NULL;
+  }
 
   /**
   * {@inheritdoc}
@@ -277,22 +356,6 @@ class SettingsForm extends ConfigFormBase {
       '#description' => $this->t('Ensure that the node title remains unchanged during processing.'),
     ];
 
-    // $form['extraction_settings']['available_extensions'] = [
-    //   '#type' => 'textarea',
-    //   '#access' => FALSE,
-    //   '#title' => $this->t('Enabled file extensions'),
-    //   '#default_value' => $config->get('extraction_settings.available_extensions') ?? $extensions,
-    //   '#description' => $this->t('Enter allowed file extensions, one per line.'),
-    // ];
-
-    // $form['extraction_settings']['actions']['submit'] = [
-    //   '#type' => 'submit',
-    //   '#value' => $this->t('Save configuration'),
-    //   '#attributes' => [
-    //     'class' => ['button', 'button--primary'],
-    //   ],
-    // ];
-
     $form['node_process'] = [
       '#type' => 'details',
       '#title' => $this->t('Node Bulk Processing'),
@@ -356,7 +419,6 @@ class SettingsForm extends ConfigFormBase {
       '#submit' => ['::processAllFiles'], 
     ];
     
-    
     return $form; 
   }
   
@@ -392,7 +454,6 @@ public function submitForm(array &$form, FormStateInterface $formState) {
     $config->set('extraction_settings.flatten_keys', $formState->getValue('flatten_keys', FALSE));
     $config->set('extraction_settings.data_protected', $formState->getValue('data_protected', FALSE));
     $config->set('extraction_settings.title_protected', $formState->getValue('title_protected', FALSE));
-    $config->set('extraction_settings.available_extensions', $formState->getValue('available_extensions', ''));
 
     $config->set('node_process.bundle_types', $formState->getValue('bundle_types', []));
     $config->set('node_process.allow_reprocess', $formState->getValue('allow_reprocess', FALSE));

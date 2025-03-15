@@ -2,12 +2,10 @@
 
 namespace Drupal\metadata_hex\Service;
 
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\metadata_hex\Base\MetadataHexCore;
 use Drupal\metadata_hex\Model\MetadataEntity;
 use Drupal\metadata_hex\Service\MetadataExtractor;
 use Drupal\metadata_hex\Service\SettingsManager;
-use Exception;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -47,18 +45,25 @@ class MetadataBatchProcessor extends MetadataHexCore
    */
   protected $extractor;
 
+  /**
+   * file system service
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
   protected $file_system;
+
   /**
    * List of file URIs to process.
    *
    * @var array
    */
   protected $files = [];
+
   /**
    * Summary of settingsManager
    * @var SettingsManager
    */
   protected $settingsManager;
+
   /**
    * Constructs the MetadataBatchProcessor class.
    *
@@ -91,25 +96,6 @@ class MetadataBatchProcessor extends MetadataHexCore
     $this->cron = $cron;
     $this->reprocess = $reprocess;
     $this->logger->info('MetadataBatchProcessor initialized with bundle type: ' . $bundleType);
-  }
-
-  /**
-   * Callback function to print batch success messages.
-   *
-   * @param bool $success
-   *   Whether the batch process was successful.
-   * @param array $results
-   *   Processed results.
-   * @param array $failed_operations
-   *   Failed operations.
-   */
-  protected function BatchFinished(bool $success, array $results, array $failed_operations)
-  {
-    if ($success) {
-      $this->logger->info('Batch process completed successfully with ' . count($results) . ' processed files.');
-    } else {
-      $this->logger->error('Batch process failed with errors in ' . count($failed_operations) . ' operations.');
-    }
   }
 
   /**
@@ -148,21 +134,17 @@ class MetadataBatchProcessor extends MetadataHexCore
     return ['processed' => $processed, 'referenced' => $referenced, 'unreferenced' => $unreferenced];
   }
 
-  public function overrideStorage($fs){
-    $this->file_system = $fs;
-  }
-
 
   /**
    * Processes files in a directory.
    * 
-   * @var File $file
+   * @var int $file
    * 
    * @return void
    */
-  public function processFile($file)
-  { 
-    $metadataEntity = new MetadataEntity($this->logger);
+  public static function processFile($file)
+  {
+    $metadataEntity = new MetadataEntity(\Drupal::logger('logger_channel.default'));
     $metadataEntity->initialize($file);
     $metadataEntity->writeMetadata();
   }
@@ -174,14 +156,15 @@ class MetadataBatchProcessor extends MetadataHexCore
    * 
    * @return void
    */
-  public function processFileUri($file_uri)
-  { 
+  public static function processFileUri($file_uri)
+  {
+    $logger = \Drupal::logger('logger_channel.default');
     if (!is_string($file_uri)) {
-      $this->logger->error("Invalid file_url: $file_uri");
+      $logger->error("Invalid file_url: $file_uri");
     }
 
     $file = \Drupal::entityTypeManager()->getStorage('file')->loadByProperties(['uri' => $file_uri]);
-    $metadataEntity = new MetadataEntity($this->logger);
+    $metadataEntity = new MetadataEntity($logger);
     $metadataEntity->initialize($file);
     $metadataEntity->writeMetadata();
   }
@@ -193,24 +176,25 @@ class MetadataBatchProcessor extends MetadataHexCore
    * 
    * @return void
    */
-  public function processFiles(array $fids){
+  public static function processFiles(array $fids)
+  {
 
     // Process the incoming array of fids
-    foreach ($fids as $fid) { 
+    foreach ($fids as $fid) {
       $file = null;
 
       // if the $fid is actuall a file, set file
-      if ($fid instanceof File){
+      if ($fid instanceof File) {
         $file = $fid;
-      } 
+      }
       // treat it like a fid
-      else if(is_string($fid) || is_int($fid)) {
+      else if (is_string($fid) || is_int($fid)) {
         $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
       }
 
       // if there's no file, then we dont proceed
       if (!empty($file)) {
-        $this->processFile($file);
+        self::processFile($file);
       }
     }
   }
@@ -221,14 +205,15 @@ class MetadataBatchProcessor extends MetadataHexCore
    * @param string $nid
    *   The node ID to process.
    */
-  public function processNode(string $nid)
+  public static function processNode(string $nid)
   {
+    $logger = \Drupal::logger('logger_channel.default');
 
     if (!is_numeric($nid) || !$node = \Drupal\node\Entity\Node::load($nid)) {
-      $this->logger->error("Invalid node ID: $nid");
+      $logger->error("Invalid node ID: $nid");
     }
 
-    $metadataEntity = new MetadataEntity($this->logger);
+    $metadataEntity = new MetadataEntity($logger);
     $metadataEntity->initialize($node);
     $metadataEntity->writeMetadata();
   }
@@ -236,15 +221,20 @@ class MetadataBatchProcessor extends MetadataHexCore
   /**
    * Processes all nodes of a specific bundle type.
    */
-  public function processNodes()
+  public static function processNodes()
   {
+    $config = \Drupal::configFactory()->get('metadata_hex.settings');
+    $bundleType = $config->get('node_process.bundle_types');
+    if (!is_array($bundleType)) {
+      $bundleType = [$bundleType];
+    }
     $nids = \Drupal::entityQuery('node')
-      ->condition('type', $this->bundleType)
+      ->condition('type', $bundleType, 'IN')
       ->accessCheck(FALSE)
       ->execute();
 
     foreach ($nids as $nid) {
-      $this->processNode($nid);
+      self::processNode($nid);
     }
   }
 }

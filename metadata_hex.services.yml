@@ -19,9 +19,9 @@ services:
     tags:
       - { name: metadata_hex.file_handler }
 
-  # DOCX File Handler
-  metadata_hex.file_handler.docx:
-    class: Drupal\metadata_hex\Handler\DocxFileHandler
+  # Markdown File Handler
+  metadata_hex.file_handler.md:
+    class: Drupal\metadata_hex\Handler\MdFileHandler
     arguments: ['@logger.channel.default']
     public: true
     tags:
