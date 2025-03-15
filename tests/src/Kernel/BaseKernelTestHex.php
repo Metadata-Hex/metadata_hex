@@ -60,14 +60,14 @@ protected $settingsManager;
     parent::setUp();
 
     $this->enableModules(['metadata_hex']);
-
+    $this->enableModules(['system']);
     // Install required entity schemas.
     $this->installEntitySchema('node');
     $this->installEntitySchema('file');
 
     $this->installSchema('file', ['file_usage']);
         $this->installEntitySchema('user');
-        $this->installSchema('system', ['batch']);  // Required for batch operations
+       // $this->installSchema('batch', ['batch']);  // Required for batch operations
     $this->installConfig(['taxonomy']);
     $this->installEntitySchema('taxonomy_term');
     $this->installEntitySchema('taxonomy_vocabulary');

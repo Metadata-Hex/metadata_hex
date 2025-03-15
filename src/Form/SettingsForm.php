@@ -100,7 +100,7 @@ class SettingsForm extends ConfigFormBase {
         $operations = [];
         foreach ($selectedNodeTypes as $bundleType) {
             $operations[] = [
-                ['MetadataBatchProcessor', 'processNodes'],
+                ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'processNodes'],
                 [$bundleType, $willReprocess],
             ];
         }
@@ -112,13 +112,16 @@ class SettingsForm extends ConfigFormBase {
             'init_message' => $this->t('Starting metadata processing...'),
             'progress_message' => $this->t('Processing...'),
             'error_message' => $this->t('Metadata processing encountered an error.'),
-            'finished' => ['Drupal\metadata_hex\Service\MetadataBatchProcessor', 'batchFinished'],
-        ];
+            'finished' => ['MetadataBatch', 'batchFinished'],
+          ];
 
         batch_set($batch);
     } else {
         $this->messenger->addWarning($this->t('No node types selected for processing.'));
     }
+    batch_process();
+
+    return $batch;
   }
 
 
@@ -248,10 +251,12 @@ return $query->execute()->fetchCol();
       'init_message' => $this->t('Starting file ingestion...'),
       'progress_message' => $this->t('Processing...'),
       'error_message' => $this->t('File ingest or Metadata processing encountered an error.'),
-      'finished' => ['MetadataBatchProcessor', 'batchFinished'],
-    ];
+      'finished' => ['MetadataBatch', 'batchFinished'],
+    ]; //@TODO MAKE SURE TO REMOVE UNEEDED BATCHFINISHED IN METADATABATCHPROCESSOR
 
     batch_set($batch);
+    batch_process();
+    return $batch;
   } 
 
   public function getFidFromUri($uri) {

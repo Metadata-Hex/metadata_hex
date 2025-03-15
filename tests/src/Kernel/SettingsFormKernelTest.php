@@ -11,6 +11,7 @@ use Drupal\metadata_hex\Form\SettingsForm;
 use Symfony\Component\HttpFoundation\Request;
 use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\metadata_hex\Service\MetadataExtractor;
+use Drupal\metadata_hex\Batch\MetadataBatch;
 
 /**
  * Tests backend logic triggered by settings form buttons.
@@ -66,7 +67,7 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
       'bundle_types' => ['article'],
       'allow_reprocess' => TRUE,
       'bundle_type_for_generation' => 'article',
-      'file_attachment_field' => 'field_file_attachment',
+      'file_attachment_field' => 'field_attachment',
       'ingest_directory' => '/',
     ];
     /**
@@ -82,13 +83,14 @@ class SettingsFormKernelTest extends BaseKernelTestHex {
       $this->file_system = $this->container->get('file_system');
       $this->metadataExtractor = new MetadataExtractor(\Drupal::service('logger.channel.default'));
       $this->metadataBatchProcessor = new MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $this->metadataExtractor, $this->file_system);
-
         // Manually instantiate the form with required dependencies.
         $this->form = new SettingsForm($this->configFactory,
         $this->typedConfigManager, // Required by parent
         $this->metadataBatchProcessor,
         $this->metadataExtractor,
         $this->messenger);
+
+        
     }
 
     /**
@@ -158,7 +160,9 @@ $nids = [1, 2, 3, 4, 5];
     $form_state = $this->getMockFormState($this->settings, 'node_process[process_nodes]');
     // Submit the form.
    // $this->form->submitForm($this->settings, $form_state);
-   $this->form->processAllNodes($builtForm, $form_state);
+   $batch = $this->form->processAllNodes($builtForm, $form_state);
+   //echo print_r($batch, TRUE);
+   $this->runBatchAndAssert($batch);
 
    // Assert that the expected logic executed.
    $this->assertTrue(TRUE, 'processAllNodes executed without errors.');
@@ -193,8 +197,13 @@ $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
     $form_state = $this->getMockFormState($this->settings, 'file_ingest[process_cron_nodes]');
     // Submit the form.
     //$form->submitForm($this->settings, $form_state);
-    $this->form->processAllFiles($builtForm, $form_state);
-
+    $batch = $this->form->processAllFiles($builtForm, $form_state);
+    $this->runBatchAndAssert($batch);
+// Manually store the batch
+// \Drupal::service('batch.storage')->set($batch); //Error: Call to undefined method Drupal\Core\ProxyClass\Batch\BatchStorage::set()
+      
+// Run the batch processing
+// batch_process();
     // Assert that the expected logic executed.
     $this->assertTrue(TRUE, 'processAllFiles executed without errors.');
 
@@ -204,16 +213,34 @@ $nids = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 }
 
 /**
+ * runs a batch and assertion on the results
+ */
+private function runBatchAndAssert($batch){
+    // Prepare the batch context manually
+    $context = [];
+    foreach ($batch['operations'] as $operation) {
+        call_user_func_array($operation[0], array_merge($operation[1], [&$context]));
+    }
+
+    // Simulate batch completion
+    MetadataBatch::batchFinished(TRUE, $context['results'] ?? [], $batch['operations']);
+
+    // Retrieve stored batch results for assertion
+    $results = \Drupal::state()->get('metadata_hex.batch_results', []);
+
+    // Assertions
+    $this->assertNotEmpty($results, "Batch process ran successfully.");
+    $this->assertContains('Processed: test_data', $results);
+}
+/**
    *
    */
   public function lookingForCorrectData($nid){
     $this->assertNotEquals('', $nid, 'Nid is empty');
     echo PHP_EOL.$nid.PHP_EOL;
     // Retrieve batch information from session.
-$batch = &$_SESSION['batch'];
 
 // Print or inspect batch structure.
-var_dump($batch);
     $node =  \Drupal::entityTypeManager()->getStorage('node')->load($nid);
 
     // Capture the current details
