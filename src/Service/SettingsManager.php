@@ -31,6 +31,7 @@ class SettingsManager extends MetadataHexCore {
   const DEFAULT_FLATTEN = false;
   const DEFAULT_PROTECT_TITLE = true;
   const DEFAULT_PROTECT_DATA = false;
+  const DEFAULT_ALLOW_REPROCESS = false;
 
   /**
    * Constructs the SettingsManager class.
@@ -129,6 +130,16 @@ class SettingsManager extends MetadataHexCore {
    */
   public function getFlattenKeys(){
     return $this->config->get('extraction_settings.flatten_keys') ??  self::DEFAULT_FLATTEN;
+  }
+
+  /**
+   * Retrieves if we are strict handling
+   * 
+   * @return bool
+   *  The node types
+   */
+  public function getReprocess(){
+    return $this->config->get('node_process.allow_reprocess') ??  self::DEFAULT_FLATTEN;
   }
 
   /**

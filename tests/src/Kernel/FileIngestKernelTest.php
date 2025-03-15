@@ -58,8 +58,6 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     // verify that files not attached to nodes are processed
 
     foreach ($nids as $nid){
-      echo PHP_EOL.$nid.PHP_EOL;
-
       $this->lookingForCorrectData($nid);
     }
   }

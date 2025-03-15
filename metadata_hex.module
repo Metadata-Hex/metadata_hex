@@ -5,17 +5,28 @@ use Drupal\metadata_hex\Service\MetadataBatchProcessor;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\metadata_hex\Service\MetadataExtractor;
 
+
 /**
  * Implements hook_node_insert().
  *
  * Processes newly inserted nodes if they match the configured node types.
  */
-function metadata_hex_node_insert(EntityInterface $node) {
-  // Ensure the entity is a node.
+function metadata_hex_node_insert(EntityInterface $node)
+{
   if ($node->getEntityTypeId() !== 'node') {
     return;
   }
 
+  metadata_hex_process_upsert($node);
+}
+
+/**
+ * Summary of metadata_hex_process_upsert
+ * @param Drupal\Core\Entity\EntityInterface $node
+ * @return void
+ */
+function metadata_hex_process_upsert(EntityInterface $node)
+{
   // Load the configuration settings.
   $settingsManager = new \Drupal\metadata_hex\Service\SettingsManager();
   $allowed_types = $settingsManager->getAllowedNodeTypes();
@@ -25,13 +36,9 @@ function metadata_hex_node_insert(EntityInterface $node) {
     // Process the node using MetadataBatchProcessor. 
     $nodeBinder = new NodeBinder(\Drupal::service('logger.channel.default'));
     $nodeBinder->init($node);
-    $justProcessed = $nodeBinder->getWasNodeJustProcessed();
 
-
-    if ($justProcessed !== null && $justProcessed !== true){
-      $mdex = new Drupal\metadata_hex\Service\MetadataExtractor(\Drupal::service('logger.channel.default'));
-      $mdbp = new Drupal\metadata_hex\Service\MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex);
-      $mdbp->processNode($node->id());
-    }
+    $mdex = new Drupal\metadata_hex\Service\MetadataExtractor(\Drupal::service('logger.channel.default'));
+    $mdbp = new Drupal\metadata_hex\Service\MetadataBatchProcessor(\Drupal::service('logger.channel.default'), $mdex, \Drupal::service('file_system'));
+    $mdbp->processNode($node->id());
   }
 }
