@@ -17,8 +17,6 @@ use Symfony\Component\Yaml\Yaml;
 class MdFileHandler extends FileHandler
 {
 
-
-
   public function getSupportedExtentions(): array
   {
     return ['md'];
@@ -28,6 +26,7 @@ class MdFileHandler extends FileHandler
   {
     return ['text/markdown'];
   }
+
 
   /**
    * Extracts metadata from a DOCX file.
@@ -40,6 +39,7 @@ class MdFileHandler extends FileHandler
    */
   public function extractMetadata(): array
   {
+
     if (!$this->isValidFile()) {
       throw new Exception("Invalid or unreadable file: {$this->fileUri}");
     }

@@ -106,9 +106,9 @@ class FileHandlerManagerTest extends TestCase {
 
       // Assuming FileHandlerManager has a method getHandlerForExtension()
       $this->fhm = $this->createMock(FileHandlerManager::class);
-      $this->fhm->method('getHandlerForExtension')->with('docx')->willReturn($mockHandler);
+      $this->fhm->method('getHandlerForExtension')->with('md')->willReturn($mockHandler);
 
-      $result = $this->fhm->getHandlerForExtension('docx');
+      $result = $this->fhm->getHandlerForExtension('md');
 
       $this->assertInstanceOf(MdFileHandler::class, $result);
   }

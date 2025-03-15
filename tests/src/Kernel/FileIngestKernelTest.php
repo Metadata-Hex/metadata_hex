@@ -50,13 +50,16 @@ class FileIngestKernelTest extends BaseKernelTestHex {
     $fids = $nids = [2,3,4,5];
 
     $this->batchProcessor->processFiles($fids);
-        sleep(1);
+       sleep(1);
 
     // verify that files already attached to nodes are filtered out
     $this->lookingForNoData($node);
 
     // verify that files not attached to nodes are processed
+
     foreach ($nids as $nid){
+      echo PHP_EOL.$nid.PHP_EOL;
+
       $this->lookingForCorrectData($nid);
     }
   }
