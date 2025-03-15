@@ -153,7 +153,7 @@ return $sampleContent;
    *
    * @return \Drupal\file\Entity\File|string The created file entity.
    */
-  public function createDrupalFile(string $filename, string $pdf_content, string $mime_type = 'application/pdf', bool $createFileEntity = true) {
+  public function createDrupalFile(string $filename, string $file_content, string $mime_type = 'application/pdf', bool $createFileEntity = true) {
     // Define Drupal's public file directory
     $directory = 'public://';
     \Drupal::service('file_system')->prepareDirectory($directory, FileSystemInterface::CREATE_DIRECTORY);
@@ -162,7 +162,7 @@ return $sampleContent;
     $file_path = $directory . $filename;
 
     // Write content to the file
-    file_put_contents(\Drupal::service('file_system')->realpath($file_path), $pdf_content);
+    file_put_contents(\Drupal::service('file_system')->realpath($file_path), $file_content);
 
     if ($createFileEntity){
     // Create a file entity
@@ -173,9 +173,10 @@ return $sampleContent;
         'status' => 1,
     ]);
     $file->save();
-
+    
     return $file;
     }
+
     return $file_path;
     }
 

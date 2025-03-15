@@ -68,6 +68,7 @@ class MetadataBatch {
     public static function batchFinished($success, $results, $failed_operations) {
        
        \Drupal::state()->set('metadata_hex.batch_results', $results);
+       \Drupal::state()->set('metadata_hex.batch_failed', $failed_operations);
         if ($success) {
             \Drupal::messenger()->addStatus(t('Metadata processing completed successfully.'));
         } else {

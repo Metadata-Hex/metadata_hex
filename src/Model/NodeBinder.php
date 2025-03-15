@@ -239,7 +239,7 @@ public function getWasNodeJustProcessed(): bool
             $file_uri = $file->getFileUri();
             $file_extension = pathinfo($file_uri, PATHINFO_EXTENSION);
             $handler = $this->fileHandlerManager->getHandlerForExtension($file_extension);
-
+            //echo $file_uri;
             // setup the handler and extract the metadata
             if ($handler !== null) {
               $handler->setFileUri($file_uri);

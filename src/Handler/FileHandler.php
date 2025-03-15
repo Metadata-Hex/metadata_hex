@@ -78,6 +78,9 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    * @return void
    */
   public function setFileUri(string $fileUri) {
+    if (strpos($fileUri, '://') === false) {
+      $fileUri = 'public://' . ltrim($fileUri, '/');
+    }
     $this->fileUri = $fileUri;
     $this->fileType = pathinfo($this->fileUri, PATHINFO_EXTENSION);
   }
