@@ -10,6 +10,9 @@ use Drupal\node\Entity\NodeType;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\taxonomy\Entity\Vocabulary;
 use Drupal\Tests\metadata_hex\Kernel\Traits\TestFileHelperTrait;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityFormBuilder;
 
 /**
  * @abstract
@@ -57,7 +60,9 @@ abstract class BaseKernelTestHex extends KernelTestBase
   protected function setUp(): void
   {
     parent::setUp();
+    $container = new ContainerBuilder();
 
+    \Drupal::setContainer($container);
     $this->enableModules(['metadata_hex']);
     $this->enableModules(['system']);
     // Install required entity schemas.
