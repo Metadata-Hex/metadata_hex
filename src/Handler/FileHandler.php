@@ -3,10 +3,9 @@ namespace Drupal\metadata_hex\Handler;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-use Drupal\Core\Plugin\PluginBase;
+
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\file\Entity\File;
-use Drupal\metadata_hex\Base\MetadataHexCore;
+use Drupal\Core\Plugin\PluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -17,7 +16,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * - Extracting and cleaning data
  * - Ensuring compatibility with Drupal field structures
  */
-abstract class FileHandler extends PluginBase implements FileHandlerInterface, ContainerFactoryPluginInterface {
+abstract class FileHandler extends PluginBase implements FileHandlerInterface, ContainerFactoryPluginInterface
+{
 
   /**
    * Array of IDs from nodes that reference the file.
@@ -46,7 +46,7 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    * @var string
    */
   protected $fileUri;
-  
+
   /**
    * The file system service
    * 
@@ -55,7 +55,7 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    */
   protected $fileSystem;
 
-   /**
+  /**
    * Constructs a FileHandler object.
    *
    * @param array $configuration
@@ -67,7 +67,8 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    * @param \Drupal\Core\File\FileSystemInterface $file_system
    *   The file system service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, $file_system) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, $file_system)
+  {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->fileSystem = $file_system;
   }
@@ -77,7 +78,8 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    * @param string $fileUri
    * @return void
    */
-  public function setFileUri(string $fileUri) {
+  public function setFileUri(string $fileUri)
+  {
     if (strpos($fileUri, '://') === false) {
       $fileUri = 'public://' . ltrim($fileUri, '/');
     }
@@ -94,8 +96,7 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    */
   abstract public function extractMetadata(): array;
 
-  
-/**
+  /**
    * Returns an array of supported file extensions.
    *
    * @return array
@@ -117,21 +118,24 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    * @return string
    *   The file extension.
    */
-  protected function getFileType(): string {
+  protected function getFileType(): string
+  {
     return $this->fileType;
   }
 
   /**
    * Returns the plugin ID.
    */
-  public function getPluginId() {
+  public function getPluginId()
+  {
     return $this->pluginId;
   }
 
   /**
    * Returns the plugin definition.
    */
-  public function getPluginDefinition() {
+  public function getPluginDefinition()
+  {
     return $this->pluginDefinition;
   }
 
@@ -141,7 +145,8 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    * @return array
    *   Array containing file reference information.
    */
-  protected function getFileReferences(): array {
+  protected function getFileReferences(): array
+  {
     $file = \Drupal::entityTypeManager()
       ->getStorage('file')
       ->loadByProperties(['uri' => $this->fileUri]);
@@ -181,14 +186,16 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    * @return bool
    *   TRUE if the file exists and is readable, FALSE otherwise.
    */
-  protected function isValidFile(): bool {
+  protected function isValidFile(): bool
+  {
     return file_exists($this->fileUri) && is_readable($this->fileUri);
   }
 
-   /**
+  /**
    * Factory method for dependency injection.
    */
-  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition)
+  {
     return new static(
       $configuration,
       $plugin_id,
@@ -205,8 +212,9 @@ abstract class FileHandler extends PluginBase implements FileHandlerInterface, C
    *
    * @return mixed
    *   The result of processing.
-   */  
-  public function process($file_path): mixed {
+   */
+  public function process($file_path): mixed
+  {
     return $file_path;
   }
 }

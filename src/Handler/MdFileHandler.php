@@ -4,6 +4,7 @@ namespace Drupal\metadata_hex\Handler;
 
 use Exception;
 use Symfony\Component\Yaml\Yaml;
+
 /**
  * Class MdFileHandler
  *
@@ -13,15 +14,18 @@ use Symfony\Component\Yaml\Yaml;
  * )
  * Handles ingestion and extraction of metadata from DOCX files.
  */
-class MdFileHandler extends FileHandler {
+class MdFileHandler extends FileHandler
+{
 
 
 
-  public function getSupportedExtentions(): array {
+  public function getSupportedExtentions(): array
+  {
     return ['md'];
   }
 
-  public function getSupportedMimeTypes(): array {
+  public function getSupportedMimeTypes(): array
+  {
     return ['text/markdown'];
   }
 
@@ -34,33 +38,31 @@ class MdFileHandler extends FileHandler {
    * @throws \Exception
    *   If the file cannot be loaded or if an error occurs during parsing.
    */
-  public function extractMetadata(): array {
+  public function extractMetadata(): array
+  {
     if (!$this->isValidFile()) {
       throw new Exception("Invalid or unreadable file: {$this->fileUri}");
     }
 
     // Read the file
-
     $content = file_get_contents($this->fileUri);
-    
+
     // Match frontmatter using regex (YAML-style --- at the start)
     if (preg_match('/^---\n(.*?)\n---\n/s', $content, $matches)) {
-        $yamlContent = $matches[1];
-        $markdownBody = preg_replace('/^---\n.*?\n---\n/s', '', $content, 1);
+      $yamlContent = $matches[1];
+      $markdownBody = preg_replace('/^---\n.*?\n---\n/s', '', $content, 1);
 
-        // Parse YAML into an array
-        $frontmatter = yaml::parse($yamlContent) ?: [];
+      // Parse YAML into an array
+      $frontmatter = yaml::parse($yamlContent) ?: [];
     } else {
-        // No frontmatter found, assume only Markdown content
-        $frontmatter = [];
-        $markdownBody = $content;
+      // No frontmatter found, assume only Markdown content
+      $frontmatter = [];
+      $markdownBody = $content;
     }
 
     return [
-        'frontmatter' => $frontmatter,
-        'markdown' => trim($markdownBody),
+      'frontmatter' => $frontmatter,
+      'markdown' => trim($markdownBody),
     ];
   }
-  
-
 }

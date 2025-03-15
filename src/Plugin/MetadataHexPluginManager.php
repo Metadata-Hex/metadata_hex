@@ -5,7 +5,6 @@ namespace Drupal\metadata_hex\Plugin;
 use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
-use Drupal\Core\Plugin\Discovery\AnnotatedClassDiscovery;
 use Traversable;
 
 /**

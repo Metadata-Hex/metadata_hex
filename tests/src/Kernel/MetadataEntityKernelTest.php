@@ -118,7 +118,6 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     );
   }
 
-
   /**
    * Tests processing a node with an invalid file.
    */
@@ -128,9 +127,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = $this->createFile($file);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
     $this->me->loadFromFile($file);
-
   }
-
 
   /**
    * Tests processing a file with an invalid class type.
@@ -142,8 +139,6 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = \Drupal\user\Entity\User::load(1);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
     $this->me->loadFromFile($file);
-
-
   }
 
   /**
@@ -155,9 +150,7 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = $this->createFile($file);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
     $this->me->loadFromNode($file);
-
   }
-
 
   /**
    * Tests processing a node with an invalid class type.
@@ -169,9 +162,8 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $file = \Drupal\user\Entity\User::load(1);
     $this->me = new MetadataEntity(\Drupal::logger('info'));
     $this->me->loadFromNode($file);
-
-
   }
+
     /**
    * Tests processing terms with invalid variable types.
    */
@@ -196,6 +188,4 @@ class MetadataEntityKernelTest extends BaseKernelTestHex {
     $this->me->loadFromFile($file->getFileUri());
     $this->me->writeMetadata();
   }
-
-
 }

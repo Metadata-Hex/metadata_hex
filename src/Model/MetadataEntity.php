@@ -173,18 +173,18 @@ class MetadataEntity extends MetadataHexCore
    *   If the file is invalid.
    */
   public function loadFromFile(string $file_uri)
-  {      
+  {
 
-  $fid = \Drupal::entityQuery('file')
-    ->condition('uri', $file_uri)
-    ->accessCheck(false)
-    ->execute();
+    $fid = \Drupal::entityQuery('file')
+      ->condition('uri', $file_uri)
+      ->accessCheck(false)
+      ->execute();
 
     // Ensure we get the first result (if any)
     $fid = reset($fid);
 
     if ($fid) {
-        $file = File::load($fid);
+      $file = File::load($fid);
     } else {
       // MAKE A NEW FILE
       $file = File::create(['uri' => $file_uri]);
@@ -285,7 +285,7 @@ class MetadataEntity extends MetadataHexCore
       throw new Exception("No valid node found for metadata writing.");
     }
 
-    if (empty($this->metadataMapped)){
+    if (empty($this->metadataMapped)) {
       return;
     }
     // iterates over all matching mapped fields
@@ -352,7 +352,7 @@ class MetadataEntity extends MetadataHexCore
 
           if (array_key_exists($value, $allowed_values) || in_array($value, $allowed_values)) {
             $node->set($field_name, $allowed_values[$value]);
-          $check_value = $node->get($field_name)->value;
+            $check_value = $node->get($field_name)->value;
           } else {
             $this->logger->error("Invalid value '{$value}' for field {$field_name}.");
           }
@@ -364,10 +364,9 @@ class MetadataEntity extends MetadataHexCore
       }
     }
 
-
-      $this->getNodeBinder()->setRevision();
-      $this->getNodeBinder()->setProcessed();
-      $node->save();
+    $this->getNodeBinder()->setRevision();
+    $this->getNodeBinder()->setProcessed();
+    $node->save();
   }
 
   /**
@@ -392,7 +391,8 @@ class MetadataEntity extends MetadataHexCore
    * 
    * @return array
    */
-  public function getMetadata(){
+  public function getMetadata()
+  {
     return ['mapped' => $this->metadataMapped, 'processed' => $this->metadataProcessed, 'raw' => $this->metadataRaw];
 
   }

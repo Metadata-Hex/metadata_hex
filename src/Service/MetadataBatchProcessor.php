@@ -2,12 +2,10 @@
 
 namespace Drupal\metadata_hex\Service;
 
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\metadata_hex\Base\MetadataHexCore;
 use Drupal\metadata_hex\Model\MetadataEntity;
 use Drupal\metadata_hex\Service\MetadataExtractor;
 use Drupal\metadata_hex\Service\SettingsManager;
-use Exception;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -47,18 +45,25 @@ class MetadataBatchProcessor extends MetadataHexCore
    */
   protected $extractor;
 
+  /**
+   * file system service
+   * @var \Drupal\Core\File\FileSystemInterface
+   */
   protected $file_system;
+
   /**
    * List of file URIs to process.
    *
    * @var array
    */
   protected $files = [];
+
   /**
    * Summary of settingsManager
    * @var SettingsManager
    */
   protected $settingsManager;
+
   /**
    * Constructs the MetadataBatchProcessor class.
    *
@@ -92,25 +97,6 @@ class MetadataBatchProcessor extends MetadataHexCore
     $this->reprocess = $reprocess;
     $this->logger->info('MetadataBatchProcessor initialized with bundle type: ' . $bundleType);
   }
-
-  // /**
-  //  * Callback function to print batch success messages.
-  //  *
-  //  * @param bool $success
-  //  *   Whether the batch process was successful.
-  //  * @param array $results
-  //  *   Processed results.
-  //  * @param array $failed_operations
-  //  *   Failed operations.
-  //  */
-  // protected function BatchFinished(bool $success, array $results, array $failed_operations)
-  // {
-  //   if ($success) {
-  //     $this->logger->info('Batch process completed successfully with ' . count($results) . ' processed files.');
-  //   } else {
-  //     $this->logger->error('Batch process failed with errors in ' . count($failed_operations) . ' operations.');
-  //   }
-  // }
 
   /**
    * Sorts files into processed and unprocessed categories.
@@ -148,21 +134,16 @@ class MetadataBatchProcessor extends MetadataHexCore
     return ['processed' => $processed, 'referenced' => $referenced, 'unreferenced' => $unreferenced];
   }
 
-  public function overrideStorage($fs){
-    $this->file_system = $fs;
-  }
-
 
   /**
    * Processes files in a directory.
    * 
-   * @var File $file
+   * @var int $file
    * 
    * @return void
    */
   public static function processFile($file)
-  {  
-
+  {
     $metadataEntity = new MetadataEntity(\Drupal::logger('logger_channel.default'));
     $metadataEntity->initialize($file);
     $metadataEntity->writeMetadata();
@@ -176,7 +157,7 @@ class MetadataBatchProcessor extends MetadataHexCore
    * @return void
    */
   public static function processFileUri($file_uri)
-  { 
+  {
     $logger = \Drupal::logger('logger_channel.default');
     if (!is_string($file_uri)) {
       $logger->error("Invalid file_url: $file_uri");
@@ -195,18 +176,19 @@ class MetadataBatchProcessor extends MetadataHexCore
    * 
    * @return void
    */
-  public static function processFiles(array $fids){
+  public static function processFiles(array $fids)
+  {
 
     // Process the incoming array of fids
-    foreach ($fids as $fid) { 
+    foreach ($fids as $fid) {
       $file = null;
 
       // if the $fid is actuall a file, set file
-      if ($fid instanceof File){
+      if ($fid instanceof File) {
         $file = $fid;
-      } 
+      }
       // treat it like a fid
-      else if(is_string($fid) || is_int($fid)) {
+      else if (is_string($fid) || is_int($fid)) {
         $file = \Drupal::entityTypeManager()->getStorage('file')->load($fid);
       }
 
