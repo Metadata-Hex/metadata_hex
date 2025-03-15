@@ -240,7 +240,7 @@ private function runBatchAndAssert($batch){
    */
   public function lookingForCorrectData($nid){
     $this->assertNotEquals('', $nid, 'Nid is empty');
-    echo PHP_EOL.$nid.PHP_EOL;
+    echo $nid;
     // Retrieve batch information from session.
 
 // Print or inspect batch structure.
@@ -256,25 +256,42 @@ private function runBatchAndAssert($batch){
     foreach ($node->get('field_topics')->referencedEntities() as $term) {
         $term_names[] = $term->label();
     }
+    $subj = $ftype == 'pdf' ? 'PDFs' : 'mds';
+    $ext = $ftype == 'pdf' ? $ftype : 'md';
+
+    if ($ext == 'pdf'){
+      $this->assertNotEquals('', $ftype, 'FileType is blank');
+      $this->assertContains($ftype, ['pdf', 'md'], 'Extracted file_type doesnt match expected');  
+      $this->assertNotEquals('', $fpages, 'Catalog is blank');
+      $this->assertEquals(1, $fpages, 'Extracted catalog doesnt match expected');
+  
+      $this->assertNotEquals('', $fdate, 'Publication date is blank');
+      $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
+  
+
+    } else {
+      $this->assertEquals('', $ftype, 'FileType isnt blank for non-pdf');
+      $this->assertEquals('', $fpages, 'Pages isnt blank for non-pdf');
+      $this->assertEquals('', $fdate, 'Publication date isnt blank for non-pdf');
+    }
+
 
     // ASSERTATIONS
     $this->assertNotEquals('', $fsubj, 'Subject is blank');
-    $this->assertEquals('Testing Metadata in PDFs', $fsubj, 'Extracted subject doesnt match expected');
+    $this->assertEquals('Testing Metadata in '.$subj, $fsubj, 'Extracted subject doesnt match expected');
 
-    $this->assertNotEquals('', $fpages, 'Catalog is blank');
-    $this->assertEquals(1, $fpages, 'Extracted catalog doesnt match expected');
 
-    $this->assertNotEquals('', $fdate, 'Publication date is blank');
-    $this->assertNotFalse(strtotime($fdate), "The publication date is not a valid date timestamp.");
 
-    $this->assertNotEquals('', $ftype, 'FileType is blank');
-    $this->assertEquals('pdf', $ftype, 'Extracted file_type doesnt match expected');
 
     $this->assertNotEquals('', $ftop, 'Topic is blank');
-    $this->assertContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
-    $this->assertContains('TCPDF', $term_names, "The expected taxonomy term name TCPDF is not present.");
-    $this->assertContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
-    $this->assertContains('Metadata', $term_names, "The expected taxonomy term name Metadata is not present.");
+
+    if ($ext == 'pdf'){
+      $this->assertContains('Drupal', $term_names, "The expected taxonomy term name Drupal is not present.");
+      $this->assertContains('TCPDF', $term_names, "The expected taxonomy term name TCPDF is not present.");
+      $this->assertContains('Metadata', $term_names, "The expected taxonomy term name Metadata is not present.");
+      $this->assertContains('Test', $term_names, "The expected taxonomy term name Test is not present.");
+
+    }
 
   }
 
