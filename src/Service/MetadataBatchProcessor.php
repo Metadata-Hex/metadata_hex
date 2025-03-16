@@ -72,12 +72,12 @@ class MetadataBatchProcessor extends MetadataHexCore
    * @param MetadataExtractor $extractor
    *   The metadata extraction service.
    */
-  public function __construct(LoggerInterface $logger, MetadataExtractor $extractor, $file_system)
+  public function __construct(LoggerInterface $logger, MetadataExtractor $extractor, $file_system=null)
   {
     parent::__construct($logger);
     $this->extractor = $extractor;
     $this->settingsManager = new SettingsManager();
-    $this->file_system = $file_system; //\Drupal::service('file_system');
+    $this->file_system = \Drupal::service('file_system');
   }
 
   /**
