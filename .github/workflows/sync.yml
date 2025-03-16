@@ -23,4 +23,4 @@ jobs:
 
       - name: Deploy
         run: |
-          git push git@github.com:your-username/your-repo.git main
+          git push git@git.drupal.org:project/metadata_hex.git main
