@@ -25,4 +25,5 @@ jobs:
       
       - name: Deploy
         run: |
+          git fetch --unshallow
           git push git@git.drupal.org:project/metadata_hex.git main
