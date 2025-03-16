@@ -1,13 +1,21 @@
-name: Mirror to Drupal
-on: [push]
 jobs:
-  push-to-drupal:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Push to Drupal.org
+      - name: Set up SSH
         run: |
-          git remote add origin-d git@git.drupal.org:project/metadata_hex.git
-          git push --mirror origin-d
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+        shell: bash
+
+      - name: Test SSH Connection
+        run: ssh -T git@github.com || exit 1
+
+      - name: Deploy
+        run: |
+          git push git@github.com:your-username/your-repo.git main
