@@ -1,0 +1,13 @@
+name: Mirror to Drupal
+on: [push]
+jobs:
+  push-to-drupal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Push to Drupal.org
+        run: |
+          git remote add drupal git@hgit.drupalcode.org/project/metadata_hex.git
+          git push --mirror drupal
