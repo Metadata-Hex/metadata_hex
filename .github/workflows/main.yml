@@ -9,5 +9,5 @@ jobs:
 
       - name: Push to Drupal.org
         run: |
-          git remote add drupal git@git.drupalcode.org/project/metadata_hex.git
-          git push --mirror drupal
+          git remote add origin-d https://git.drupalcode.org/project/metadata_hex.git
+          git push --mirror origin-d
